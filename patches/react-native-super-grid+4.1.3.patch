@@ -1,0 +1,25 @@
+diff --git a/node_modules/react-native-super-grid/FlatGrid.js b/node_modules/react-native-super-grid/FlatGrid.js
+index 979075a..266757e 100644
+--- a/node_modules/react-native-super-grid/FlatGrid.js
++++ b/node_modules/react-native-super-grid/FlatGrid.js
+@@ -98,6 +98,7 @@ const FlatGrid = memo(
+               >
+                 {renderItem({
+                   item,
++                  itemStyle: containerStyle,
+                   index: rowIndex * itemsPerRow + i,
+                   separators,
+                   rowIndex,
+diff --git a/node_modules/react-native-super-grid/index.d.ts b/node_modules/react-native-super-grid/index.d.ts
+index 59f5d16..314fd12 100644
+--- a/node_modules/react-native-super-grid/index.d.ts
++++ b/node_modules/react-native-super-grid/index.d.ts
+@@ -16,6 +16,8 @@ type Omit<T, K extends keyof any> = Pick<T, Exclude<keyof T, K>>
+ // Grid item info, same as original + rowIndex
+ export type GridRenderItemInfo<ItemT> = ListRenderItemInfo<ItemT> & {
+   rowIndex: number;
++  itemStyle: ViewStyle;
++  
+ }
+ 
+ export type GridRenderItem<ItemT> = (

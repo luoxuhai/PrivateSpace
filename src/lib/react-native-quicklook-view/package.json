@@ -1,0 +1,34 @@
+{
+  "name": "react-native-quicklook-view",
+  "version": "1.0.3",
+  "license": "ISC",
+  "main": "lib/index.js",
+  "author": "Karl Gunst <karl.gunst@geminidsystems.com> (https://github.com/GeminidSystems)",
+  "description": "QuickLook support for react-native applications",
+  "homepage": "https://github.com/GeminidSystems/react-native-quicklook-view",
+  "scripts": {
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GeminidSystems/react-native-quicklook-view.git"
+  },
+  "keywords": [
+    "react-native",
+    "react native",
+    "quicklook",
+    "react-native-quicklook",
+    "react-native-quicklook-view"
+  ],
+  "files": [
+    "ios/",
+    "lib/",
+    "react-native-quicklook-view.podspec"
+  ],
+  "bugs": {
+    "url": "https://github.com/GeminidSystems/react-native-quicklook-view/issues"
+  }
+}

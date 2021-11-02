@@ -1,0 +1,81 @@
+diff --git a/node_modules/rnn-screens/lib/layouts.d.ts b/node_modules/rnn-screens/lib/layouts.d.ts
+index acb1579..dc9fc9b 100644
+--- a/node_modules/rnn-screens/lib/layouts.d.ts
++++ b/node_modules/rnn-screens/lib/layouts.d.ts
+@@ -10,6 +10,7 @@ export declare const Root: (root: Layout) => LayoutRoot;
+ export declare const BottomTabs: (
+   children?: LayoutTabsChildren[] | undefined,
+   options?: Options | undefined,
++  id?: string
+ ) => Layout;
+ export declare const StackMany: (
+   children?: LayoutStackChildren[] | undefined,
+diff --git a/node_modules/rnn-screens/lib/layouts.js b/node_modules/rnn-screens/lib/layouts.js
+index a570679..3673437 100644
+--- a/node_modules/rnn-screens/lib/layouts.js
++++ b/node_modules/rnn-screens/lib/layouts.js
+@@ -1,6 +1,6 @@
+ export const Root = root => ({root});
+-export const BottomTabs = (children, options) => ({
+-  bottomTabs: {children, options},
++export const BottomTabs = (children, options, id) => ({
++  bottomTabs: {id, children, options},
+ });
+ export const StackMany = (children, options) => ({
+   stack: {children, options},
+diff --git a/node_modules/rnn-screens/lib/screens.d.ts b/node_modules/rnn-screens/lib/screens.d.ts
+index 350970e..06bff25 100644
+--- a/node_modules/rnn-screens/lib/screens.d.ts
++++ b/node_modules/rnn-screens/lib/screens.d.ts
+@@ -30,14 +30,16 @@ declare type Provider =
+     ) => React.ComponentType<P>)
+   | ComponentProvider;
+ export declare class Screens<ScreenName extends string = string> {
+-  N: import('react-native-navigation/lib/dist/NavigationDelegate').NavigationDelegate;
++  N: import('react-native-navigation/lib/dist/src/NavigationDelegate').NavigationDelegate;
+   private Screens;
+   private Constants;
+   constructor(screens: ScreenLayouts<ScreenName>, withProviders?: Provider[]);
+   push<T>(cId: string, name: ScreenName, passProps?: T, options?: Options): PVoid;
+   pop(cId: string): PVoid;
+   show<T>(name: ScreenName, passProps?: T, options?: Options): PVoid;
++  dismissModal<T>(name: ScreenName): PVoid;
+   get(name: ScreenName): ScreenLayoutsWithName<ScreenName>[ScreenName];
++  getById(id: string): ScreenLayoutsWithName<ScreenName>[ScreenName];
+   getAll(): ScreenLayoutsWithName<ScreenName>;
+   getConstants(): NavigationConstants;
+   private registerScreens;
+diff --git a/node_modules/rnn-screens/lib/screens.js b/node_modules/rnn-screens/lib/screens.js
+index cdb4ddc..8b732da 100644
+--- a/node_modules/rnn-screens/lib/screens.js
++++ b/node_modules/rnn-screens/lib/screens.js
+@@ -10,9 +10,10 @@ export class Screens {
+   constructor(screens, withProviders = []) {
+     this.Screens = screens;
+     // setting `name` for screens based on provided keys
+-    Object.keys(screens).forEach(key => {
++    Object.keys(screens).forEach((key, index) => {
+       const snKey = key;
+       this.Screens[snKey] = {
++        id:  String(index + 1),
+         ...screens[snKey],
+         name: snKey,
+       };
+@@ -47,10 +48,17 @@ export class Screens {
+       ),
+     );
+   }
++  async dismissModal(name) {
++    const s = omit(this.Screens[name], 'component');
++    this.N.dismissModal(s.id);
++  }
+   // Get methods
+   get(name) {
+     return this.Screens[name];
+   }
++  getById(id) {
++    return Object.values(this.Screens).find(screens => screens.id === id)
++  }
+   getAll() {
+     return this.Screens;
+   }

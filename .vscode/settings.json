@@ -1,0 +1,14 @@
+{
+  "cSpell.words": [
+    "Fundebug",
+    "Ionicons",
+    "pluralrules",
+    "Pressable",
+    "typeorm",
+    "varchar"
+  ],
+  "svg.preview.background": "transparent",
+  "search.exclude": {
+    "**/node_modules": false
+  }
+}
