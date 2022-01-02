@@ -4,6 +4,7 @@ import CodePush, { LocalPackage } from 'react-native-code-push';
 import { stores } from '@/store';
 
 export class DynamicUpdate {
+  static timer?: NodeJS.Timer;
   /**
    * 检查并更新，不会重启应用
    */
@@ -40,6 +41,18 @@ export class DynamicUpdate {
    */
   static checkForUpdate(): void {
     CodePush.checkForUpdate();
+  }
+
+  /**
+   * 定时检查并更新
+   */
+  static timingSync(): void {
+    if (this.timer) {
+      clearInterval(this.timer);
+    }
+    this.timer = setInterval(() => {
+      this.sync();
+    }, 1000 * 60);
   }
 
   /**

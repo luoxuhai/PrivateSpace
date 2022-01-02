@@ -3,6 +3,7 @@ import { AppState, AppStateStatus } from 'react-native';
 
 import { getScreens, ScreenName } from '@/screens';
 import { getDefaultOptions, components } from './options';
+
 import { stores } from '@/store';
 import { initShare } from '@/utils/initShare';
 

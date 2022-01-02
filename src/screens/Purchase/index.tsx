@@ -177,7 +177,7 @@ const PurchaseScreen: NavigationFunctionComponent =
       await LoadingOverlay.show({
         text: {
           visible: true,
-          value: '正在恢复购买',
+          value: '正在恢复',
         },
       });
       const result = await InAppPurchases.getPurchaseHistoryAsync();
@@ -191,6 +191,7 @@ const PurchaseScreen: NavigationFunctionComponent =
         handleDismiss();
       } else {
         user.setPurchaseResults([]);
+        Alert.alert('恢复失败', '无购买记录，请购买');
       }
     }
 

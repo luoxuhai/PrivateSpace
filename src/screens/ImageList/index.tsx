@@ -205,13 +205,7 @@ const ImageList: NavigationFunctionComponent<IImageListProps> = props => {
       services.nav.screens?.N.mergeOptions(props.componentId, {
         topBar: {
           leftButtons: [],
-          rightButtons: [
-            ...rightButtons,
-            {
-              id: 'select',
-              text: t('common:select'),
-            },
-          ],
+          rightButtons,
         },
       });
     }

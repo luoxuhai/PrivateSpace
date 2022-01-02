@@ -66,6 +66,7 @@ export const LoadingOverlay: LoadingOverlayComponent =
                 .alpha(0.7)
                 .css(),
             },
+            props.text?.visible && styles.indicatorWithText,
           ]}>
           <VibrancyView
             style={StyleSheet.absoluteFill}
@@ -108,6 +109,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: 'hidden',
   },
+  indicatorWithText: {
+    width: 120,
+    height: 120,
+  },
   indicatorText: {
     marginTop: 14,
     fontSize: 15,
@@ -133,7 +138,7 @@ LoadingOverlay.show = async (props?: ILoadingOverlayProps) => {
           componentBackgroundColor: 'transparent',
         },
       },
-      passProps: merge(props, defaultProps),
+      passProps: merge(defaultProps, props),
     },
   });
   LoadingOverlay.isOpend = true;

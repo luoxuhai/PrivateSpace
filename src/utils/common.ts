@@ -29,7 +29,7 @@ export async function appUpdateCheck(): PVoid {
   try {
     StatusBar.setNetworkActivityIndicatorVisible(true);
     const res = await axios.get(
-      `https://apps.apple.com/lookup?id=${config.appId}`,
+      `https://itunes.apple.com/cn/lookup?id=${config.appId}`,
     );
 
     if (!res?.data?.results?.[0]) return;

@@ -5,7 +5,6 @@ import {
   Linking,
   StyleSheet,
   Text,
-  Pressable,
   View,
   TouchableOpacity,
 } from 'react-native';
@@ -199,15 +198,12 @@ function SettingsPage(props: NavigationComponentProps) {
               encodeURI(
                 `${config.TXC_FEEDBACK_URL}?os=${platformInfo.os}&osVersion=${
                   platformInfo.version
-                }&
-                clientInfo=${JSON.stringify({
+                }&clientInfo=${JSON.stringify({
                   label: updateMetadata?.label,
-                  packageHash: updateMetadata?.packageHash,
                   installationTime,
-                })}&
-                clientVersion=${Application.nativeApplicationVersion}&
-                netType=${networkType}&
-                customInfo=${JSON.stringify({
+                })}&clientVersion=${
+                  Application.nativeApplicationVersion
+                }&netType=${networkType}&customInfo=${JSON.stringify({
                   modelName: platformInfo.modelName,
                   supportedCpuArchitectures:
                     platformInfo.supportedCpuArchitectures,

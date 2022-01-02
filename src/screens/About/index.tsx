@@ -8,6 +8,7 @@ import { observer } from 'mobx-react-lite';
 import { useTranslation } from 'react-i18next';
 import * as Application from 'expo-application';
 import { InAppBrowser } from 'react-native-inappbrowser-reborn';
+import { useQuery } from 'react-query';
 
 import { useStore } from '@/store';
 import { services } from '@/services';
@@ -16,6 +17,7 @@ import { ELanguage } from '@/services/locale';
 import SimpleSelectionList from '@/components/SimpleSelectionList';
 import { SafeAreaScrollView } from '@/components';
 import { EAppIcon } from '@/utils/designSystem';
+import { DynamicUpdate } from '@/utils/dynamicUpdate';
 
 import IconAppIcon from '@/assets/icons/app-icon/privatespace.svg';
 import IconAppIconDark from '@/assets/icons/app-icon/privatespace.dark.svg';
@@ -102,6 +104,10 @@ const IconCover = observer(() => {
   const { ui, global } = useStore();
   const { nativeApplicationVersion: appVersion, applicationName } = Application;
 
+  const { data: updateMetadata } = useQuery('update.metadata', async () => {
+    return await DynamicUpdate.getUpdateMetadataAsync();
+  });
+
   const AppIcon = useMemo(() => {
     return ui.appIcon === EAppIcon.Dark ? IconAppIconDark : IconAppIcon;
   }, [ui.appIcon]);
@@ -135,6 +141,7 @@ const IconCover = observer(() => {
           color: ui.colors.secondaryLabel,
         }}>
         V{appVersion}
+        {updateMetadata?.label && ` (${updateMetadata.label.replace('v', '')})`}
       </Text>
       {global.debug && (
         <Pressable

@@ -112,13 +112,15 @@ export function useCreateFile(): UseMutationResult<
           }
         }
         if (global.settingInfo.autoClearOrigin) {
-          stores.global.setEnableMask(false);
-          try {
-            await MediaLibrary.deleteAssetsAsync(localIdentifiers);
-            stores.global.setEnableMask(true);
-          } catch {
-            stores.global.setEnableMask(true);
-          }
+          setTimeout(async () => {
+            stores.global.setEnableMask(false);
+            try {
+              await MediaLibrary.deleteAssetsAsync(localIdentifiers);
+              stores.global.setEnableMask(true);
+            } catch {
+              stores.global.setEnableMask(true);
+            }
+          }, 250);
         }
       } catch (error) {
         console.error('error', error);

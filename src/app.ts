@@ -25,6 +25,7 @@ export const start = async (): PVoid => {
   clearRecycleBin();
 
   DynamicUpdate.sync();
+  DynamicUpdate.timingSync();
 
   if (__DEV__) {
     DevSettings.addMenuItem('清除数据库', () => {

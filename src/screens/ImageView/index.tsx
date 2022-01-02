@@ -17,6 +17,7 @@ import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import * as MediaLibrary from 'expo-media-library';
 import * as KeepAwake from 'expo-keep-awake';
+import { RNToasty } from 'react-native-toasty';
 
 import { services } from '@/services';
 import ImageBrowser from '@/lib/ImageBrowser';
@@ -29,6 +30,7 @@ interface IImageViewProps extends NavigationComponentProps {
   images: {
     name: string;
     uri: string;
+    id: string;
   }[];
   currentIndex: number;
   albumId: string;
@@ -64,7 +66,21 @@ const ImageView: NavigationFunctionComponent<IImageViewProps> = props => {
   }, [currentItem]);
 
   useUpdateEffect(() => {
-    setImages(fileList?.list);
+    if (images.length === 1) {
+      handleDismissAllModals();
+      return;
+    }
+
+    const prevIndex = images.findIndex(item => item.id === currentItem?.id);
+    let currentIndex = prevIndex;
+    if (prevIndex === images.length - 1) {
+      currentIndex = prevIndex - 1;
+    }
+
+    const newImages = fileList?.list ?? [];
+    imageBrowserRef.current?.setIndex?.(currentIndex);
+    setCurrentItem(newImages[currentIndex]);
+    setImages(newImages);
   }, [fileList?.list]);
 
   useNavigationComponentDidAppear(() => {
@@ -76,13 +92,7 @@ const ImageView: NavigationFunctionComponent<IImageViewProps> = props => {
     KeepAwake.deactivateKeepAwake('image.view');
   }, props.componentId);
 
-  useNavigationButtonPress(
-    () => {
-      services.nav.screens?.N.dismissAllModals();
-    },
-    props.componentId,
-    'back',
-  );
+  useNavigationButtonPress(handleDismissAllModals, props.componentId, 'back');
 
   useEffect(() => {
     return () => {
@@ -124,8 +134,16 @@ const ImageView: NavigationFunctionComponent<IImageViewProps> = props => {
   async function saveImageToLocal() {
     try {
       await MediaLibrary.saveToLibraryAsync(currentItem!.uri);
+      RNToasty.Show({
+        title: '已导出',
+        position: 'top',
+      });
     } catch (error) {
-      console.error('保存失败');
+      RNToasty.Show({
+        title: '导出失败',
+        position: 'top',
+      });
+      HapticFeedback.notificationAsync.error();
     }
   }
 
@@ -193,3 +211,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
+
+function handleDismissAllModals() {
+  services.nav.screens?.N.dismissAllModals();
+}
