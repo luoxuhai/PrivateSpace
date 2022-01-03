@@ -1,7 +1,6 @@
 import { getRepository, InsertResult, UpdateResult } from 'typeorm/browser';
 import FS from 'react-native-fs';
 import isUUID from 'validator/es/lib/isUUID';
-import fundebug from 'fundebug-reactnative';
 import { Asset } from 'expo-asset';
 
 import { SOURCE_PATH, THUMBNAIL_PATH } from '@/config';
@@ -19,6 +18,7 @@ import FileEntity, {
   FileStatus,
   SourceType,
 } from '@/services/db/file';
+import { stores } from '@/store';
 import {
   IListAlbumRequest,
   IListAlbumResponse,
@@ -28,6 +28,7 @@ import {
   IListFileData,
   IListFileResponse,
   IListFileRequest,
+  ISearchFileRequest,
   IListAlbumData,
   IDeleteResult,
   ICreateFileResponse,
@@ -35,6 +36,7 @@ import {
   IGetFileRequest,
   IDeleteAlbumRequest,
 } from './type';
+import { isNull } from 'lodash';
 
 const defaultCover = Asset.fromModule(
   require('@/assets/images/noimage.png'),
@@ -49,62 +51,12 @@ export async function listAlbum(
       `json_extract(file.extra, '$.is_album') = true AND owner = '${params.owner}'`,
     )
     .orderBy({
-      ctime: 'DESC',
+      mtime: 'DESC',
     })
     .getMany();
 
   for (const [index, album] of albums.entries()) {
-    const fileCount = await getRepository(FileEntity).count({
-      where: {
-        parent_id: album.id,
-        owner: params.owner,
-        status: FileStatus.Normal,
-      },
-    });
-
-    albums[index].file_count = fileCount;
-
-    try {
-      if (album.extra?.cover) {
-        // 封面为图片
-        if (isUUID(album.extra?.cover)) {
-          const thumbnail = getThumbnailPath({
-            sourceId: album.extra?.cover,
-          });
-          albums[index].cover = (await FS.exists(thumbnail))
-            ? thumbnail
-            : (await FS.readDir(join(SOURCE_PATH, album.extra?.cover)))[0].path;
-          // 封面为内置图片
-        } else {
-          albums[index].cover = album.extra?.cover;
-        }
-        // 为设置封面
-      } else {
-        const firstFile = await getFile({
-          where: {
-            parent_id: album.id,
-            status: FileStatus.Normal,
-          },
-          order: {
-            ctime: 'DESC',
-          },
-        });
-        const sourceId = firstFile.data?.extra?.source_id;
-
-        if (sourceId) {
-          albums[index].cover =
-            firstFile.data!.extra!.width! < 400
-              ? getSourcePath(sourceId, firstFile.data?.name)
-              : getThumbnailPath({
-                  sourceId,
-                });
-        } else {
-          albums[index].cover = defaultCover;
-        }
-      }
-    } catch (error) {
-      fundebug.notify('获取相册封面错误', error?.message ?? error);
-    }
+    albums[index] = await getAlbumExtraInfo(album);
   }
 
   return {
@@ -116,15 +68,71 @@ export async function listAlbum(
   };
 }
 
+async function getAlbumExtraInfo(
+  album: FileEntity & { cover: string; file_count: number },
+) {
+  const fileCount = await getRepository(FileEntity).count({
+    where: {
+      parent_id: album.id,
+      status: FileStatus.Normal,
+    },
+  });
+
+  album.file_count = fileCount;
+
+  try {
+    if (album.extra?.cover) {
+      // 封面为图片
+      if (isUUID(album.extra?.cover)) {
+        const thumbnail = getThumbnailPath({
+          sourceId: album.extra?.cover,
+        });
+        album.cover = (await FS.exists(thumbnail))
+          ? thumbnail
+          : (await FS.readDir(join(SOURCE_PATH, album.extra?.cover)))[0].path;
+        // 封面为内置图片
+      } else {
+        album.cover = album.extra?.cover;
+      }
+      // 为设置封面
+    } else {
+      const firstFile = await getFile({
+        where: {
+          parent_id: album.id,
+          status: FileStatus.Normal,
+        },
+        order: {
+          ctime: 'DESC',
+        },
+      });
+      const sourceId = firstFile.data?.extra?.source_id;
+
+      if (sourceId) {
+        album.cover =
+          firstFile.data!.extra!.width! < 400
+            ? getSourcePath(sourceId, firstFile.data?.name)
+            : getThumbnailPath({
+                sourceId,
+              });
+      } else {
+        album.cover = defaultCover;
+      }
+    }
+
+    return album;
+  } catch {}
+}
+
 export async function listFile(
-  params: IListFileRequest,
+  params?: IListFileRequest,
 ): Promise<IListFileResponse> {
-  const { order } = params;
-  delete params.order;
+  const order = params?.order;
+  delete params?.order;
+  const refetchFileListTime = Date.now();
 
   const where = {
-    ...params,
     type: FileType.File,
+    ...params,
   };
   const files = await getRepository<FileEntity & IListFileData>(
     FileEntity,
@@ -140,12 +148,93 @@ export async function listFile(
   });
 
   for (const [index, file] of files.entries()) {
-    const sourceId = file.extra!.source_id!;
+    const sourceId = file.extra?.source_id;
+    if (!sourceId) continue;
     files[index].uri = getSourcePath(sourceId, file.name);
     files[index].thumbnail =
       file.extra!.width! < 400
         ? files[index].uri
         : getThumbnailPath({ sourceId });
+
+    if (getSourceByMime(file.mime!) === SourceType.Video) {
+      files[index].poster = file.thumbnail;
+    }
+  }
+
+  return {
+    code: 0,
+    data: {
+      list: files,
+      total: fileTotal,
+    },
+  };
+}
+
+export async function searchFile(params: ISearchFileRequest) {
+  const { keywords, mime, type, status, owner } = params;
+  delete params.order;
+  delete params.keywords;
+  let sqlStr = '';
+
+  if (keywords) {
+    sqlStr += `(name LIKE "%${keywords ?? ''}%" OR description LIKE "%${
+      keywords ?? ''
+    }%"`;
+
+    if (stores.global.settingInfo.advanced?.smartSearch?.enabled) {
+      sqlStr += ` OR exists (SELECT * FROM json_each(json_extract(file.labels, '$.zh_cn')) WHERE json_each.value LIKE "%${
+        keywords ?? ''
+      }%")`;
+    }
+
+    sqlStr += ')';
+  }
+
+  if (mime) {
+    sqlStr += ` AND mime LIKE "${mime}/%"`;
+  }
+
+  if (type) {
+    sqlStr += ` AND type = ${type}`;
+  }
+
+  if (status) {
+    sqlStr += ` AND status = ${status}`;
+  }
+
+  if (owner) {
+    sqlStr += ` AND owner = "${owner}"`;
+  }
+
+  const files = await getRepository<FileEntity & IListFileData>(
+    FileEntity,
+  ).query(`SELECT * FROM file WHERE ${sqlStr}`);
+
+  const fileTotal = files.length;
+
+  for (const [index, file] of files.entries()) {
+    if (!isNull(file.extra)) {
+      files[index].extra = JSON.parse(file.extra);
+    }
+
+    if (files[index].extra.is_album) {
+      files[index] = {
+        ...files[index],
+        ...(await getAlbumExtraInfo(file)),
+      };
+    }
+
+    const sourceId = file.extra?.source_id;
+    if (!sourceId) continue;
+    files[index].uri = getSourcePath(sourceId, file.name);
+    files[index].thumbnail =
+      file.extra!.width! < 400
+        ? files[index].uri
+        : getThumbnailPath({ sourceId });
+
+    if (getSourceByMime(file.mime!) === SourceType.Video) {
+      files[index].poster = file.thumbnail;
+    }
   }
 
   return {
@@ -201,8 +290,6 @@ export async function createFile(
   const thumbnailPath = join(thumbnailDir, 'default.jpg');
 
   try {
-    console.log('params', params);
-    console.log('await FS.stat(params.uri!)', await FS.stat(params.uri!));
     const imgSize = params.width
       ? { width: params.width, height: params.height }
       : await getImageSize(params.uri!);
@@ -228,7 +315,7 @@ export async function createFile(
       await FS.mkdir(thumbnailDir);
       await FS.moveFile(thumbnail!.path!, thumbnailPath);
     }
-    const ctime = Date.now();
+    const ctime = params.ctime || Date.now();
     const res = await getRepository(FileEntity).insert({
       id: fileId,
       ctime,
@@ -250,7 +337,6 @@ export async function createFile(
 
     return res;
   } catch (error) {
-    console.log(error);
     getRepository(FileEntity).delete({
       id: fileId,
     });

@@ -1,15 +1,23 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, memo } from 'react';
 import { ViewStyle, StyleSheet, Pressable, View, Text } from 'react-native';
 import { observer } from 'mobx-react-lite';
 import FastImage from 'react-native-fast-image';
 import dayjs from 'dayjs';
 import durationPlugin from 'dayjs/plugin/duration';
+import Animated, {
+  FadeOut,
+  FadeIn,
+  SequencedTransition,
+  Layout,
+} from 'react-native-reanimated';
 
 import { IListFileData } from '@/services/api/local/type.d';
 import { useStore, stores } from '@/store';
 import { formatFileSize } from '@/utils';
 
 dayjs.extend(durationPlugin);
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 interface IImageItemProps {
   style?: ViewStyle;
@@ -27,26 +35,29 @@ interface IImageItemBlockProps {
   onLongPress?: (data: IListFileData) => void;
 }
 
-export function ImageItemBlock(props: IImageItemBlockProps): JSX.Element {
-  return (
-    <Pressable
-      style={[styles.blockContainer, props.style]}
-      onPress={() => props.onPress?.(props.index)}
-      onLongPress={() => props.onLongPress?.(props.data)}>
-      <FastImage
-        style={styles.blockImage}
-        source={{
-          uri: props.data.thumbnail,
-        }}
-      />
-      {props.data.extra?.duration && (
-        <Text style={styles.duration}>
-          {dayjs.duration(props.data.extra?.duration).format('mm:ss')}
-        </Text>
-      )}
-    </Pressable>
-  );
-}
+export const ImageItemBlock = memo(
+  (props: IImageItemBlockProps): JSX.Element => {
+    return (
+      <Pressable
+        style={[styles.blockContainer, props.style]}
+        onPress={() => props.onPress?.(props.index)}
+        onLongPress={() => props.onLongPress?.(props.data)}>
+        <FastImage
+          style={styles.blockImage}
+          source={{
+            uri: props.data.thumbnail,
+          }}
+          nativeID={`image.${props.data.id}`}
+        />
+        {props.data.extra?.duration && (
+          <Text style={styles.duration}>
+            {dayjs.duration(props.data.extra?.duration).format('mm:ss')}
+          </Text>
+        )}
+      </Pressable>
+    );
+  },
+);
 
 export const ImageItemLine = observer<IImageItemProps>(props => {
   const { ui } = useStore();

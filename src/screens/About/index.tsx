@@ -9,6 +9,8 @@ import { useTranslation } from 'react-i18next';
 import * as Application from 'expo-application';
 import { InAppBrowser } from 'react-native-inappbrowser-reborn';
 import { useQuery } from 'react-query';
+import Clipboard from '@react-native-clipboard/clipboard';
+import { RNToasty } from 'react-native-toasty';
 
 import { useStore } from '@/store';
 import { services } from '@/services';
@@ -51,10 +53,12 @@ const AboutScreen: NavigationFunctionComponent<
       data: [
         {
           title: t('about:changelog'),
-          onPress: () =>
-            handleOpenBrowserPress({
-              url: `${config.CHANGELOG[webLanguageKey]}`,
-            }),
+          onPress: () => {
+            Linking.openURL(config.APP_URL.cn);
+          },
+          // handleOpenBrowserPress({
+          //   url: `${config.CHANGELOG[webLanguageKey]}`,
+          // }),
         },
         {
           title: t('about:moreApps'),
@@ -80,6 +84,35 @@ const AboutScreen: NavigationFunctionComponent<
             handleOpenBrowserPress({
               url: `${config.USER_AGREEMENT[webLanguageKey]}`,
             }),
+        },
+      ],
+    },
+    {
+      title: '联系我们',
+      data: [
+        {
+          title: 'QQ反馈群',
+          extra: config.qqGroup,
+          onPress: async () => {
+            if (await Linking.canOpenURL('mqq://')) {
+              Linking.openURL(
+                `mqq://card/show_pslcard?src_type=internal&version=1&uin=${config.qqGroup}&key=d6758f2f4dee2c7e73a455f674a888651b0c05e24904f7001cbad20f7f859f82&card_type=group&source=external`,
+              );
+            } else {
+              Clipboard.setString(config.qqGroup);
+              RNToasty.Show({
+                title: '已复制群号',
+                position: 'top',
+              });
+            }
+          },
+        },
+        {
+          title: t('开发者邮箱'),
+          extra: config.email,
+          onPress: () => {
+            Linking.openURL(`mailto:${config.email}`);
+          },
         },
       ],
     },

@@ -20,7 +20,6 @@ import {
 import {
   CameraDeviceFormat,
   CameraRuntimeError,
-  FrameProcessorPerformanceSuggestion,
   PhotoFile,
   sortFormats,
   useCameraDevices,
@@ -42,6 +41,7 @@ import { CaptureButton } from './CaptureButton';
 import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import IonIcon from 'react-native-vector-icons/Ionicons';
 
+import { useStat } from '@/hooks';
 import { services } from '@/services';
 
 const ReanimatedCamera = Reanimated.createAnimatedComponent(Camera);
@@ -83,6 +83,8 @@ export function CameraPage(props: Props): React.ReactElement {
     if (device?.formats == null) return [];
     return device.formats.sort(sortFormats);
   }, [device?.formats]);
+
+  useStat('Camera');
 
   //#region Memos
   const [is60Fps, setIs60Fps] = useState(false);
@@ -182,12 +184,10 @@ export function CameraPage(props: Props): React.ReactElement {
     console.error(error);
   }, []);
   const onInitialized = useCallback(() => {
-    console.log('Camera initialized!');
     setIsCameraInitialized(true);
   }, []);
   const onMediaCaptured = useCallback(
     (media: PhotoFile | VideoFile, type: 'photo' | 'video') => {
-      console.log(`Media captured! ${JSON.stringify(media)}`);
       props.onCapture?.(media, type);
     },
     [props.onCapture],
@@ -248,12 +248,6 @@ export function CameraPage(props: Props): React.ReactElement {
     },
   });
   //#endregion
-
-  if (device != null && format != null) {
-    console.log(format);
-  } else {
-    console.log('re-rendering camera page without active camera');
-  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -392,7 +386,7 @@ CameraPage.open = async ({
             title: '关闭',
           },
         },
-        modalPresentationStyle: OptionsModalPresentationStyle.fullScreen,
+        modalPresentationStyle: OptionsModalPresentationStyle.overFullScreen,
         ...options,
       },
     },

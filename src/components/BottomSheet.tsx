@@ -1,23 +1,10 @@
 import React, {
   forwardRef,
   useImperativeHandle,
-  useMemo,
   useRef,
   useCallback,
-  useEffect,
 } from 'react';
-import {
-  TouchableHighlight,
-  TouchableOpacityProps,
-  OpaqueColorValue,
-  ViewStyle,
-  Pressable,
-  StyleSheet,
-  View,
-  Text,
-} from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import { IconProps } from 'react-native-vector-icons/Icon';
+import { StyleSheet, View, Text } from 'react-native';
 import {
   BottomSheetModal,
   BottomSheetModalProvider,

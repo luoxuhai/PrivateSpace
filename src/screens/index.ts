@@ -20,6 +20,7 @@ import ThemeSettingScreen from './Settings/Theme';
 import AutoLockSettingScreen from './Settings/AutoLock';
 import FakePasswordSettingScreen from './Settings/FakePassword';
 import UrgentSettingScreen from './Settings/Urgent';
+import AdvancedSettingScreen from './Settings/Advanced';
 import PasscodeLockScreen, { EInputType } from './PasscodeLock';
 import RecycleBinScreen from './RecycleBin';
 import RecycleBinSettingScreen from './RecycleBin/Setting';
@@ -29,6 +30,7 @@ import FolderPickerScreen from './FolderPicker';
 import VideoPlayerScreen from './ImageList/VideoPlayer';
 import PurchaseScreen from './Purchase';
 import DeveloperScreen from './About/Developer';
+import DescriptionFormScreen from './ImageView/DescriptionForm';
 
 const t = getI18n().t;
 
@@ -49,6 +51,7 @@ export type ScreenName =
   | 'AutoLockSetting'
   | 'ImageView'
   | 'UrgentSetting'
+  | 'AdvancedSetting'
   | 'RecycleBin'
   | 'RecycleBinSetting'
   | 'AlbumCover'
@@ -56,6 +59,7 @@ export type ScreenName =
   | 'VideoPlayer'
   | 'Purchase'
   | 'Developer'
+  | 'DescriptionForm'
   | 'PasscodeLock';
 
 export const getScreens = (): Screens<ScreenName> =>
@@ -76,6 +80,14 @@ export const getScreens = (): Screens<ScreenName> =>
                 text: t('album:add:title'),
               },
             ],
+            searchBar: {
+              visible: true,
+              hideTopBarOnFocus: true,
+              placeholder: '搜索',
+              cancelText: '取消',
+              hideOnScroll: true,
+              tintColor: stores.ui.themes.primary,
+            },
           },
           bottomTab: {
             text: t('album:navigation.title'),
@@ -301,6 +313,17 @@ export const getScreens = (): Screens<ScreenName> =>
         },
       },
 
+      AdvancedSetting: {
+        component: AdvancedSettingScreen,
+        options: {
+          topBar: {
+            title: {
+              text: '高级功能',
+            },
+          },
+        },
+      },
+
       AlbumCover: {
         id: 'AlbumCover',
         component: AlbumCoverScreen,
@@ -325,7 +348,10 @@ export const getScreens = (): Screens<ScreenName> =>
         options: {
           topBar: {
             title: {
-              fontWeight: '400',
+              component: {
+                id: 'ImageViewTitle',
+                name: 'ImageViewTitle',
+              },
             },
             leftButtons: [
               {
@@ -366,12 +392,39 @@ export const getScreens = (): Screens<ScreenName> =>
         },
       },
 
+      DescriptionForm: {
+        component: DescriptionFormScreen,
+        options: {
+          topBar: {
+            title: {
+              text: '修改描述',
+            },
+            rightButtons: [
+              {
+                id: 'done',
+                text: t('common:done'),
+              },
+            ],
+            leftButtons: [
+              {
+                id: 'cancel',
+                text: t('common:cancel'),
+              },
+            ],
+          },
+        },
+      },
+
       Purchase: {
         component: PurchaseScreen,
         options: {
           topBar: {
             title: {
-              text: '会员',
+              text: '隐私空间高级版',
+            },
+            subtitle: {
+              text: '完整的 隐私空间 功能体验',
+              fontSize: 10,
             },
             leftButtons: [
               {

@@ -1,7 +1,14 @@
-import React, { useRef, useState, useEffect, useMemo } from 'react';
+import React, {
+  useRef,
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+  forwardRef,
+  useImperativeHandle,
+} from 'react';
 import {
   OptionsModalPresentationStyle,
-  OptionsModalTransitionStyle,
   NavigationFunctionComponent,
   NavigationComponentProps,
 } from 'react-native-navigation';
@@ -20,19 +27,24 @@ import { observer } from 'mobx-react-lite';
 import { FlatGrid } from 'react-native-super-grid';
 import { useQuery, useMutation } from 'react-query';
 import { useTranslation, getI18n } from 'react-i18next';
+import {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+} from 'react-native-reanimated';
 
 import { useStore } from '@/store';
 import { platformInfo } from '@/utils';
 import AddButton from './AddButton';
 import { services } from '@/services';
 import { FileStatus } from '@/services/db/file';
-import { useUpdateEffect } from '@/hooks';
+import { useDeepEffect, useUpdateEffect } from '@/hooks';
 import { IListFileData } from '@/services/api/local/type.d';
 import IconCheckmarkCircleFill from '@/assets/icons/checkmark.circle.fill.svg';
 import { ToolbarContainer } from './ToolbarContainer';
 import { ContextMenu } from './ContextMenu';
 import { ImageItemLine, ImageItemBlock } from './ImageItem';
-import { useForceRender } from '@/hooks';
+import { useForceRender, useStat } from '@/hooks';
 import { DataLoadStatus } from '@/components/DataLoadStatus';
 import { FileDetail } from './FileDetail';
 
@@ -56,6 +68,29 @@ const rightButtons = [
   },
 ];
 
+export async function queryImage(albumId, user, album) {
+  let res;
+
+  try {
+    res = await services.api.local.listFile({
+      owner: user.userInfo!.id,
+      parent_id: albumId,
+      status: FileStatus.Normal,
+      order: {
+        [album.photoViewConfig!.sort.field]:
+          album.photoViewConfig?.sort.order === 'desc' ? 'DESC' : 'ASC',
+      },
+    });
+  } catch (error) {
+    console.log(error);
+  }
+
+  return {
+    list: res?.data?.list ?? [],
+    total: res?.data?.total ?? 0,
+  };
+}
+
 export function useDeleteImage(): {
   onDelete: (id: string) => void;
   isLoading: boolean;
@@ -78,14 +113,29 @@ export function useDeleteImage(): {
   };
 }
 
+let refetchFileListTime;
+
 const ImageList: NavigationFunctionComponent<IImageListProps> = props => {
   const { ui, user, album } = useStore();
   const { t } = useTranslation();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isSelectMode, setIsSelectMode] = useState(false);
   const [isSelectAll, setIsSelectAll] = useState(false);
+  const addButtonOpacity = useSharedValue(1);
   const { visible, forceRender } = useForceRender();
-  const fileDetailRef = useRef();
+  const fileDetailRef = useRef(null);
+  const galleryListRef = useRef(null);
+  const imagesRef = useRef<IListFileData[] | undefined>();
+
+  const addButtonStyle = useAnimatedStyle(() => {
+    return {
+      opacity: withTiming(addButtonOpacity.value, {
+        duration: 150,
+      }),
+    };
+  }, []);
+
+  useStat('ImageList');
 
   useNavigationComponentDidDisappear(() => {
     forceRender();
@@ -94,7 +144,15 @@ const ImageList: NavigationFunctionComponent<IImageListProps> = props => {
   useEffect(() => {
     services.nav.screens?.N.updateProps('ImageListMoreButton', {
       albumId: props.albumId,
+      async onDone() {
+        await refetchFileList();
+        galleryListRef.current?.scrollToOffset({
+          animated: false,
+          offset: 0,
+        });
+      },
     });
+
     return () => {
       setIsSelectMode(false);
     };
@@ -104,16 +162,12 @@ const ImageList: NavigationFunctionComponent<IImageListProps> = props => {
     services.nav.screens?.show(
       'ImageView',
       {
-        currentIndex: index,
-        images: fileList?.list,
-        albumId: props.albumId,
+        initialIndex: index,
+        images: imagesRef.current,
+        onRefetch: refetchFileList,
       },
       {
-        layout: {
-          componentBackgroundColor: 'transparent',
-        },
         modalPresentationStyle: OptionsModalPresentationStyle.overFullScreen,
-        modalTransitionStyle: OptionsModalTransitionStyle.crossDissolve,
       },
     );
   }
@@ -137,27 +191,7 @@ const ImageList: NavigationFunctionComponent<IImageListProps> = props => {
     refetch: refetchFileList,
   } = useQuery(
     ['image.list.list.item', props.albumId],
-    async () => {
-      let res;
-      try {
-        res = await services.api.local.listFile({
-          owner: user.userInfo!.id,
-          parent_id: props.albumId,
-          status: FileStatus.Normal,
-          order: {
-            [album.photoViewConfig!.sort.field]:
-              album.photoViewConfig?.sort.order === 'desc' ? 'DESC' : 'ASC',
-          },
-        });
-      } catch (error) {
-        console.log(error);
-      }
-
-      return {
-        list: res?.data?.list ?? [],
-        total: res?.data?.total ?? 0,
-      };
-    },
+    () => queryImage(props.albumId, user, album),
     {
       enabled: true,
     },
@@ -166,6 +200,10 @@ const ImageList: NavigationFunctionComponent<IImageListProps> = props => {
   const { refetch: refetchAlbumList } = useQuery('list.album', {
     enabled: false,
   });
+
+  useDeepEffect(() => {
+    imagesRef.current = fileList?.list;
+  }, [fileList?.list]);
 
   // 没有图片时禁用选择按钮，退出选择模式
   useUpdateEffect(() => {
@@ -292,6 +330,31 @@ const ImageList: NavigationFunctionComponent<IImageListProps> = props => {
     }
   }, [album.photoViewConfig?.view]);
 
+  const renderItem = useCallback(
+    ({ item, itemStyle, index }) => {
+      return visible ? (
+        <ContextMenu
+          item={item}
+          disabled={isSelectMode}
+          albumId={props.albumId}
+          fileDetailRef={fileDetailRef}>
+          <GalleryItem
+            style={[
+              isGalleryView && {
+                height: itemStyle.width,
+              },
+            ]}
+            index={index}
+            data={item}
+            onPress={() => handleImagePress(item, index)}
+          />
+          {isSelectMode && selectedIds?.includes(item.id) && <SelectedMask />}
+        </ContextMenu>
+      ) : null;
+    },
+    [visible, isSelectMode, selectedIds, isGalleryView],
+  );
+
   return (
     <>
       <GalleryList
@@ -301,43 +364,25 @@ const ImageList: NavigationFunctionComponent<IImageListProps> = props => {
             backgroundColor: ui.colors.systemBackground,
           },
         ]}
+        ref={galleryListRef}
         ListEmptyComponent={
           <DataLoadStatus loading={isLoading} text={t('imageList:noData')} />
         }
         itemDimension={isGalleryView ? undefined : 400}
-        spacing={isGalleryView ? undefined : 0}
         data={fileList?.list}
-        renderItem={
-          visible
-            ? ({ item, itemStyle, index }) => {
-                return (
-                  <ContextMenu
-                    item={item}
-                    disabled={isSelectMode}
-                    albumId={props.albumId}
-                    fileDetailRef={fileDetailRef}>
-                    <GalleryItem
-                      style={[
-                        isGalleryView && {
-                          height: itemStyle.width,
-                        },
-                      ]}
-                      index={index}
-                      data={item}
-                      onPress={() => handleImagePress(item, index)}
-                    />
-                    {isSelectMode && selectedIds?.includes(item.id) && (
-                      <SelectedMask />
-                    )}
-                  </ContextMenu>
-                );
-              }
-            : () => <></>
-        }
+        renderItem={renderItem}
+        windowSize={11}
+        onScrollBeginDrag={() => {
+          addButtonOpacity.value = 0.4;
+        }}
+        onMomentumScrollEnd={() => {
+          addButtonOpacity.value = 1;
+        }}
       />
 
       {!isSelectMode && (
         <AddButton
+          style={addButtonStyle}
           albumId={props.albumId}
           onDone={() => {
             refetchFileList();
@@ -421,32 +466,38 @@ interface IGalleryListProps extends FlatListProps<any> {
 /**
  * 画廊视图列表
  */
-export const GalleryList = ({
-  style,
-  data,
-  spacing = 2,
-  itemDimension = 100,
-  renderItem,
-  onLayout,
-  ...rest
-}: IGalleryListProps): JSX.Element => {
-  return (
-    <FlatGrid
-      style={[
-        {
-          marginHorizontal: -spacing,
-        },
-        style,
-      ]}
-      itemDimension={itemDimension}
-      spacing={spacing}
-      data={data}
-      onLayout={onLayout}
-      renderItem={renderItem}
-      {...rest}
-    />
-  );
-};
+export const GalleryList = forwardRef(
+  (
+    {
+      style,
+      data,
+      spacing = 2,
+      itemDimension = 100,
+      renderItem,
+      onLayout,
+      ...rest
+    }: IGalleryListProps,
+    ref,
+  ): JSX.Element => {
+    const flatGridRef = useRef(null);
+
+    useImperativeHandle(ref, () => flatGridRef.current);
+
+    return (
+      <FlatGrid
+        ref={flatGridRef}
+        style={[style]}
+        itemDimension={itemDimension}
+        spacing={spacing}
+        between={false}
+        data={data}
+        onLayout={onLayout}
+        renderItem={renderItem}
+        {...rest}
+      />
+    );
+  },
+);
 
 const styles = StyleSheet.create({
   flatGrid: {

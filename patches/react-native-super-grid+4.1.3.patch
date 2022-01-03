@@ -1,8 +1,16 @@
 diff --git a/node_modules/react-native-super-grid/FlatGrid.js b/node_modules/react-native-super-grid/FlatGrid.js
-index 979075a..266757e 100644
+index 979075a..449321d 100644
 --- a/node_modules/react-native-super-grid/FlatGrid.js
 +++ b/node_modules/react-native-super-grid/FlatGrid.js
-@@ -98,6 +98,7 @@ const FlatGrid = memo(
+@@ -13,6 +13,7 @@ const FlatGrid = memo(
+     const {
+       style,
+       spacing,
++      between,
+       fixed,
+       data,
+       itemDimension,
+@@ -98,6 +99,7 @@ const FlatGrid = memo(
                >
                  {renderItem({
                    item,
@@ -10,8 +18,16 @@ index 979075a..266757e 100644
                    index: rowIndex * itemsPerRow + i,
                    separators,
                    rowIndex,
+@@ -129,6 +131,7 @@ const FlatGrid = memo(
+         spacing,
+         fixedSpacing,
+         fixed,
++        between
+       }),
+       [horizontal, itemDimension, containerDimension, spacing, fixedSpacing, fixed],
+     );
 diff --git a/node_modules/react-native-super-grid/index.d.ts b/node_modules/react-native-super-grid/index.d.ts
-index 59f5d16..314fd12 100644
+index 59f5d16..a7b0620 100644
 --- a/node_modules/react-native-super-grid/index.d.ts
 +++ b/node_modules/react-native-super-grid/index.d.ts
 @@ -16,6 +16,8 @@ type Omit<T, K extends keyof any> = Pick<T, Exclude<keyof T, K>>
@@ -23,3 +39,40 @@ index 59f5d16..314fd12 100644
  }
  
  export type GridRenderItem<ItemT> = (
+@@ -44,6 +46,11 @@ type CommonProps<ItemType> = {
+    */
+   spacing?: number;
+ 
++  /**
++   * Spacing between each item.
++   */
++   between?: boolean;
++
+   /**
+    * Specifies a static width or height for the GridView container.
+    * If your container dimension is known or can be calculated at runtime
+diff --git a/node_modules/react-native-super-grid/utils.js b/node_modules/react-native-super-grid/utils.js
+index faf7ad6..4bd9330 100644
+--- a/node_modules/react-native-super-grid/utils.js
++++ b/node_modules/react-native-super-grid/utils.js
+@@ -47,17 +47,18 @@ function generateStyles({
+   fixed,
+   horizontal,
+   fixedSpacing,
++  between = true
+ }) {
+   let rowStyle = {
+     flexDirection: 'row',
+-    paddingLeft: fixed ? fixedSpacing : spacing,
++    paddingLeft: between ? fixed ? fixedSpacing : spacing : 0,
+     paddingBottom: spacing,
+   };
+ 
+   let containerStyle = {
+     flexDirection: 'column',
+     justifyContent: 'center',
+-    width: fixed ? itemDimension : (containerDimension - spacing),
++    width: fixed ? itemDimension : (containerDimension - (between ?  spacing : 0)),
+     marginRight: fixed ? fixedSpacing : spacing,
+   };
+ 

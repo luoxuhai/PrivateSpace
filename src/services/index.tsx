@@ -7,8 +7,8 @@ import {
 import FS from 'react-native-fs';
 // import { HoldMenuProvider } from '@/lib/context-menu/src';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
-import fundebug from 'fundebug-reactnative';
 
+import { CustomSentry } from '@/utils/customSentry';
 import Navigation from './navigation';
 import { SOURCE_PATH, THUMBNAIL_PATH, TEMP_PATH, STATIC_PATH } from '@/config';
 import DB from './db';
@@ -86,14 +86,13 @@ export const initAlbums = async (): PVoid => {
           is_album: true,
         },
       });
-    } catch (error: any) {
-      console.log('初始化默认相册出错', error);
-      fundebug.notify('初始化默认相册出错', error?.message ?? '');
+    } catch (error) {
+      CustomSentry.captureException(error);
     }
   }
 };
 
-const queryClient = new QueryClient({
+export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       // 重试3次

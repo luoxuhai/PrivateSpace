@@ -1,17 +1,17 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import {
   StyleSheet,
   TouchableOpacity,
   View,
   Text,
   TextStyle,
+  ViewProps,
 } from 'react-native';
 import { observer } from 'mobx-react-lite';
 import { SvgProps } from 'react-native-svg';
 import { useDeviceOrientation } from '@react-native-community/hooks';
 
 import { useStore } from '@/store';
-import { services } from '@/services';
 import { VibrancyView } from '@react-native-community/blur';
 import { platformInfo } from '@/utils';
 
@@ -23,7 +23,7 @@ interface IToolbarItem {
   iconProps?: SvgProps;
 }
 
-interface IToolbarProps {
+interface IToolbarProps extends ViewProps {
   visible: boolean;
   list: IToolbarItem[];
   disabled?: boolean;
@@ -34,18 +34,15 @@ export const Toolbar = observer<IToolbarProps>(
   ({ list, visible = false, disabled = false, ...rest }) => {
     const { ui } = useStore();
     const orientation = useDeviceOrientation();
-    const bottomTabsHeight = useMemo(
-      () => services.nav.screens?.getConstants().bottomTabsHeight ?? 44,
-      [orientation],
-    );
 
-    return visible ? (
+    return (
       <View
         style={[
           styles.container,
+          rest.style,
           {
             borderColor: ui.colors.opaqueSeparator,
-            height: bottomTabsHeight,
+            display: visible ? 'flex' : 'none',
           },
           (platformInfo.isPad || orientation.landscape) && {
             paddingBottom: 20,
@@ -63,6 +60,9 @@ export const Toolbar = observer<IToolbarProps>(
                 platformInfo.isPad || orientation.landscape
                   ? styles.itemRow
                   : styles.item,
+                {
+                  width: `${100 / list.length}%`,
+                },
               ]}
               key={item.key}
               onPress={() => {
@@ -104,7 +104,7 @@ export const Toolbar = observer<IToolbarProps>(
           );
         })}
       </View>
-    ) : null;
+    );
   },
 );
 
@@ -122,13 +122,11 @@ const styles = StyleSheet.create({
   },
   item: {
     alignItems: 'center',
-    width: '25%',
   },
   itemRow: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    width: '25%',
   },
   title: {
     fontSize: 17,

@@ -6,6 +6,8 @@ import {
 import {
   useNavigationButtonPress,
   useNavigationComponentDidAppear,
+  useNavigationSearchBarCancelPress,
+  useNavigationSearchBarUpdate,
 } from 'react-native-navigation-hooks';
 import { VibrancyView } from '@react-native-community/blur';
 import FastImage from 'react-native-fast-image';
@@ -17,28 +19,47 @@ import {
   Text,
   StyleSheet,
   LayoutAnimation,
+  ViewStyle,
 } from 'react-native';
 import { observer } from 'mobx-react-lite';
 import { FlatGrid } from 'react-native-super-grid';
+import baidumobstat from '@/utils/baidumobstat';
 
-import { services } from '@/services';
+import { services, queryClient } from '@/services';
 import { IListAlbumData } from '@/services/api/local/type.d';
 import { appUpdateCheck } from '@/utils';
 import { useStore } from '@/store';
+import { queryImage } from '@/screens/ImageList';
 import Icon from '@/components/Icon';
 import {
   AddAlbumDialog,
   IAddAlbumDialogRef,
 } from '@/components/AddAlbumDialog';
-import { useCreateAlbum } from '@/hooks';
+import { useCreateAlbum, useUpdateEffect } from '@/hooks';
 import { DataLoadStatus } from '@/components/DataLoadStatus';
+import { SearchPanel } from './SearchPanel';
 
 const AlbumScreen: NavigationFunctionComponent<
   NavigationComponentProps
 > = props => {
-  const { ui, user, album, global } = useStore();
+  const { ui, user, album } = useStore();
   const { t } = useTranslation();
   const addAlbumDialogRef = useRef<IAddAlbumDialogRef>();
+  const searchPanelRef = useRef<any>(null);
+
+  useNavigationSearchBarUpdate(e => {
+    if (e.isFocused) {
+      searchPanelRef.current.show();
+      searchPanelRef.current.search(e.text);
+      baidumobstat.onEvent('preview_page_search');
+    } else {
+      searchPanelRef.current.hide();
+    }
+  }, props.componentId);
+
+  useNavigationSearchBarCancelPress(() => {
+    searchPanelRef.current.hide();
+  }, props.componentId);
 
   const {
     isLoading,
@@ -64,6 +85,10 @@ const AlbumScreen: NavigationFunctionComponent<
     refetchAlbumList();
   }, [user.userInfo?.id, album.refetchAlbum]);
 
+  useUpdateEffect(() => {
+    services.nav.startMainScreen();
+  }, [user.userInfo?.id]);
+
   useEffect(() => {
     setTimeout(() => {
       appUpdateCheck();
@@ -86,8 +111,6 @@ const AlbumScreen: NavigationFunctionComponent<
   return (
     <>
       <FlatGrid
-        refreshing={isLoading}
-        onRefresh={refetchAlbumList}
         style={{
           backgroundColor: ui.colors.systemBackground,
         }}
@@ -100,6 +123,11 @@ const AlbumScreen: NavigationFunctionComponent<
         renderItem={({ item }) => (
           <AlbumCard
             data={item}
+            onPressIn={() => {
+              queryClient.prefetchQuery(['image.list.list.item', item.id], () =>
+                queryImage(item.id, user, album),
+              );
+            }}
             onPress={() => {
               services.nav.screens?.push(
                 props.componentId,
@@ -149,6 +177,7 @@ const AlbumScreen: NavigationFunctionComponent<
           refetchAlbumList();
         }}
       />
+      <SearchPanel ref={searchPanelRef} componentId={props.componentId} />
     </>
   );
 };
@@ -158,7 +187,10 @@ export default observer(AlbumScreen);
 interface IAlbumCardProps {
   componentId: string;
   data: IListAlbumData;
+  style?: ViewStyle;
+  footerStyle?: ViewStyle;
   onPress?: () => void;
+  onPressIn?: () => void;
   extraButton?: JSX.Element;
 }
 
@@ -173,7 +205,9 @@ export function AlbumCard(props: IAlbumCardProps) {
           backgroundColor: ui.colors.secondaryFill,
           borderColor: ui.colors.systemGray6,
         },
+        props.style,
       ]}
+      onPressIn={props.onPressIn}
       onPress={props.onPress}>
       <FastImage
         style={albumCardStyles.image}
@@ -181,7 +215,7 @@ export function AlbumCard(props: IAlbumCardProps) {
           uri: props.data.cover,
         }}
       />
-      <View style={albumCardStyles.footer}>
+      <View style={[albumCardStyles.footer, props.footerStyle]}>
         <VibrancyView
           style={albumCardStyles.blurView}
           blurType={ui.appearance === 'dark' ? 'materialDark' : 'materialLight'}

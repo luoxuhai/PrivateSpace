@@ -1,3 +1,4 @@
+/* eslint-disable no-bitwise */
 import { v4 } from 'uuid';
 import {
   Alert,
@@ -39,7 +40,7 @@ export async function appUpdateCheck(): PVoid {
     const { appUpdateIgnore } = stores.global;
     // 存在最新版
     if (
-      latestVersion !== localVersion &&
+      compareVersion(latestVersion, localVersion ?? '') === 1 &&
       latestVersion !== appUpdateIgnore?.version
     ) {
       Alert.alert(`发现新版本(V${latestVersion})`, releaseNotes, [
@@ -218,4 +219,26 @@ export function showDeleteActionSheet({
       }
     },
   );
+}
+
+/**
+ * @returns 0 相等; 1: 大于; 2: 小于
+ */
+export function compareVersion(version1: string, version2: string): number {
+  const arr1 = version1?.split('.');
+  const arr2 = version2?.split('.');
+  //获取最大数组长度
+  const maxLen = arr1.length > arr2.length ? arr1.length : arr2.length;
+
+  for (let i = 0; i < maxLen; i++) {
+    //转换数字
+    const p1 = arr1[i] >> 0 || 0;
+    const p2 = arr2[i] >> 0 || 0;
+    if (p1 > p2) {
+      return 1;
+    } else if (p1 < p2) {
+      return -1;
+    }
+  }
+  return 0;
 }

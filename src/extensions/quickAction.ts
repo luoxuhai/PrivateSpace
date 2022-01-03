@@ -3,13 +3,15 @@ import {
   AppState,
   NativeEventSubscription,
 } from 'react-native';
+import { OptionsModalPresentationStyle } from 'react-native-navigation';
 import Shortcuts, { ShortcutItem } from 'react-native-actions-shortcuts';
 import { getI18n } from 'react-i18next';
 import { RNToasty } from 'react-native-toasty';
-import fundebug from 'fundebug-reactnative';
 
+import { CustomSentry } from '@/utils/customSentry';
 import { services, initAlbums } from '@/services';
 import { stores } from '@/store';
+import { UserRole } from '@/store/user';
 import { HapticFeedback, getDefaultAlbum } from '@/utils';
 import { FileImporter } from '@/screens/ImageList/FileImporter';
 import { transformResult } from '@/screens/ImageList/AddButton';
@@ -18,10 +20,18 @@ const fileImporter = new FileImporter();
 
 const getShortcuts = (): ShortcutItem[] => [
   {
+    type: 'quick.transfer',
+    title: 'WI-FI 互传',
+    shortTitle: '互传',
+    iconType: 'system',
+    iconName: 'wifi',
+  },
+  {
     type: 'quick.capture',
     title: getI18n().t('quickAction:capture.title'),
     shortTitle: getI18n().t('quickAction:capture.shortTitle'),
-    iconName: 'capturePhoto',
+    iconType: 'system',
+    iconName: 'camera',
   },
 ];
 
@@ -31,16 +41,66 @@ export class QuickAction {
 
   constructor() {
     this.shortcutsEmitter = new NativeEventEmitter(Shortcuts as never);
-    this.shortcutsEmitter.addListener('onShortcutItemPressed', () =>
-      this.handleShortcut(),
-    );
+    this.shortcutsEmitter.addListener('onShortcutItemPressed', e => {
+      switch (e.type) {
+        case 'quick.capture':
+          this.handleCameraShortcut();
+          break;
+        case 'quick.transfer':
+          this.handleTransferShortcuts();
+      }
+    });
   }
 
   async init(): PVoid {
     Shortcuts.setShortcuts(getShortcuts());
   }
 
-  handleShortcut(): void {
+  async handleTransferShortcuts(): PVoid {
+    this.removeAppStateListener();
+    this.addAppStateListener();
+
+    if (services.nav.screens?.getConstants()) {
+      this.showTransferModal();
+    } else {
+      const timer = setInterval(() => {
+        if (services.nav.screens?.getConstants()) {
+          clearInterval(timer);
+          this.showTransferModal();
+        }
+      }, 200);
+    }
+  }
+
+  showTransferModal(): void {
+    if (stores.user.userRole !== UserRole.VIP) {
+      services.nav.screens?.show('Purchase');
+      return;
+    }
+
+    services.nav.screens?.show(
+      'Transfer',
+      {},
+      {
+        modalPresentationStyle: OptionsModalPresentationStyle.fullScreen,
+        animations: {
+          showModal: {
+            enabled: false,
+          },
+        },
+        topBar: {
+          rightButtons: [
+            {
+              id: 'cancel',
+              text: '关闭',
+            },
+          ],
+        },
+      },
+    );
+  }
+
+  handleCameraShortcut(): void {
     this.removeAppStateListener();
     this.addAppStateListener();
     if (services.nav.screens?.getConstants()) {
@@ -80,7 +140,7 @@ export class QuickAction {
             });
             stores.album.setRefetchAlbum(stores.album.refetchAlbum + 1);
           } catch (error) {
-            fundebug.notify('快速拍摄导入图片视频出错', error?.message ?? '');
+            CustomSentry.captureException(error);
           }
         },
         () => {
@@ -96,6 +156,14 @@ export class QuickAction {
       state => {
         if (state === 'background') {
           fileImporter.camera().close?.().then(this.removeAppStateListener);
+          services.nav.screens?.dismissModal('Transfer', {
+            animations: {
+              dismissModal: {
+                enabled: false,
+              },
+            },
+          });
+          this.removeAppStateListener();
         }
       },
     );

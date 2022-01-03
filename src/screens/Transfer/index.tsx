@@ -7,6 +7,7 @@ import {
 import {
   useNavigationComponentDidAppear,
   useNavigationComponentDidDisappear,
+  useNavigationButtonPress,
 } from 'react-native-navigation-hooks';
 import { observer } from 'mobx-react-lite';
 import QRCode from 'react-native-qrcode-svg';
@@ -16,8 +17,7 @@ import NetInfo, {
   NetInfoStateType,
   NetInfoSubscription,
 } from '@react-native-community/netinfo';
-import httpServer from 'react-native-http-server';
-import fundebug from 'fundebug-reactnative';
+import { HttpServer } from '@darkce/react-native-webserver';
 
 import { useStore } from '@/store';
 import { FileStatus } from '@/services/db/file';
@@ -36,6 +36,7 @@ import SafeAreaScrollView from '@/components/SafeAreaScrollView';
 import { services } from '@/services';
 import WebClient from './WebClient';
 import { RNToasty } from 'react-native-toasty';
+import { useStat } from '@/hooks';
 
 import IconWifi from '@/assets/icons/wifi.svg';
 import IconWifiSlash from '@/assets/icons/wifi.slash.svg';
@@ -55,6 +56,16 @@ const TransferScreen: NavigationFunctionComponent =
     const [url, setUrl] = useState<string | undefined>();
     const [connectState, setConnectState] = useState<ConnectState>(
       ConnectState.Pending,
+    );
+
+    useStat('Transfer');
+
+    useNavigationButtonPress(
+      () => {
+        services.nav.screens?.dismissModal('Transfer');
+      },
+      props.componentId,
+      'cancel',
     );
 
     useNavigationComponentDidAppear(() => {
@@ -121,15 +132,18 @@ const TransferScreen: NavigationFunctionComponent =
       const ip = await platformInfo.getIpAddressAsync();
       const port = randomNumRange(5000, 60000);
 
-      await httpServer.start(
+      await HttpServer.start(
         port,
         'http_service',
         async (request, response) => {
-          if (request.type === 'OPTIONS') {
+          if (request.method === 'OPTIONS') {
             response.send(200);
           }
           // 获取网站
-          else if (request.type === 'GET' && !request.url.startsWith('/api/')) {
+          else if (
+            request.method === 'GET' &&
+            !request.url.startsWith('/api/')
+          ) {
             let filePath = join(WebClient.path, request.url);
             if (request.url === '/') {
               filePath = join(WebClient.path, 'index.html');
@@ -142,7 +156,7 @@ const TransferScreen: NavigationFunctionComponent =
             response.sendFile(filePath);
           }
           // 获取相册
-          else if (request.type === 'GET' && request.url === '/api/folders') {
+          else if (request.method === 'GET' && request.url === '/api/folders') {
             try {
               const res = await services.api.local.listAlbum({
                 owner: user.userInfo!.id,
@@ -169,7 +183,7 @@ const TransferScreen: NavigationFunctionComponent =
             }
             // 获取文件
           } else if (
-            request.type === 'GET' &&
+            request.method === 'GET' &&
             request.url.startsWith('/api/files')
           ) {
             try {
@@ -214,7 +228,7 @@ const TransferScreen: NavigationFunctionComponent =
             }
             // 上传文件
           } else if (
-            request.type === 'POST' &&
+            request.method === 'POST' &&
             request.url.startsWith('/api/file/upload')
           ) {
             const { file, query } = request;
@@ -222,10 +236,9 @@ const TransferScreen: NavigationFunctionComponent =
               response.send(400);
               return;
             }
-
             const tempPath = join(
               TEMP_PATH,
-              generateID() + extname(file.fileName),
+              generateID() + extname(file.filename),
             );
             await FS.moveFile(file.path, tempPath);
 
@@ -235,19 +248,18 @@ const TransferScreen: NavigationFunctionComponent =
                   {
                     uri: tempPath,
                     mime: file?.mimeType,
-                    name: file?.fileName,
+                    name: file?.filename,
                   },
                   query.folderId,
                 ),
               ]);
               response.send(200);
             } catch (error) {
-              fundebug.notify('保存分享图片视频出错', error?.message ?? '');
               response.send(500);
             }
             // 获取缩略图
           } else if (
-            request.type === 'GET' &&
+            request.method === 'GET' &&
             request.url.startsWith('/api/thumbnail/')
           ) {
             response.sendFile(
@@ -256,7 +268,7 @@ const TransferScreen: NavigationFunctionComponent =
 
             // 下载文件
           } else if (
-            request.type === 'GET' &&
+            request.method === 'GET' &&
             request.url.startsWith('/api/source/')
           ) {
             response.sendFile(request.url.replace('/api/source', SOURCE_PATH));
@@ -271,8 +283,8 @@ const TransferScreen: NavigationFunctionComponent =
       setConnectState(ConnectState.Successful);
     }
 
-    function stopHttpServer() {
-      return httpServer.stop();
+    async function stopHttpServer() {
+      return await HttpServer.stop();
     }
 
     const handleShareUrl = useCallback(() => {

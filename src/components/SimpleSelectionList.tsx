@@ -34,6 +34,7 @@ function SimpleSelectionList(props: ISimpleSelectionList): JSX.Element {
               <CheckList
                 options={selection.data as ICheckListItem<string>[]}
                 defaultValue={selection.defaultValue}
+                value={selection.value}
                 onChange={selection.onChange}
               />
             ) : (

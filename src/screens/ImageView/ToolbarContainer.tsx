@@ -4,7 +4,8 @@ import { observer } from 'mobx-react-lite';
 import { useTranslation, TFunction } from 'react-i18next';
 import { useQuery, useMutation } from 'react-query';
 import RNFS from 'react-native-fs';
-import PhotoEditor from '@baronha/react-native-photo-editor';
+import PhotoEditor from 'react-native-image-editor';
+import { cloneDeep } from 'lodash';
 
 import {
   showDeleteActionSheet,
@@ -14,25 +15,32 @@ import {
 } from '@/utils';
 import { Toolbar } from '../../components/Toolbar';
 import IconTrash from '@/assets/icons/trash.svg';
+import IconMore from '@/assets/icons/ellipsis.circle.svg';
 import IconShare from '@/assets/icons/share.svg';
 import IconInfoCircle from '@/assets/icons/info.circle.svg';
 import IconPencil from '@/assets/icons/square.and.pencil.svg';
 import { useDeleteFile } from '@/hooks';
 import { useStore } from '@/store';
-import { UIStore } from '@/store/ui';
 import FileEntity, { SourceType } from '@/services/db/file';
 import { ICreateFileRequest } from '@/services/api/local/type.d';
 import { services } from '@/services';
 import { FileDetail } from '../ImageList/FileDetail';
+import { MorePopoverMenu } from './MorePopoverMenu';
+import classifyImageProcess from '@/utils/classifyImageProcess';
 
 interface IToolbarContainerProps {
   visible: boolean;
   item?: FileEntity;
-  albumId: string;
+  images: any[];
   onDone?: (type: 'edit' | 'delete') => void;
+  onChange?: (value: any[], index?: number) => void;
+  onRefetch?: () => void;
 }
 
-function getList(t: TFunction<'translation', undefined>, ui: UIStore) {
+function getList(
+  t: TFunction<'translation', undefined>,
+  props: IToolbarContainerProps,
+) {
   return [
     {
       title: t('common:share'),
@@ -53,32 +61,38 @@ function getList(t: TFunction<'translation', undefined>, ui: UIStore) {
       title: t('common:delete'),
       key: 'delete',
       icon: IconTrash,
-      titleStyle: {
-        color: ui.colors.systemRed,
-      },
-      iconProps: {
-        fill: ui.colors.systemRed,
-      },
+    },
+    {
+      title: '更多',
+      key: 'more',
+      icon: iconProps => (
+        <MorePopoverMenu
+          item={props.item}
+          images={props.images}
+          onChange={props.onChange}>
+          <IconMore {...iconProps} />
+        </MorePopoverMenu>
+      ),
     },
   ];
 }
 
 export const ToolbarContainer = observer<IToolbarContainerProps>(props => {
   const { t } = useTranslation();
-  const { ui, global, user } = useStore();
-  const list = useMemo(() => getList(t, ui), [t, ui.colors]);
+  const { global, user } = useStore();
+  const list = useMemo(() => getList(t, props), [t, props]);
   const fileDetailRef = useRef();
 
   const { isLoading, mutateAsync } = useDeleteFile();
   const { mutateAsync: createImages } = useMutation<
-    void,
+    any,
     unknown,
     ICreateFileRequest
   >('image.list.create.image', async file => {
     try {
-      await services.api.local.createFile({
+      return await services.api.local.createFile({
         ...file,
-        parent_id: props.item.parent_id,
+        parent_id: props.item?.parent_id,
         owner: user.userInfo!.id,
       });
     } catch (error) {
@@ -86,12 +100,6 @@ export const ToolbarContainer = observer<IToolbarContainerProps>(props => {
     }
   });
 
-  const { refetch: refetchImageList } = useQuery(
-    ['image.list.list.item', props.albumId],
-    {
-      enabled: false,
-    },
-  );
   const { refetch: refetchAlbumList } = useQuery('list.album', {
     enabled: false,
   });
@@ -108,9 +116,18 @@ export const ToolbarContainer = observer<IToolbarContainerProps>(props => {
                 isMark: global.settingInfo.recycleBin.enabled,
               });
             } catch (error) {}
-            refetchImageList();
+
+            const index = props.images.findIndex(
+              item => item.id === props.item?.id,
+            );
+
+            const pageIndex =
+              index === props.images.length - 1 ? index - 1 : index;
+            props.onChange?.(
+              props.images.filter(item => item.id !== props.item?.id),
+              pageIndex,
+            );
             refetchAlbumList();
-            props.onDone?.('delete');
           },
         });
         break;
@@ -123,19 +140,48 @@ export const ToolbarContainer = observer<IToolbarContainerProps>(props => {
         try {
           const path = await PhotoEditor.open({
             path: `file://${props.item!.uri}`,
-            stickers: [],
+            stickers: Array.from({ length: 26 }, (_, index) =>
+              encodeURI(
+                `https://private-space-storage.oss-cn-beijing.aliyuncs.com/image/stickers/watermark (${
+                  index + 1
+                }).png`,
+              ),
+            ),
           });
 
           const fileInfo = await RNFS.stat(path);
-          await createImages({
+          const res = await createImages({
             name: `IMG_${randomNum(6)}${extname(props.item.name)}`,
             uri: path.replace(/^file:\/\//, ''),
             size: fileInfo.size,
             mime: props.item.mime,
+            ctime: props.item?.ctime,
           });
-          refetchImageList();
+
+          const id = res.generatedMaps?.[0]?.id;
+
+          const resp = await services.api.local.listFile({
+            id,
+          });
+
+          const index = props.images.findIndex(
+            item => item.id === props.item?.id,
+          );
+
+          const newImages = cloneDeep(props.images);
+
+          for (let i = newImages.length; i > index; i--) {
+            if (i === index + 1) {
+              newImages[i] = resp.data.list[0];
+              break;
+            } else {
+              newImages[i] = props.images[i - 1];
+            }
+          }
+
+          props.onChange?.(newImages, index + 1);
           refetchAlbumList();
-          props.onDone?.('edit');
+          classifyImageProcess.start();
         } catch (error) {
           console.error(error);
         }
@@ -146,7 +192,7 @@ export const ToolbarContainer = observer<IToolbarContainerProps>(props => {
   }
 
   const isVideo = useMemo(
-    () => getSourceByMime(props.item.mime!) === SourceType.Video,
+    () => getSourceByMime(props.item?.mime!) === SourceType.Video,
     [props.item?.mime],
   );
 

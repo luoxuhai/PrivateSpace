@@ -13,14 +13,14 @@ interface IVideoPlayerProps extends NavigationComponentProps {
 
 const VideoPlayer = observer<IVideoPlayerProps>(
   (props, ref) => {
-    const videoRef = useRef();
+    const videoRef = useRef<Video>(null);
     const [paused, setPaused] = useState(false);
 
     useNavigationComponentDidDisappear(() => {
       setPaused(true);
     }, props.componentId);
 
-    useImperativeHandle(ref, () => videoRef.current);
+    useImperativeHandle(ref, () => videoRef.current!);
 
     return (
       <Video

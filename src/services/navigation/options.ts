@@ -6,6 +6,7 @@ import BlurMask from '@/components/BlurMask';
 import { LoadingOverlay } from '@/components/LoadingOverlay';
 import { CameraPage } from '@/screens/Camera';
 import { MoreButton } from '@/screens/ImageList/MoreButton';
+import { ImageViewTitle } from '@/screens/ImageView/ImageViewTitle';
 
 export function getDefaultOptions(): Options {
   return {
@@ -67,5 +68,9 @@ export const components = [
   {
     id: 'LoadingOverlay',
     componentProvider: () => LoadingOverlay,
+  },
+  {
+    id: 'ImageViewTitle',
+    componentProvider: () => ImageViewTitle,
   },
 ];

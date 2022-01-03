@@ -21,6 +21,7 @@ interface IContextMenuProps {
   albumId?: string;
   disabled?: boolean;
   children?: React.ReactNode;
+  onDone?: () => void;
 }
 
 const getDefaultOrder = (key: string) => {
@@ -40,12 +41,12 @@ export const MoreButton = observer<IContextMenuProps>(props => {
   const { ui, album } = useStore();
   const popoverRef = useRef();
 
-  const { refetch: refetchFileList } = useQuery(
-    ['image.list.list.item', props.albumId],
-    {
-      enabled: false,
-    },
-  );
+  // const { refetch: refetchFileList } = useQuery(
+  //   ['image.list.list.item', props.albumId],
+  //   {
+  //     enabled: false,
+  //   },
+  // );
 
   const iconProps = useMemo(
     () => ({
@@ -121,7 +122,7 @@ export const MoreButton = observer<IContextMenuProps>(props => {
                 : getDefaultOrder(key),
           },
         });
-        refetchFileList();
+        props.onDone?.();
         break;
       case 'gallery':
       case 'list':
@@ -131,7 +132,6 @@ export const MoreButton = observer<IContextMenuProps>(props => {
         break;
     }
     popoverRef.current?.setVisibility(false);
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   }, []);
 
   const menuConfig = {

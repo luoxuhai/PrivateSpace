@@ -29,14 +29,17 @@ function List(props: IList): JSX.Element {
 
   return (
     <ListContainer style={props.style}>
-      {props.data?.map((item, index) => (
-        <TouchableHighlight
-          key={item.title}
-          underlayColor={colors.systemGray5}
-          onPress={item.onPress}>
-          {renderItem(item, index !== props.data!.length - 1)}
-        </TouchableHighlight>
-      ))}
+      {props.data?.map(
+        (item, index) =>
+          item.renderItem?.() ?? (
+            <TouchableHighlight
+              key={item.title}
+              underlayColor={colors.systemGray5}
+              onPress={item.onPress}>
+              {renderItem(item, index !== props.data!.length - 1)}
+            </TouchableHighlight>
+          ),
+      )}
     </ListContainer>
   );
 }
@@ -72,11 +75,12 @@ export const ListContainer = observer(
 );
 
 export interface IListItem {
-  title: string;
+  title?: string;
   icon?: JSX.Element;
   extra?: ExtraValue;
   onPress?: () => void;
   render?: (() => JSX.Element) | null;
+  renderItem?: (() => JSX.Element) | null;
 }
 
 const renderItem = (item: IListItem, hasBorder: boolean): JSX.Element => {

@@ -1,7 +1,7 @@
 import { unzip } from 'react-native-zip-archive';
 import { downloadFile, unlink, exists, mkdir } from 'react-native-fs';
-import fundebug from 'fundebug-reactnative';
 
+import { CustomSentry } from '@/utils/customSentry';
 import { TEMP_PATH, STATIC_PATH } from '@/config';
 import { join, generateID } from '@/utils';
 
@@ -42,7 +42,7 @@ export default class WebClient {
       this.path = path;
       unlink(TEMP_SAVE_PATH);
     } catch (error) {
-      fundebug.notify('下载互传web客户端错误', error?.message ?? '');
+      CustomSentry.captureException(error);
     }
   }
 

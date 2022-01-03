@@ -120,8 +120,6 @@ function PasswordKeyboard(
     },
   ];
 
-  console.log(width);
-
   return (
     <View
       style={[

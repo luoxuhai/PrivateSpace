@@ -79,7 +79,9 @@ export const PopoverMenu = observer<
                         },
                       ]),
                   ]}>
-                  <View style={styles.menuIcon}>{menu.checkedIcon}</View>
+                  {menu.checkedIcon && (
+                    <View style={styles.menuIcon}>{menu.checkedIcon}</View>
+                  )}
                   <Text
                     style={[
                       styles.menuTitle,

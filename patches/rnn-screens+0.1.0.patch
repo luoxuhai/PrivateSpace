@@ -24,7 +24,7 @@ index a570679..3673437 100644
  export const StackMany = (children, options) => ({
    stack: {children, options},
 diff --git a/node_modules/rnn-screens/lib/screens.d.ts b/node_modules/rnn-screens/lib/screens.d.ts
-index 350970e..06bff25 100644
+index 350970e..1337ad1 100644
 --- a/node_modules/rnn-screens/lib/screens.d.ts
 +++ b/node_modules/rnn-screens/lib/screens.d.ts
 @@ -30,14 +30,16 @@ declare type Provider =
@@ -39,14 +39,14 @@ index 350970e..06bff25 100644
    push<T>(cId: string, name: ScreenName, passProps?: T, options?: Options): PVoid;
    pop(cId: string): PVoid;
    show<T>(name: ScreenName, passProps?: T, options?: Options): PVoid;
-+  dismissModal<T>(name: ScreenName): PVoid;
++  dismissModal<T>(name: ScreenName, options?: Options): PVoid;
    get(name: ScreenName): ScreenLayoutsWithName<ScreenName>[ScreenName];
 +  getById(id: string): ScreenLayoutsWithName<ScreenName>[ScreenName];
    getAll(): ScreenLayoutsWithName<ScreenName>;
    getConstants(): NavigationConstants;
    private registerScreens;
 diff --git a/node_modules/rnn-screens/lib/screens.js b/node_modules/rnn-screens/lib/screens.js
-index cdb4ddc..8b732da 100644
+index cdb4ddc..f50020c 100644
 --- a/node_modules/rnn-screens/lib/screens.js
 +++ b/node_modules/rnn-screens/lib/screens.js
 @@ -10,9 +10,10 @@ export class Screens {
@@ -65,9 +65,9 @@ index cdb4ddc..8b732da 100644
        ),
      );
    }
-+  async dismissModal(name) {
++  async dismissModal(name, options) {
 +    const s = omit(this.Screens[name], 'component');
-+    this.N.dismissModal(s.id);
++    this.N.dismissModal(s.id, options);
 +  }
    // Get methods
    get(name) {

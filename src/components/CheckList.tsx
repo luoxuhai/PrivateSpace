@@ -12,6 +12,7 @@ type CheckValue = string | number;
 export interface ICheckList<T extends CheckValue = CheckValue> {
   options: ICheckListItem<T>[];
   defaultValue?: T;
+  value?: T;
   onChange?: (value: T) => void;
 }
 
@@ -46,9 +47,12 @@ function CheckList(props: ICheckList): JSX.Element {
           HapticFeedback.impactAsync.light();
           setCheckedValue(item.value);
         },
-        render: checkedValue === item.value ? renderIconCheckMark : null,
+        render:
+          (props.value ?? checkedValue) === item.value
+            ? renderIconCheckMark
+            : null,
       })),
-    [props.options, checkedValue],
+    [props.options, checkedValue, props.value],
   );
 
   return <List data={data} />;

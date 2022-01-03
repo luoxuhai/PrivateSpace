@@ -1,5 +1,17 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { View, StyleSheet, StatusBar, ActionSheetIOS } from 'react-native';
+import React, {
+  useEffect,
+  useState,
+  useCallback,
+  useRef,
+  useMemo,
+} from 'react';
+import {
+  View,
+  StyleSheet,
+  StatusBar,
+  ActionSheetIOS,
+  Pressable,
+} from 'react-native';
 import {
   NavigationFunctionComponent,
   NavigationComponentProps,
@@ -12,76 +24,75 @@ import {
   useNavigationComponentDidDisappear,
 } from 'react-native-navigation-hooks';
 import { observer } from 'mobx-react-lite';
-import { useQuery } from 'react-query';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import * as MediaLibrary from 'expo-media-library';
 import * as KeepAwake from 'expo-keep-awake';
 import { RNToasty } from 'react-native-toasty';
+import Animated, {
+  FadeIn,
+  FadeOut,
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+} from 'react-native-reanimated';
 
 import { services } from '@/services';
-import ImageBrowser from '@/lib/ImageBrowser';
+import ImageBrowser, {
+  ImageBrowserInstance,
+  LoadStatus,
+} from '@/components/ImageBrowser';
 import { useStore } from '@/store';
-import { HapticFeedback } from '@/utils';
+import { HapticFeedback, getSourceByMime } from '@/utils';
+import { SourceType } from '@/services/db/file';
 import { useUpdateEffect } from '@/hooks';
 import { ToolbarContainer } from './ToolbarContainer';
+
+import IconPlayCircleFill from '@/assets/icons/play.circle.fill.svg';
+import { isUndefined } from 'lodash';
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
+const iconPlaySize = {
+  width: 60,
+  height: 60,
+};
 
 interface IImageViewProps extends NavigationComponentProps {
   images: {
     name: string;
     uri: string;
     id: string;
+    mime: string;
   }[];
-  currentIndex: number;
-  albumId: string;
+  initialIndex: number;
+  onRefetch?: () => void;
 }
 
 const ImageView: NavigationFunctionComponent<IImageViewProps> = props => {
-  const [images, setImages] = useState(props.images ?? []);
-  const [currentItem, setCurrentItem] = useState(
-    images.find((_, index) => index === props.currentIndex),
-  );
   const [toolbarVisible, setToolbarVisible] = useState(true);
   const { ui } = useStore();
-  const imageBrowserRef = useRef();
   const { t } = useTranslation();
-
-  const { data: fileList } = useQuery(['image.list.list.item', props.albumId], {
-    enabled: false,
-  });
+  const imageBrowserRef = useRef<ImageBrowserInstance>(null);
+  const [index, setIndex] = useState(props.initialIndex ?? 0);
+  const [images, setImages] = useState(props.images ?? []);
+  const currentItem = useMemo(() => images[index], [index, images]);
+  const iconPlayOpacity = useSharedValue(1);
 
   useEffect(() => {
     if (currentItem) {
-      services.nav.screens?.N.mergeOptions(props.componentId, {
-        topBar: {
-          title: {
-            text: currentItem.name,
-          },
-          subtitle: {
-            text: dayjs(currentItem?.ctime).format('MM月DD日 hh:mm'),
-          },
-        },
+      services.nav.screens?.N.updateProps('ImageViewTitle', {
+        title: currentItem.name,
+        subtitle: dayjs(currentItem?.ctime).format('MM月DD日 HH:mm'),
       });
     }
   }, [currentItem]);
 
   useUpdateEffect(() => {
-    if (images.length === 1) {
+    if (images.length === 0) {
       handleDismissAllModals();
-      return;
     }
-
-    const prevIndex = images.findIndex(item => item.id === currentItem?.id);
-    let currentIndex = prevIndex;
-    if (prevIndex === images.length - 1) {
-      currentIndex = prevIndex - 1;
-    }
-
-    const newImages = fileList?.list ?? [];
-    imageBrowserRef.current?.setIndex?.(currentIndex);
-    setCurrentItem(newImages[currentIndex]);
-    setImages(newImages);
-  }, [fileList?.list]);
+  }, [images]);
 
   useNavigationComponentDidAppear(() => {
     mergeOptions();
@@ -102,16 +113,25 @@ const ImageView: NavigationFunctionComponent<IImageViewProps> = props => {
 
   useEffect(() => {
     mergeOptions();
+    StatusBar.setHidden(!toolbarVisible);
   }, [toolbarVisible]);
+
+  const iconPlayStyle = useAnimatedStyle(() => {
+    return {
+      opacity: withTiming(iconPlayOpacity.value, {
+        duration: 150,
+      }),
+    };
+  }, []);
 
   function mergeOptions() {
     services.nav.screens?.N.mergeOptions(props.componentId, {
       topBar: {
         visible: toolbarVisible,
+        animate: false,
         background: {
           translucent: true,
         },
-        animate: false,
       },
     });
   }
@@ -163,6 +183,10 @@ const ImageView: NavigationFunctionComponent<IImageViewProps> = props => {
     );
   }
 
+  function handleDismissAllModals() {
+    services.nav.screens?.dismissModal('ImageView');
+  }
+
   const handlePress = useCallback(() => {
     setToolbarVisible(visible => {
       StatusBar.setHidden(visible);
@@ -171,34 +195,62 @@ const ImageView: NavigationFunctionComponent<IImageViewProps> = props => {
   }, [toolbarVisible]);
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} nativeID="container">
       <ImageBrowser
-        ref={imageBrowserRef}
-        images={images}
-        imageIndex={props.currentIndex}
-        visible={true}
-        swipeToCloseEnabled={false}
-        containerStyle={{
+        style={{
           backgroundColor:
             !toolbarVisible || ui.appearance === 'dark'
               ? ui.colors.black
               : ui.colors.white,
         }}
-        onImageExtraPress={showVideo}
-        onLongPress={handleLongPress}
-        onPress={handlePress}
-        onDoublePress={() => {
-          StatusBar.setHidden(true);
-          setToolbarVisible(false);
+        ref={imageBrowserRef}
+        images={images}
+        initialIndex={index}
+        renderExtraElements={({ index: i, loadStatus }) => {
+          return getSourceByMime(images[i].mime) === SourceType.Video &&
+            loadStatus === LoadStatus.Succeeded ? (
+            <AnimatedPressable
+              style={[
+                styles.imageExtra,
+                iconPlayStyle,
+                {
+                  backgroundColor: ui.colors.tabBar,
+                },
+              ]}
+              entering={FadeIn}
+              exiting={FadeOut}
+              onPress={showVideo}>
+              <IconPlayCircleFill {...iconPlaySize} fill={ui.colors.white} />
+            </AnimatedPressable>
+          ) : null;
         }}
-        onImageIndexChange={index => {
-          setCurrentItem(images?.[index]);
+        keyExtractor={item => item.uri}
+        onPress={handlePress}
+        onLongPress={handleLongPress}
+        onPageChanged={setIndex}
+        onScrollBeginDrag={() => {
+          iconPlayOpacity.value = 0;
+        }}
+        onScrollEndDrag={event => {
+          iconPlayOpacity.value = 1;
+          if (event.nativeEvent.zoomScale > 1) {
+            setToolbarVisible(false);
+          }
         }}
       />
       <ToolbarContainer
         visible={toolbarVisible}
         item={currentItem}
-        albumId={props.albumId}
+        images={images}
+        onChange={(value, i) => {
+          setImages(value);
+          props.onRefetch?.();
+          if (!isUndefined(i)) {
+            setTimeout(() => {
+              imageBrowserRef.current?.setPage(i, false);
+            });
+          }
+        }}
       />
     </View>
   );
@@ -209,6 +261,20 @@ export default observer(ImageView);
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  imageExtra: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: iconPlaySize.width / 2,
+    position: 'absolute',
+    overflow: 'hidden',
+    opacity: 0.95,
+    top: '50%',
+    left: '50%',
+    transform: [
+      { translateX: -iconPlaySize.width / 2 },
+      { translateY: -iconPlaySize.height / 2 },
+    ],
   },
 });
 

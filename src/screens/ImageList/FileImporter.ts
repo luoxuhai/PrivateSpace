@@ -107,7 +107,7 @@ export class FileImporter implements IFileImporter {
           const res = await DocumentPicker.pick({
             type: [DocumentPicker.types.images, DocumentPicker.types.video],
             allowMultiSelection: true,
-            presentationStyle: 'fullScreen',
+            presentationStyle: 'overFullScreen',
             ...options,
           });
 

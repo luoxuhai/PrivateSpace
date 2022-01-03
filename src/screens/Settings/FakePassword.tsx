@@ -9,10 +9,12 @@ import List, { IListItem } from '@/components/List';
 import { SafeAreaScrollView } from '@/components';
 import PasscodeLock, { EInputType } from '@/screens/PasscodeLock';
 import { EUserType } from '@/services/db/user';
+import { useStat } from '@/hooks';
 
 function FakePasswordSettingScreen(): JSX.Element {
   const { ui, global, user } = useStore();
   const { t } = useTranslation();
+  useStat('FakePasswordSetting');
 
   const list: IListItem[] = [
     {

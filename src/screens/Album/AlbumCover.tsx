@@ -8,7 +8,7 @@ import { observer } from 'mobx-react-lite';
 import { useNavigationButtonPress } from 'react-native-navigation-hooks';
 import SegmentedControl from '@react-native-segmented-control/segmented-control';
 import { useMutation, useQuery } from 'react-query';
-import PagerView from 'react-native-pager-view';
+import { PagerView } from 'react-native-pager-view';
 import chroma from 'chroma-js';
 import { Asset } from 'expo-asset';
 
@@ -76,7 +76,6 @@ const AlbumCover: NavigationFunctionComponent<IAlbumCoverProps> = props => {
   const [selectedCoverId, setSelectedCoverId] = useState<string | undefined>(
     props.album.extra?.cover,
   );
-  const [toastVisible, setToastVisivle] = useState<boolean>(false);
   const { topBarHeight } = services.nav.screens?.getConstants();
   const pagerViewRef = useRef<{
     setPage: (index: number) => void;
@@ -159,6 +158,8 @@ const AlbumCover: NavigationFunctionComponent<IAlbumCoverProps> = props => {
       <PagerView
         style={styles.pagerView}
         ref={pagerViewRef}
+        pageMargin={20}
+        overdrag
         initialPage={0}
         onPageSelected={e => {
           setSelectedIndex(e.nativeEvent.position);

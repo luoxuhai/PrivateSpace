@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { TextInput, Image, StyleSheet, View } from 'react-native';
 import {
   NavigationFunctionComponent,
@@ -7,6 +7,7 @@ import {
 import { observer } from 'mobx-react-lite';
 import { useNavigationButtonPress } from 'react-native-navigation-hooks';
 import { useMutation, useQuery } from 'react-query';
+import baidumobstat from 'react-native-baidumobstat';
 
 import { debounce } from 'lodash';
 import { services } from '@/services';
@@ -27,6 +28,10 @@ const AlbumSettingModal: NavigationFunctionComponent<
   IAlbumSettingModalProps
 > = props => {
   const { ui, global } = useStore();
+
+  useEffect(() => {
+    baidumobstat.onEvent('preview_page_album_setting', '事件1');
+  }, []);
 
   const { refetch: refetchAlbumList, data: albumResult } = useQuery(
     'list.album',

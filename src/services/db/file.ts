@@ -1,4 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm/browser';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  Index,
+  VersionColumn,
+} from 'typeorm/browser';
 
 /**
  * 资源类型
@@ -30,12 +36,14 @@ export default class File {
   @PrimaryGeneratedColumn('uuid')
   id?: string;
 
+  @Index()
   @Column('varchar', { nullable: true })
   parent_id?: string;
 
   @Column('varchar')
   owner!: string;
 
+  @Index()
   @Column('varchar')
   name!: string;
 
@@ -62,6 +70,15 @@ export default class File {
 
   @Column('int')
   mtime!: number;
+
+  @Column('simple-json', { nullable: true, comment: '系统标签' })
+  labels?: FileLabel;
+
+  @Column('text', { nullable: true, comment: '描述' })
+  description?: string;
+
+  @VersionColumn({ default: 0 })
+  version?: number;
 
   @Column('simple-json', { nullable: true })
   extra?: FileExtra;

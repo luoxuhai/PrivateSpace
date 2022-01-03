@@ -67,7 +67,6 @@ export default class Nav {
         const screen = allScreen[key as ScreenName];
         const bottomTabIcon = this.screens?.getById(screen.id).options
           ?.bottomTab?.icon;
-
         this.screens?.N.mergeOptions(screen.id, {
           topBar: {
             ...screen.options?.topBar,
@@ -76,6 +75,7 @@ export default class Nav {
               ...btn,
               color: primaryColor,
             })),
+            searchBarTintColor: primaryColor,
           },
 
           bottomTab: bottomTabIcon

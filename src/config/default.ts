@@ -44,10 +44,15 @@ export default {
   developerId: '1572453992',
   enableDebugModeKey: 'a1a9ac8f80b62',
   email: '1852067571@qq.com',
+  qqGroup: '168380697',
   fundebugApiKey:
     '740fabe1c51a8ef0cf52195956a707e05c24d471da5d33703d69513d40f36990',
   inAppPurchasesProductIds: [
     'net.darkce.privatespace_1.0',
     'net.darkce.privatespace_2',
   ],
+  sentry: {
+    dsn: 'https://d04bc938d0934611b16c70c75a8f20d5@o264285.ingest.sentry.io/6139676',
+    tracesSampleRate: 0.5,
+  },
 };

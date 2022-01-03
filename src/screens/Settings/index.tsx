@@ -35,6 +35,10 @@ import { SafeAreaScrollView } from '@/components';
 import { appearanceModeOptions } from './Theme';
 import { platformInfo } from '@/utils';
 import { DynamicUpdate } from '@/utils/dynamicUpdate';
+import baidumobstat from '@/utils/baidumobstat';
+
+import { getAutoLockOptions } from './AutoLock';
+import { getUrgentOptions } from './Urgent';
 
 import IconVip from '@/assets/icons/vip.svg';
 import ImageVipCrown from '@/assets/images/vip/crown.svg';
@@ -67,6 +71,12 @@ function SettingsPage(props: NavigationComponentProps) {
     {
       data: [
         {
+          title: '高级功能',
+          onPress() {
+            handleToPage('AdvancedSetting');
+          },
+        },
+        {
           title: t('setting:changePass'),
           onPress() {
             PasscodeLockOverlay.open({
@@ -78,11 +88,15 @@ function SettingsPage(props: NavigationComponentProps) {
         user.userInfo?.type === EUserType.ADMIN
           ? {
               title: t('fakePass:navigation.title'),
+              extra: global.settingInfo.fakePassword.enabled ? '已开启' : null,
               onPress: () => handleToPage('FakePasswordSetting'),
             }
           : undefined,
         {
           title: t('autoLock:navigation.title'),
+          extra: getAutoLockOptions(t).find(
+            o => o.value === global.settingInfo.autoLockDuration,
+          )?.title,
           onPress: () => handleToPage('AutoLockSetting'),
         },
         user.userInfo?.type === EUserType.ADMIN && global.localAuthTypes?.length
@@ -108,6 +122,11 @@ function SettingsPage(props: NavigationComponentProps) {
           : undefined,
         {
           title: t('urgent:navigation.title'),
+          extra: global.settingInfo.urgentSwitchUrl
+            ? getUrgentOptions(t, ui).find(
+                o => o.value === global.settingInfo.urgentSwitchUrl,
+              )?.title
+            : null,
           onPress() {
             handleToPage('UrgentSetting');
           },
@@ -257,6 +276,7 @@ function SettingsPage(props: NavigationComponentProps) {
 
 function handleToPurchases() {
   services.nav.screens?.show('Purchase');
+  baidumobstat.onEvent('click_purchase');
 }
 
 function PurchasesCard(): JSX.Element {

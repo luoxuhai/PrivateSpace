@@ -5,11 +5,18 @@ import React, {
   useMemo,
   useCallback,
 } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Text,
+  ScrollView,
+  useWindowDimensions,
+} from 'react-native';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import durationPlugin from 'dayjs/plugin/duration';
 import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
+import { useDeviceOrientation } from '@react-native-community/hooks';
 
 import { useStore } from '@/store';
 import {
@@ -35,6 +42,8 @@ export const FileDetail = observer<IFileDetailProps>(
     const { t } = useTranslation();
     const [item, setItem] = useState<FileEntity>();
     const { ui } = useStore();
+    const windowSize = useWindowDimensions();
+    const deviceOrientation = useDeviceOrientation();
     const [dime, setDime] = useState<
       { width: number; height: number } | undefined
     >();
@@ -49,7 +58,6 @@ export const FileDetail = observer<IFileDetailProps>(
         if (value.extra?.duration) {
           setDuration(value.extra?.duration);
         }
-        console.log(value.extra);
 
         if (value.extra?.width && value.extra?.height) {
           setDime({
@@ -112,32 +120,56 @@ export const FileDetail = observer<IFileDetailProps>(
     );
 
     return (
-      <>
-        <BottomSheet
-          ref={bottomSheetRef}
-          header="详情"
-          snapPoints={[200, 300]}
-          onDismiss={handleClose}>
-          <BottomSheetScrollView style={styles.bottomSheetWrapper}>
-            {list?.map(item => (
-              <View style={styles.operationContainer} key={item.type}>
+      <BottomSheet
+        ref={bottomSheetRef}
+        header="详情"
+        snapPoints={
+          deviceOrientation.landscape
+            ? [windowSize.height, windowSize.height]
+            : [windowSize.height * 0.6, windowSize.height * 0.6]
+        }
+        onDismiss={handleClose}>
+        <BottomSheetScrollView style={styles.bottomSheetWrapper}>
+          {list?.map(item => (
+            <View style={styles.operationContainer} key={item.type}>
+              <Text
+                style={[
+                  styles.label,
+                  {
+                    color: ui.colors.label,
+                  },
+                ]}>
+                {item.label}：
+              </Text>
+
+              <ScrollView horizontal alwaysBounceHorizontal={false}>
                 <Text
-                  style={[
-                    styles.label,
-                    {
-                      color: ui.colors.label,
-                    },
-                  ]}>
-                  {item.label}：
-                </Text>
-                <Text selectable style={{ color: ui.colors.label }}>
+                  selectable
+                  numberOfLines={2}
+                  style={{ color: ui.colors.label }}>
                   {item.value}
                 </Text>
-              </View>
-            ))}
-          </BottomSheetScrollView>
-        </BottomSheet>
-      </>
+              </ScrollView>
+            </View>
+          ))}
+          <View style={[styles.operationContainerDesc]}>
+            <Text
+              style={[
+                styles.label,
+                {
+                  color: ui.colors.label,
+                },
+              ]}>
+              描述：
+            </Text>
+            <Text
+              selectable
+              style={[{ color: ui.colors.label }, styles.descInput]}>
+              {item?.description ?? '-'}
+            </Text>
+          </View>
+        </BottomSheetScrollView>
+      </BottomSheet>
     );
   },
   { forwardRef: true },
@@ -154,8 +186,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: 40,
   },
+  operationContainerDesc: {
+    flexDirection: 'row',
+    marginTop: 10,
+  },
   label: {
     fontSize: 16,
     marginRight: 5,
+  },
+  descInput: {
+    flex: 1,
   },
 });

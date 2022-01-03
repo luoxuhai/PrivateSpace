@@ -1,0 +1,67 @@
+diff --git a/node_modules/react-native-actions-shortcuts/ios/Shortcuts.swift b/node_modules/react-native-actions-shortcuts/ios/Shortcuts.swift
+index ad77cd9..f593174 100644
+--- a/node_modules/react-native-actions-shortcuts/ios/Shortcuts.swift
++++ b/node_modules/react-native-actions-shortcuts/ios/Shortcuts.swift
+@@ -94,10 +94,21 @@ fileprivate extension UIApplicationShortcutItem {
+             else {
+                 throw ShortcutsError.invalidShortcutItem
+         }
+-
+-        let subtitle = value["subtitle"] as? String
+-        let icon = UIApplicationShortcutIcon.from(value["iconName"] as? String)
+         let userInfo = value["data"] as? [String: NSSecureCoding]
++        let subtitle = value["subtitle"] as? String
++        let iconType = value["iconType"] as? String
++        let iconName = value["iconName"] as? String
++        var icon: UIApplicationShortcutIcon
++
++        if (iconName != nil) {
++            if (iconType == "system") {
++                icon = UIApplicationShortcutIcon.init(systemImageName: iconName!)
++            } else {
++                icon = UIApplicationShortcutIcon.init(templateImageName: iconName!)
++            }
++        } else {
++            icon = UIApplicationShortcutIcon.init(type: .favorite)
++        }
+         
+         return UIApplicationShortcutItem(
+             type: type,
+@@ -108,12 +119,3 @@ fileprivate extension UIApplicationShortcutItem {
+         )
+     }
+ }
+-
+-fileprivate extension UIApplicationShortcutIcon {
+-    static func from(_ imageName: String?) -> UIApplicationShortcutIcon? {
+-        guard let imageName = imageName else {
+-            return nil
+-        }
+-        return UIApplicationShortcutIcon(templateImageName: imageName)
+-    }
+-}
+diff --git a/node_modules/react-native-actions-shortcuts/lib/typescript/src/index.d.ts b/node_modules/react-native-actions-shortcuts/lib/typescript/src/index.d.ts
+index 73e6b03..cfc824f 100644
+--- a/node_modules/react-native-actions-shortcuts/lib/typescript/src/index.d.ts
++++ b/node_modules/react-native-actions-shortcuts/lib/typescript/src/index.d.ts
+@@ -18,6 +18,7 @@ export interface ShortcutItem {
+      * iOS only, ignored on Android
+      */
+     subtitle?: string;
++    iconType?: 'system' | 'image';
+     /**
+      * The name of the iOS Asset or Android drawable
+      */
+diff --git a/node_modules/react-native-actions-shortcuts/src/index.tsx b/node_modules/react-native-actions-shortcuts/src/index.tsx
+index e0d0e46..270b723 100644
+--- a/node_modules/react-native-actions-shortcuts/src/index.tsx
++++ b/node_modules/react-native-actions-shortcuts/src/index.tsx
+@@ -23,6 +23,8 @@ export interface ShortcutItem {
+    */
+   subtitle?: string; // only used on iOS
+ 
++  icoType?: 'system' | 'image';
++
+   /**
+    * The name of the iOS Asset or Android drawable
+    */

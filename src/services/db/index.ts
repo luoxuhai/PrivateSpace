@@ -1,6 +1,11 @@
-import { createConnection, Connection, InsertResult } from 'typeorm/browser';
-import fundebug from 'fundebug-reactnative';
+import {
+  createConnection,
+  Connection,
+  InsertResult,
+  UpdateResult,
+} from 'typeorm/browser';
 
+import { CustomSentry, Sentry } from '@/utils/customSentry';
 import FileEntity from './file';
 import UserEntity, { EUserType } from './user';
 import { stores } from '@/store';
@@ -17,15 +22,18 @@ class DataBase {
         type: 'react-native',
         database: 'private-space',
         location: 'default',
-        logging: ['error', 'query', 'schema'],
+        // logging: __DEV__ ? ['error', 'query', 'schema'] : undefined,
         synchronize: true,
         entities: [FileEntity, UserEntity],
       });
-      console.log('数据库连接成功！');
+      __DEV__ && console.log('数据库连接成功！');
       await this.initUser();
       await initAlbums();
     } catch (error) {
-      fundebug.notify('数据库连接失败！', error?.message ?? '');
+      __DEV__ && console.log('数据库连接失败！', error);
+      CustomSentry.captureException(error, {
+        level: Sentry.Severity.Fatal,
+      });
     }
   }
 
@@ -65,6 +73,17 @@ class DataBase {
   clear(): void {
     this.connection?.getRepository(UserEntity).clear();
     this.connection?.getRepository(FileEntity).clear();
+  }
+
+  clearFiled(filed: string): Promise<UpdateResult> | undefined {
+    return this.connection
+      ?.getRepository(FileEntity)
+      .createQueryBuilder('file')
+      .update(FileEntity)
+      .set({
+        [filed]: null,
+      })
+      .execute();
   }
 }
 

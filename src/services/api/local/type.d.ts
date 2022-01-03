@@ -9,11 +9,17 @@ export interface IListAlbumRequest {
   limit?: number;
 }
 
-export interface IListFileRequest
-  extends Partial<Pick<FileEntity, 'owner' | 'parent_id' | 'status'>> {
+export interface IListFileRequest extends Partial<Omit<FileEntity, 'extra'>> {
   offset?: number;
   limit?: number;
   order?: { [key: string]: 'ASC' | 'DESC' };
+}
+
+export interface ISearchFileRequest extends Partial<Omit<FileEntity, 'extra'>> {
+  offset?: number;
+  limit?: number;
+  order?: { [key: string]: 'ASC' | 'DESC' };
+  keywords?: string;
 }
 
 export interface IGetFileRequest {

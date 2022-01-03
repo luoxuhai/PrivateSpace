@@ -192,7 +192,7 @@ const RecycleBinScreen: NavigationFunctionComponent<
           style={{
             color: ui.colors.secondaryLabel,
           }}>
-          最多保留30天，之后将永久删除。
+          最多保留{global.settingInfo.recycleBin.keep ?? 30}天，之后将永久删除。
         </Text>
         {!global.settingInfo.recycleBin?.enabled && (
           <Text
@@ -207,7 +207,7 @@ const RecycleBinScreen: NavigationFunctionComponent<
         )}
       </View>
     ),
-    [ui.appearance, global.settingInfo.recycleBin?.enabled],
+    [ui.appearance, global.settingInfo.recycleBin],
   );
 
   return (

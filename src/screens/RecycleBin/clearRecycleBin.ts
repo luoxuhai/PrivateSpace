@@ -12,14 +12,16 @@ export const clearRecycleBin = async (): PVoid => {
       owner: stores.user.userInfo!.id,
       status: FileStatus.Deleted,
     });
+    const keep = stores.global.settingInfo.recycleBin.keep ?? 30;
     const files = res.data.list.filter(item =>
-      dayjs(item.mtime).add(30, 'day').isBefore(dayjs()),
+      dayjs(item.mtime).add(keep, 'day').isBefore(dayjs()),
     );
-
-    services.api.local.deleteFile({
-      ids: files.map(file => file.id),
-      isMark: false,
-    });
+    const ids = files.map(file => file.id);
+    if (ids.length)
+      services.api.local.deleteFile({
+        ids,
+        isMark: false,
+      });
   } catch (error) {
     console.log(error);
   }

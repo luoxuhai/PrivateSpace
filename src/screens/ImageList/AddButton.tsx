@@ -4,10 +4,12 @@ import {
   TouchableOpacity,
   StyleSheet,
   View,
+  ViewStyle,
   Text,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { RNToasty } from 'react-native-toasty';
+import Animated from 'react-native-reanimated';
 
 import { stores, useStore } from '@/store';
 import { HapticFeedback, getMediaInfo, getSourceByMime } from '@/utils';
@@ -19,8 +21,13 @@ import IconPhotoRectangle from '@/assets/icons/photo.on.rectangle.angled.svg';
 import IconPlusCircleFill from '@/assets/icons/plus.circle.fill.svg';
 import { FileImporter, IResult } from './FileImporter';
 import { BottomSheet, IBottomSheetPropsRef } from '@/components/BottomSheet';
+import { LoadingOverlay } from '@/components/LoadingOverlay';
+import classifyImageProcess from '@/utils/classifyImageProcess';
 
 const fileImporter = new FileImporter();
+
+const AnimatedTouchableOpacity =
+  Animated.createAnimatedComponent(TouchableOpacity);
 
 const ICON_PROPS = {
   width: 30,
@@ -37,7 +44,10 @@ export async function transformResult(
     height: item.height,
     duration: item.duration,
   };
-  if (getSourceByMime(item.mime!) === SourceType.Video) {
+  if (
+    getSourceByMime(item.mime!) === SourceType.Video &&
+    (!info.duration || !info.width)
+  ) {
     info = await getMediaInfo(item.uri!);
   }
 
@@ -55,6 +65,7 @@ export async function transformResult(
 }
 
 interface IAddButtonProps {
+  style?: ViewStyle;
   albumId: string;
   touchableOpacityProps?: TouchableOpacityProps;
   onDone?: () => void;
@@ -63,7 +74,7 @@ interface IAddButtonProps {
 function AddButton(props: IAddButtonProps): JSX.Element {
   const bottomSheetRef = useRef<IBottomSheetPropsRef>();
   const { t } = useTranslation();
-  const { ui, user, global } = useStore();
+  const { ui } = useStore();
 
   const { mutateAsync: createFiles } = useCreateFile();
 
@@ -116,25 +127,29 @@ function AddButton(props: IAddButtonProps): JSX.Element {
         break;
     }
 
-    if (result) {
+    if (result?.length) {
+      LoadingOverlay.show();
       await createFiles(
         await Promise.all(
           result.map(res => transformResult(res, props.albumId)),
         ),
       );
+      LoadingOverlay.hide();
       props.onDone?.();
+      classifyImageProcess.start();
     }
   }
 
   return (
     <>
-      <TouchableOpacity
+      <AnimatedTouchableOpacity
         style={[
           styles.container,
           {
             shadowColor: stores.ui.themes.primary,
             backgroundColor: stores.ui.colors.white,
           },
+          props.style,
         ]}
         onPress={() => {
           HapticFeedback.impactAsync.light();
@@ -147,8 +162,8 @@ function AddButton(props: IAddButtonProps): JSX.Element {
           height={50}
           fill={stores.ui.themes.primary}
         />
-      </TouchableOpacity>
-      <BottomSheet ref={bottomSheetRef}>
+      </AnimatedTouchableOpacity>
+      <BottomSheet ref={bottomSheetRef} snapPoints={[150, 200]}>
         <View style={[styles.bottomSheetWrapper, styles.bottomSheetContent]}>
           {list.map(item => (
             <TouchableOpacity

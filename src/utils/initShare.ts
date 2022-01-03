@@ -1,13 +1,14 @@
 import ShareMenu, { ShareData } from 'react-native-share-menu';
-import fundebug from 'fundebug-reactnative';
 
 import { transformResult } from '@/screens/ImageList/AddButton';
 import { createFile } from '@/services/api/local/file';
-import config from '@/config';
 import albumStore from '@/store/album';
 import userStore from '@/store/user';
 import { LoadingOverlay } from '@/components/LoadingOverlay';
+import { RNToasty } from 'react-native-toasty';
 import { randomNum, extname, getDefaultAlbum } from '@/utils';
+import baidumobstat from '@/utils/baidumobstat';
+import classifyImageProcess from '@/utils/classifyImageProcess';
 
 export function initShare(): void {
   ShareMenu.getInitialShare(handleShare);
@@ -18,6 +19,7 @@ const handleShare = async (shareData?: ShareData) => {
   if (!shareData?.data) {
     return;
   }
+
   LoadingOverlay.show({
     text: {
       value: '保存中...',
@@ -41,11 +43,16 @@ const handleShare = async (shareData?: ShareData) => {
       ),
     );
     albumStore.setRefetchAlbum(albumStore.refetchAlbum + 1);
-  } catch (error) {
-    fundebug.notify('保存分享图片视频出错', error?.message ?? '');
+  } catch {
+    RNToasty.Show({
+      title: '保存失败',
+      position: 'top',
+    });
   }
 
+  baidumobstat.onEvent('operate_share');
   LoadingOverlay.hide();
+  classifyImageProcess.start();
 };
 
 export const createFiles = async files => {

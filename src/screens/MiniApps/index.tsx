@@ -122,9 +122,4 @@ const itemStyles = StyleSheet.create({
   },
 });
 
-MiniAppsScreen.options = () => {
-  console.log('23453647586utyhrgfedwrgt');
-  return {};
-};
-
 export default observer(MiniAppsScreen);

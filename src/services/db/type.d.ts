@@ -13,6 +13,7 @@ type FileExtra = {
   duration?: number;
   width?: number;
   height?: number;
+  blurhash?: string;
   [key: string]: any;
 };
 
@@ -20,3 +21,8 @@ type UserExtra = {
   username?: string;
   [key: string]: any;
 };
+
+interface FileLabel {
+  en?: string[];
+  zh_cn?: string[];
+}

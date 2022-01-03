@@ -7,6 +7,7 @@ import {
   useWindowDimensions,
   Alert,
   Linking,
+  TouchableOpacity,
 } from 'react-native';
 import {
   NavigationComponentProps,
@@ -20,22 +21,30 @@ import { InAppBrowser } from 'react-native-inappbrowser-reborn';
 import chroma from 'chroma-js';
 import * as InAppPurchases from 'expo-in-app-purchases';
 import { Placeholder, PlaceholderLine, Fade } from 'rn-placeholder';
-import fundebug from 'fundebug-reactnative';
 
+import { CustomSentry } from '@/utils/customSentry';
 import { stores, useStore } from '@/store';
 import { UIStore } from '@/store/ui';
 import { services } from '@/services';
+import { ScreenName } from '@/screens';
 import config from '@/config';
 import { HapticFeedback } from '@/utils';
 import { SafeAreaScrollView } from '@/components';
 import { Toolbar } from '@/components/Toolbar';
 import CustomButton from '@/components/CustomButton';
 import { LoadingOverlay } from '@/components/LoadingOverlay';
+import { useStat } from '@/hooks';
 
-import ImageTransfer from '@/assets/images/transfer.svg';
-import ImageMore from '@/assets/images/more.svg';
+import { RNToasty } from 'react-native-toasty';
+import { UserRole } from '@/store/user';
+
+import IconMore from '@/assets/icons/ellipsis.circle.svg';
+import IconSearch from '@/assets/icons/vip.search.svg';
+import IconTrash from '@/assets/icons/vip.trash.svg';
+import IconWifi from '@/assets/icons/vip.wifi.2.svg';
 
 const PAY_BUTTON_WIDTH = 200;
+const ICON_COLOR = '#EED198';
 let inAppPurchaseConnected = false;
 
 const enum ToolbarListKey {
@@ -95,6 +104,8 @@ const PurchaseScreen: NavigationFunctionComponent =
       }),
       [projectList],
     );
+
+    useStat('Purchase');
 
     useNavigationButtonPress(handleDismiss, props.componentId, 'cancel');
     useNavigationButtonPress(
@@ -223,9 +234,7 @@ const PurchaseScreen: NavigationFunctionComponent =
           style={[
             styles.scrollView,
             {
-              backgroundColor: isDark(ui)
-                ? ui.colors.systemBackground
-                : ui.colors.secondarySystemBackground,
+              backgroundColor: ui.colors.systemBackground,
             },
           ]}
           contentContainerStyle={{
@@ -238,7 +247,7 @@ const PurchaseScreen: NavigationFunctionComponent =
             onChange={item => setCurrentProject(item)}
           />
           <LargeTitle text="高级特权" />
-          <Rights />
+          <Rights componentId={props.componentId} />
           <Agreement />
         </SafeAreaScrollView>
 
@@ -267,7 +276,14 @@ const PurchaseScreen: NavigationFunctionComponent =
           />
         )}
 
-        <Toolbar visible list={toolbarList} onPress={handleOpenBrowserPress} />
+        <Toolbar
+          visible
+          style={{
+            paddingTop: 10,
+          }}
+          list={toolbarList}
+          onPress={handleOpenBrowserPress}
+        />
       </>
     );
   });
@@ -409,47 +425,83 @@ const Project = observer(
 
 const rightsList = [
   {
-    image: ImageTransfer,
+    image: IconWifi,
     title: 'WI-FI 无线传输',
+    screenId: 'Transfer',
   },
   {
-    image: ImageMore,
+    image: IconTrash,
+    title: '自定义回收站保留时长',
+    screenId: 'RecycleBinSetting',
+  },
+  // {
+  //   image: IconFace,
+  //   title: '人像封面',
+  //   screenId: '',
+  // },
+  // {
+  //   image: IconSaliency,
+  //   title: '焦点封面',
+  //   screenId: '',
+  // },
+  {
+    image: IconSearch,
+    title: '智能搜索',
+    screenId: 'AdvancedSetting',
+  },
+  {
+    image: IconMore,
     title: '更多功能即将推出...',
   },
 ];
 
-const Rights = () => {
+const Rights = ({ componentId }: { componentId: string }) => {
   const { width } = useWindowDimensions();
-  const { ui } = useStore();
+  const { user } = useStore();
+
+  const handlePress = useCallback(
+    screenId => {
+      if (user.userRole === UserRole.VIP) {
+        if (screenId) {
+          services.nav.screens?.push(componentId, screenId as ScreenName);
+        }
+      } else {
+        RNToasty.Show({
+          title: '购买后可使用',
+          position: 'top',
+        });
+      }
+    },
+    [componentId],
+  );
 
   return (
     <View style={styles.rightsWrapper}>
-      {rightsList.map((item, index) => (
-        <View
-          key={item.title}
+      {rightsList.map(item => (
+        <TouchableOpacity
+          key={item.screenId}
+          activeOpacity={item.screenId ? 0.5 : 1}
           style={[
             styles.rightsItem,
-            index !== 0 && {
-              marginLeft: 26,
-            },
             {
-              width: width > 400 ? 160 : (width - 16 * 2 - 26) / 2,
-              backgroundColor: isDark(ui)
-                ? ui.colors.secondarySystemBackground
-                : ui.colors.systemBackground,
+              width: '25%',
             },
-          ]}>
-          <Text
-            style={[
-              styles.rightsItemTitle,
-              {
-                color: ui.colors.label,
-              },
-            ]}>
+          ]}
+          onPress={() => handlePress(item.screenId)}>
+          <View style={styles.rightsIcon}>
+            {
+              <item.image
+                width={30}
+                height={30}
+                fill={ICON_COLOR}
+                style={styles.rightsItemImg}
+              />
+            }
+          </View>
+          <Text numberOfLines={2} style={styles.rightsItemTitle}>
             {item.title}
           </Text>
-          {<item.image width={70} height={70} style={styles.rightsItemImg} />}
-        </View>
+        </TouchableOpacity>
       ))}
     </View>
   );
@@ -533,20 +585,31 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   rightsItem: {
-    height: 180,
+    height: 100,
     alignItems: 'center',
     justifyContent: 'space-between',
-    borderRadius: 6,
-    paddingVertical: 16,
-    paddingHorizontal: 10,
+    paddingHorizontal: 5,
+    marginBottom: 10,
   },
   rightsItemImg: {
-    opacity: 0.9,
+    overflow: 'hidden',
+  },
+  rightsIcon: {
+    width: 50,
+    height: 50,
+    marginBottom: 12,
+    backgroundColor: '#FCF6E9',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 25,
   },
   rightsItemTitle: {
-    alignSelf: 'flex-start',
+    flex: 1,
     fontWeight: '500',
-    fontSize: 17,
+    color: '#A7853E',
+    fontSize: 12,
+    textAlign: 'center',
+    flexWrap: 'wrap',
   },
   projectWrapper: {
     flexDirection: 'row',
@@ -603,6 +666,13 @@ function setPurchaseListener() {
               }
             }
             stores.user.setPurchaseResults(results);
+            stores.global.setSettingInfo({
+              advanced: {
+                smartSearch: {
+                  enabled: true,
+                },
+              },
+            });
             handleDismiss();
           }
           break;
@@ -613,7 +683,9 @@ function setPurchaseListener() {
           Alert.alert('购买失败', '您无权购买，请求家长批准');
           break;
         default:
-          fundebug.notify('购买失败', `错误代码：${errorCode}`);
+          CustomSentry.captureException(
+            new Error(`购买失败,错误代码：${errorCode}`),
+          );
           Alert.alert('购买失败', `错误代码：${errorCode}`);
       }
     },

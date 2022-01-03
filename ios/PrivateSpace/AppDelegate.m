@@ -1,5 +1,6 @@
 #import "AppDelegate.h"
 #import "Orientation.h"
+#import "BaiduMobStat.h"
 #import <CodePush/CodePush.h>
 #import <ReactNativeNavigation/ReactNativeNavigation.h>
 #import <RNShortcuts.h>
@@ -14,7 +15,6 @@
 #import <FlipperKitNetworkPlugin/FlipperKitNetworkPlugin.h>
 #import <SKIOSNetworkPlugin/SKIOSNetworkAdapter.h>
 #import <FlipperKitReactPlugin/FlipperKitReactPlugin.h>
-
 
 static void InitializeFlipper(UIApplication *application) {
   FlipperClient *client = [FlipperClient sharedClient];
@@ -37,7 +37,13 @@ static void InitializeFlipper(UIApplication *application) {
 
   RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
 [ReactNativeNavigation bootstrapWithBridge:bridge];
-  
+
+#if !DEBUG
+  // 百度移动统计
+  BaiduMobStat *baiduMobStat = [BaiduMobStat defaultStat];
+  baiduMobStat.platformType = 1;
+  [baiduMobStat startWithAppId:@"8ef53e8289"];
+#endif
 
   [super application:application didFinishLaunchingWithOptions:launchOptions];
   return YES;

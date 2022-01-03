@@ -1,13 +1,8 @@
 import { Image } from 'react-native';
-import ImageResizer from 'react-native-image-resizer';
-import {
-  FFprobeKit,
-  FFmpegKit,
-  MediaInformationSession,
-  ReturnCode,
-} from 'ffmpeg-kit-react-native';
-import fundebug from 'fundebug-reactnative';
+import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
+import { FFprobeKit, FFmpegKit, ReturnCode } from 'ffmpeg-kit-react-native';
 
+import { CustomSentry } from '@/utils/customSentry';
 import config, { SOURCE_PATH, THUMBNAIL_PATH, TEMP_PATH } from '@/config';
 import FileEntity, { SourceType, FileType } from '@/services/db/file';
 import { getFile } from '@/services/api/local/file';
@@ -84,58 +79,75 @@ export async function generateThumbnail(
   path: string,
   type: SourceType,
 ): Promise<{ path: string } | void | null> {
-  const TARGET_SIZE = 400;
+  const TARGET_SIZE = 300;
 
   switch (type) {
     case SourceType.Image:
       try {
-        const res = await ImageResizer.createResizedImage(
-          path,
-          TARGET_SIZE,
-          TARGET_SIZE,
-          'JPEG',
-          80,
-          undefined,
-          undefined,
-          undefined,
-          {
-            mode: 'cover',
-          },
-        );
+        const res = await resizeImage({ uri: path, width: TARGET_SIZE });
         return res;
-      } catch (e) {
-        fundebug.notify('压缩图片失败', e?.message ?? '');
+      } catch {
         return null;
       }
     case SourceType.Video: {
       const outputPath = join(TEMP_PATH, `${generateID()}.jpg`);
       // 截取时间，ms
       const stime = 100 / 1000;
-      return new Promise(resolve => {
-        FFmpegKit.executeAsync(
-          `-ss ${stime} -i ${path.replace(
-            /^file:\/\//,
-            '',
-          )} -frames:v 1 -an -q:v 1 -vcodec mjpeg ${outputPath}`,
-          async session => {
-            try {
-              const code = await session.getReturnCode();
-              if (ReturnCode.isSuccess(code)) {
-                resolve({
-                  path: outputPath,
-                });
-              } else {
-                throw await session.getAllLogsAsString();
-              }
-            } catch (error) {
-              resolve(null);
-              fundebug.notify('截取视频封面失败', error?.message ?? '');
-            }
+
+      const session = await FFmpegKit.execute(
+        `-ss ${stime} -i ${path.replace(
+          /^file:\/\//,
+          '',
+        )} -frames:v 1 -an -q:v 1 -vcodec mjpeg ${outputPath}`,
+      );
+
+      try {
+        const code = await session.getReturnCode();
+        if (ReturnCode.isSuccess(code)) {
+          return {
+            path: outputPath,
+          };
+        } else {
+          throw await session.getAllLogsAsString();
+        }
+      } catch (error) {
+        CustomSentry.captureException(error, {
+          extra: {
+            title: '截取视频封面失败',
           },
-        );
-      });
+        });
+        return null;
+      }
     }
   }
+}
+
+export async function resizeImage({
+  uri,
+  width,
+  compress = 0.5,
+}: {
+  uri: string;
+  width: number;
+  compress?: number;
+}): Promise<{
+  path: string;
+} | null> {
+  const res = await manipulateAsync(
+    uri,
+    [
+      {
+        resize: {
+          width,
+        },
+      },
+    ],
+    { compress, format: SaveFormat.JPEG, base64: false },
+  );
+
+  return {
+    path: res.uri,
+  };
 }
 
 export function getImageSize(
@@ -159,26 +171,22 @@ export async function getMediaInfo(path: string): Promise<{
   duration: number;
   width: number;
   height: number;
-}> {
-  return new Promise((resolve, reject) => {
-    FFprobeKit.getMediaInformationAsync(path, async session => {
-      try {
-        const information = await (
-          session as MediaInformationSession
-        ).getMediaInformation();
-        const allProperties = information.getAllProperties();
-        const stream = allProperties.streams.find(item => item.width);
+} | null> {
+  const session = await FFprobeKit.getMediaInformation(path);
 
-        resolve({
-          duration: allProperties.format.duration * 1000,
-          width: stream.width,
-          height: stream.height,
-        });
-      } catch (error) {
-        reject(error);
-      }
-    });
-  });
+  try {
+    const information = session.getMediaInformation();
+    const allProperties = information.getAllProperties();
+    const stream = allProperties.streams.find(item => item.width);
+
+    return {
+      duration: allProperties.format.duration * 1000,
+      width: stream.width,
+      height: stream.height,
+    };
+  } catch (error) {
+    return null;
+  }
 }
 
 export async function getDefaultAlbum(

@@ -4,9 +4,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Text,
-  SafeAreaView,
   AppState,
-  LayoutAnimation,
 } from 'react-native';
 import * as LocalAuthentication from 'expo-local-authentication';
 import { useTranslation, getI18n } from 'react-i18next';

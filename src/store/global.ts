@@ -21,7 +21,7 @@ export const enum EAppOpenUrl {
   /** 备忘录 */
   Notes = 'mobilenotes://',
   /** 邮件 */
-  Mailto = 'mailto:2639415619@qq.com',
+  Mailto = 'mailto:xxx@qq.com',
   /** 相册 */
   Photos = 'photos-redirect://',
   /** 浏览器 */
@@ -51,6 +51,14 @@ interface ISetting {
   /** 回收站 */
   recycleBin: {
     enabled: boolean;
+    // 保留天数
+    keep: number;
+  };
+  /** 高级功能 */
+  advanced: {
+    smartSearch: {
+      enabled: boolean;
+    };
   };
 }
 
@@ -73,6 +81,12 @@ export class GlobalStore implements IStore {
     autoClearOrigin: true,
     recycleBin: {
       enabled: true,
+      keep: 30,
+    },
+    advanced: {
+      smartSearch: {
+        enabled: true,
+      },
     },
   };
   @observable maskVisible = false;
