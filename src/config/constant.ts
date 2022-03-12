@@ -17,3 +17,8 @@ export const STATIC_PATH = DATA_PATH + '/static';
 
 /** 临时目录 */
 export const TEMP_PATH = RNFS.TemporaryDirectoryPath + '/temp';
+
+export const enum AppLaunchType {
+  Unknown = 0,
+  QuickAction = 1,
+}

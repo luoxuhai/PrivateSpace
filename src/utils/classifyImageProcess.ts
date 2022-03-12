@@ -36,7 +36,7 @@ class ClassifyImageProcess {
 
         try {
           const result = await ClassifyImage.request(image.uri, {
-            minConfidence: 0.8,
+            minConfidence: 0.7,
           });
           await this.updateImageLabels(image.id, result);
           this.sendEvent('progress', {

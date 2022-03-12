@@ -32,7 +32,6 @@ export const start = async (): PVoid => {
 
   if (!__DEV__) {
     DynamicUpdate.sync();
-    DynamicUpdate.timingSync();
   }
 
   if (__DEV__) {

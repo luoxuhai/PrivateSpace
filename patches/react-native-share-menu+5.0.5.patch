@@ -12,7 +12,7 @@ index 2811008..08385b7 100644
  // MARK: Keys
  
 diff --git a/node_modules/react-native-share-menu/ios/Modules/ShareMenu.swift b/node_modules/react-native-share-menu/ios/Modules/ShareMenu.swift
-index 6c4922a..1277df2 100644
+index 6c4922a..74badda 100644
 --- a/node_modules/react-native-share-menu/ios/Modules/ShareMenu.swift
 +++ b/node_modules/react-native-share-menu/ios/Modules/ShareMenu.swift
 @@ -9,7 +9,7 @@ class ShareMenu: RCTEventEmitter {
@@ -65,7 +65,7 @@ index 6c4922a..1277df2 100644
              finalData[EXTRA_DATA_KEY] = extraData
          }
 diff --git a/node_modules/react-native-share-menu/ios/Modules/ShareMenuReactView.swift b/node_modules/react-native-share-menu/ios/Modules/ShareMenuReactView.swift
-index 5d21773..3a148dc 100644
+index 5d21773..8cc90cf 100644
 --- a/node_modules/react-native-share-menu/ios/Modules/ShareMenuReactView.swift
 +++ b/node_modules/react-native-share-menu/ios/Modules/ShareMenuReactView.swift
 @@ -3,8 +3,8 @@
@@ -79,7 +79,16 @@ index 5d21773..3a148dc 100644
  import MobileCoreServices
  
  @objc(ShareMenuReactView)
-@@ -65,12 +65,12 @@ public class ShareMenuReactView: NSObject {
+@@ -17,8 +17,6 @@ public class ShareMenuReactView: NSObject {
+     }
+ 
+     public static func attachViewDelegate(_ delegate: ReactShareViewDelegate!) {
+-        guard (ShareMenuReactView.viewDelegate == nil) else { return }
+-
+         ShareMenuReactView.viewDelegate = delegate
+     }
+ 
+@@ -65,12 +63,12 @@ public class ShareMenuReactView: NSObject {
  
          let extensionContext = viewDelegate.loadExtensionContext()
  
@@ -95,7 +104,7 @@ index 5d21773..3a148dc 100644
      }
  
      @objc(data:reject:)
-@@ -82,91 +82,96 @@ public class ShareMenuReactView: NSObject {
+@@ -82,91 +80,96 @@ public class ShareMenuReactView: NSObject {
              return
          }
  
@@ -167,16 +176,16 @@ index 5d21773..3a148dc 100644
 -                } else {
 -                    let image: UIImage! = item as? UIImage
 +                            results.append([DATA_KEY: url.absoluteString, MIME_TYPE_KEY: "text/plain"])
- 
--                    if (image != nil) {
--                        let imageData: Data! = image.pngData();
++
 +                            semaphore.signal()
 +                        }
 +                        semaphore.wait()
 +                    } else if provider.hasItemConformingToTypeIdentifier(kUTTypeText as String) {
 +                        provider.loadItem(forTypeIdentifier: kUTTypeText as String, options: nil) { (item, error) in
 +                            let text:String! = item as? String
-+
+ 
+-                    if (image != nil) {
+-                        let imageData: Data! = image.pngData();
 +                            results.append([DATA_KEY: text, MIME_TYPE_KEY: "text/plain"])
  
 -                        // Creating temporary URL for image data (UIImage)
@@ -300,7 +309,7 @@ index 0aa4c58..ad0812c 100644
 +    func continueInApp(with items: [NSExtensionItem], and extraData: [String:Any]?)
  }
 diff --git a/node_modules/react-native-share-menu/ios/ShareViewController.swift b/node_modules/react-native-share-menu/ios/ShareViewController.swift
-index 7faf6e4..eba3887 100644
+index 7faf6e4..c09b26b 100644
 --- a/node_modules/react-native-share-menu/ios/ShareViewController.swift
 +++ b/node_modules/react-native-share-menu/ios/ShareViewController.swift
 @@ -6,7 +6,8 @@

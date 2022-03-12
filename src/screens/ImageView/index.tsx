@@ -277,7 +277,3 @@ const styles = StyleSheet.create({
     ],
   },
 });
-
-function handleDismissAllModals() {
-  services.nav.screens?.N.dismissAllModals();
-}

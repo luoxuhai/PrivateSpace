@@ -15,6 +15,7 @@ import { UserRole } from '@/store/user';
 import { HapticFeedback, getDefaultAlbum } from '@/utils';
 import { FileImporter } from '@/screens/ImageList/FileImporter';
 import { transformResult } from '@/screens/ImageList/AddButton';
+import { AppLaunchType } from '@/config';
 
 const fileImporter = new FileImporter();
 
@@ -42,6 +43,7 @@ export class QuickAction {
   constructor() {
     this.shortcutsEmitter = new NativeEventEmitter(Shortcuts as never);
     this.shortcutsEmitter.addListener('onShortcutItemPressed', e => {
+      global.appLaunchType = AppLaunchType.QuickAction;
       switch (e.type) {
         case 'quick.capture':
           this.handleCameraShortcut();
@@ -170,6 +172,7 @@ export class QuickAction {
   }
 
   removeAppStateListener(): void {
+    global.appLaunchType = AppLaunchType.Unknown;
     this.appStateEventSubscription?.remove();
   }
 }

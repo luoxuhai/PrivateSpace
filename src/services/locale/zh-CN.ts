@@ -122,7 +122,7 @@ export default {
       title: '创建相册',
       msg: '请输入相册名称',
     },
-    changelog: '更新说明',
+    changelog: '更新日志',
     private: '隐私政策',
     agreement: '用户协议',
     moreApps: '我的其他应用',

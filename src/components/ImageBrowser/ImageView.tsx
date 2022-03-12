@@ -151,7 +151,7 @@ function ImageView(props: ImageViewProps): JSX.Element {
             pressInEvent = event.nativeEvent;
           }}
           onPressOut={handlePressOut}
-          onLongPress={() => loaded && props.onLongPress}>
+          onLongPress={() => loaded && props.onLongPress?.()}>
           <Image
             style={[styles.image]}
             source={{

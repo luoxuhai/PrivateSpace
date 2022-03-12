@@ -13,7 +13,10 @@ import {
   NavigationComponentProps,
   NavigationFunctionComponent,
 } from 'react-native-navigation';
-import { useNavigationButtonPress } from 'react-native-navigation-hooks';
+import {
+  useNavigationButtonPress,
+  useNavigationComponentDidAppear,
+} from 'react-native-navigation-hooks';
 import { useDeviceOrientation } from '@react-native-community/hooks';
 
 import { useStore, stores } from '@/store';
@@ -24,6 +27,7 @@ import { PermissionManager } from '@/utils';
 import { EAppIcon } from '@/utils/designSystem';
 import PasscodeKeyboard from '@/components/PasscodeKeyboard';
 import { useUpdateEffect } from '@/hooks';
+import { AppLaunchType } from '@/config';
 
 import IconTouchID from '@/assets/icons/touchid.svg';
 import IconFaceID from '@/assets/icons/faceid.svg';
@@ -102,7 +106,7 @@ const PasscodeLockOverlay: PasscodeLockOverlayComponent<IPasscodeLockProps> = (
   props: IPasscodeLockProps,
 ) => {
   const { t } = useTranslation();
-  const { global, ui, user: userStore } = useStore();
+  const { global: globalStore, ui, user: userStore } = useStore();
   const [password, setPassword] = useState('');
   const [stage, setStage] = useState<EInputStage>(EInputStage.Start);
   const [inputType, setInputType] = useState<EInputType>(
@@ -121,18 +125,21 @@ const PasscodeLockOverlay: PasscodeLockOverlayComponent<IPasscodeLockProps> = (
     [inputType, stage],
   );
 
-  useEffect(() => {
+  useNavigationComponentDidAppear(() => {
     if (
-      AppState.isAvailable &&
-      global.settingInfo.autoLocalAuth &&
+      globalStore.settingInfo.autoLocalAuth &&
       inputType === EInputType.Verify &&
       props.userType !== EUserType.GHOST
     ) {
       setTimeout(() => {
-        handleLocalAuth();
+        if (global.appLaunchType === AppLaunchType.QuickAction) {
+          global.appLaunchType = AppLaunchType.Unknown;
+        } else {
+          handleLocalAuth();
+        }
       }, 300);
     }
-  }, [inputType]);
+  }, props.componentId);
 
   useEffect(() => {
     if (!userStore.userInfo?.password && inputType === EInputType.Verify) {
@@ -166,7 +173,7 @@ const PasscodeLockOverlay: PasscodeLockOverlayComponent<IPasscodeLockProps> = (
 
   async function handleLocalAuth() {
     if (
-      global.localAuthTypes?.includes(
+      globalStore.localAuthTypes?.includes(
         LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION,
       ) &&
       !(await PermissionManager.checkPermissions(['ios.permission.FACE_ID']))
@@ -190,7 +197,7 @@ const PasscodeLockOverlay: PasscodeLockOverlayComponent<IPasscodeLockProps> = (
   async function handleAuthSuccess() {
     setStage(EInputStage.Done);
 
-    global.setLockScreenVisible(false);
+    globalStore.setLockScreenVisible(false);
   }
 
   function LocalAuthIconButton() {
@@ -199,7 +206,7 @@ const PasscodeLockOverlay: PasscodeLockOverlayComponent<IPasscodeLockProps> = (
       height: 34,
       fill: ui.colors.systemBlue,
     };
-    const authIcon = global.localAuthTypes?.includes(
+    const authIcon = globalStore.localAuthTypes?.includes(
       LocalAuthentication.AuthenticationType.FINGERPRINT,
     ) ? (
       <IconTouchID {...style} fill={ui.colors.systemPink} />
@@ -264,7 +271,7 @@ const PasscodeLockOverlay: PasscodeLockOverlayComponent<IPasscodeLockProps> = (
         if (
           result.data?.type === EUserType.ADMIN ||
           (result.data?.type === EUserType.GHOST &&
-            global.settingInfo.fakePassword.enabled)
+            globalStore.settingInfo.fakePassword.enabled)
         ) {
           userStore.setUserInfo(result.data);
           handleAuthSuccess();
