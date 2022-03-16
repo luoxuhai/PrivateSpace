@@ -23,13 +23,13 @@ import {
 } from 'react-native';
 import { observer } from 'mobx-react-lite';
 import { FlatGrid } from 'react-native-super-grid';
-import baidumobstat from '@/utils/baidumobstat';
+import baidumobstat from '@/utils/analytics/baidumob';
 
 import { services, queryClient } from '@/services';
 import { IListAlbumData } from '@/services/api/local/type.d';
 import { appUpdateCheck } from '@/utils';
 import { useStore } from '@/store';
-import { queryImage } from '@/screens/ImageList';
+import { queryImage } from '@/screens/PhotoList';
 import Icon from '@/components/Icon';
 import {
   AddAlbumDialog,
@@ -52,8 +52,18 @@ const AlbumScreen: NavigationFunctionComponent<
       searchPanelRef.current.show();
       searchPanelRef.current.search(e.text);
       baidumobstat.onEvent('preview_page_search');
+      services.nav.screens?.N.mergeOptions(props.componentId, {
+        topBar: {
+          noBorder: true,
+        },
+      });
     } else {
       searchPanelRef.current.hide();
+      services.nav.screens?.N.mergeOptions(props.componentId, {
+        topBar: {
+          noBorder: false,
+        },
+      });
     }
   }, props.componentId);
 
@@ -63,16 +73,19 @@ const AlbumScreen: NavigationFunctionComponent<
 
   const {
     isLoading,
-    data: albumList,
+    data: albumData,
     refetch: refetchAlbumList,
   } = useQuery(
-    'list.album',
+    'albums',
     async () => {
-      return await services.api.local
-        .listAlbum({
-          owner: user.userInfo!.id,
-        })
-        .then(res => res.data);
+      const res = await services.api.album.list({
+        owner: user.current?.id,
+      });
+
+      return {
+        items: res.items ?? [],
+        total: res.total ?? 0,
+      };
     },
     {
       enabled: false,
@@ -83,11 +96,11 @@ const AlbumScreen: NavigationFunctionComponent<
 
   useEffect(() => {
     refetchAlbumList();
-  }, [user.userInfo?.id, album.refetchAlbum]);
+  }, [user.current?.id, album.refetchAlbum]);
 
   useUpdateEffect(() => {
     services.nav.startMainScreen();
-  }, [user.userInfo?.id]);
+  }, [user.current?.id]);
 
   useEffect(() => {
     setTimeout(() => {
@@ -117,15 +130,16 @@ const AlbumScreen: NavigationFunctionComponent<
         ListEmptyComponent={
           <DataLoadStatus loading={isLoading} text={t('album:noData')} />
         }
+        windowSize={3}
         itemDimension={150}
         spacing={20}
-        data={albumList?.list ?? []}
+        data={albumData?.items ?? []}
         renderItem={({ item }) => (
           <AlbumCard
             data={item}
             onPressIn={() => {
-              queryClient.prefetchQuery(['image.list.list.item', item.id], () =>
-                queryImage(item.id, user, album),
+              queryClient.prefetchQuery([item.id, '.photos'], () =>
+                queryImage(item.id, album),
               );
             }}
             onPress={() => {
@@ -135,7 +149,11 @@ const AlbumScreen: NavigationFunctionComponent<
                 {
                   albumName: item.name,
                   albumId: item.id,
-                  hasImage: !!item.file_count,
+                  hasImage: !!item.item_total,
+                  count: {
+                    image: item.image_total,
+                    video: item.video_total,
+                  },
                 },
                 {
                   bottomTabs: {
@@ -185,7 +203,7 @@ const AlbumScreen: NavigationFunctionComponent<
 export default observer(AlbumScreen);
 
 interface IAlbumCardProps {
-  componentId: string;
+  componentId?: string;
   data: IListAlbumData;
   style?: ViewStyle;
   footerStyle?: ViewStyle;
@@ -239,7 +257,7 @@ export function AlbumCard(props: IAlbumCardProps) {
                   color: ui.colors.secondaryLabel,
                 },
               ]}>
-              {props.data.file_count}
+              {props.data.item_total}
             </Text>
           </View>
           {props.extraButton}

@@ -4,7 +4,10 @@ import { FFprobeKit, FFmpegKit, ReturnCode } from 'ffmpeg-kit-react-native';
 
 import { CustomSentry } from '@/utils/customSentry';
 import config, { SOURCE_PATH, THUMBNAIL_PATH, TEMP_PATH } from '@/config';
-import FileEntity, { SourceType, FileType } from '@/services/db/file';
+import FileEntity, {
+  SourceType,
+  FileType,
+} from '@/services/database/entities/file.entity';
 import { getFile } from '@/services/api/local/file';
 import { initAlbums } from '@/services';
 import { join } from './path';
@@ -78,7 +81,7 @@ export function formatFileSize(size = 0 as number | string, n = 1): string {
 export async function generateThumbnail(
   path: string,
   type: SourceType,
-): Promise<{ path: string } | void | null> {
+): Promise<{ path: string } | undefined | null> {
   const TARGET_SIZE = 300;
 
   switch (type) {

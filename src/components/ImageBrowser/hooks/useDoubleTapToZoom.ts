@@ -3,15 +3,14 @@ import { ScrollView } from 'react-native';
 
 import { Dimensions, NativeSyntheticTouchEvent } from '../type.d';
 
-const DOUBLE_PRESS_DELAY = 250;
 let lastTime: number | undefined;
 let timer: NodeJS.Timeout | undefined;
 
 interface UseDoubleTapToZoomParams {
   scrollViewRef: React.RefObject<ScrollView>;
   scaled: boolean;
+  doublePressDelay: number;
   containerDimensions?: Dimensions;
-  doublePressDelay?: number;
   onDoublePress?: (event: Event) => void;
   onPress?: (event: Event) => void;
 }
@@ -22,7 +21,7 @@ function useDoubleTapToZoom({
   scrollViewRef,
   scaled,
   containerDimensions,
-  doublePressDelay = DOUBLE_PRESS_DELAY,
+  doublePressDelay,
   onDoublePress,
   onPress,
 }: UseDoubleTapToZoomParams): (event: NativeSyntheticTouchEvent) => void {

@@ -26,6 +26,18 @@
 				<key>UIPrerenderedIcon</key>
 				<false/>
 			</dict>
+			<key>orange</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>orange152x152</string>
+					<string>orange167x167</string>
+					<string>orange128x128</string>
+					<string>orange120x120</string>
+				</array>
+				<key>UIPrerenderedIcon</key>
+				<false/>
+			</dict>
 		</dict>
 	</dict>
 	<key>CFBundleIdentifier</key>
@@ -57,6 +69,8 @@
 	<string>$(CODEPUSH_KEY)</string>
 	<key>CodePushServerURL</key>
 	<string>$(CODEPUSH_HOST)</string>
+	<key>GOOGLE_ANALYTICS_REGISTRATION_WITH_AD_NETWORK_ENABLED</key>
+	<false/>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>wechat</string>

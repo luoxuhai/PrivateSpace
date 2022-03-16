@@ -1,13 +1,13 @@
 import ShareMenu, { ShareData } from 'react-native-share-menu';
 
-import { transformResult } from '@/screens/ImageList/AddButton';
+import { transformResult } from '@/screens/PhotoList/AddButton';
 import { createFile } from '@/services/api/local/file';
 import albumStore from '@/store/album';
 import userStore from '@/store/user';
 import { LoadingOverlay } from '@/components/LoadingOverlay';
 import { RNToasty } from 'react-native-toasty';
 import { randomNum, extname, getDefaultAlbum } from '@/utils';
-import baidumobstat from '@/utils/baidumobstat';
+import baidumobstat from '@/utils/analytics/baidumob';
 import classifyImageProcess from '@/utils/classifyImageProcess';
 
 export function initShare(): void {
@@ -36,7 +36,7 @@ const handleShare = async (shareData?: ShareData) => {
               name: `IMG_${randomNum(10)}${extname(item.data)}`,
             },
             (
-              await getDefaultAlbum(userStore.userInfo!.id)
+              await getDefaultAlbum(userStore.current!.id)
             )?.id as string,
           ),
         ) ?? [],
@@ -60,7 +60,7 @@ export const createFiles = async files => {
     for (const file of files) {
       await createFile({
         ...file,
-        owner: userStore.userInfo!.id ?? '',
+        owner: userStore.current!.id ?? '',
       });
     }
   } catch (error) {

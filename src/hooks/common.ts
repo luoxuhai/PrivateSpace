@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
+import { useDeviceOrientation } from '@react-native-community/hooks';
+import { NavigationConstants } from 'react-native-navigation';
 
-import baidumobstat, { PageName } from '@/utils/baidumobstat';
-import { ScreenName } from '@/screens';
+import baidumobstat, { PageName } from '@/utils/analytics/baidumob';
+import { getUIFrame } from '@/utils';
 
 // HACK: 重新渲染
 export function useForceRender(): {
@@ -29,4 +31,17 @@ export function useStat(pageName: PageName): void {
       baidumobstat.onPageEnd(pageName);
     };
   }, []);
+}
+
+export function useUIFrame(): NavigationConstants {
+  const orientation = useDeviceOrientation();
+  const [UIFrame, setUIFrame] = useState<NavigationConstants>(getUIFrame());
+
+  useEffect(() => {
+    setTimeout(() => {
+      setUIFrame(getUIFrame());
+    }, 20);
+  }, [orientation.landscape]);
+
+  return UIFrame;
 }

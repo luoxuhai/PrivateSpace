@@ -1,4 +1,9 @@
+import uiStore from '@/store/ui';
 import chroma from 'chroma-js';
+
+import IconAppIcon from '@/assets/icons/app-icon/privatespace.svg';
+import IconAppIconDark from '@/assets/icons/app-icon/privatespace.dark.svg';
+import IconAppIconOrange from '@/assets/icons/app-icon/privatespace.orange.svg';
 
 export type AppearanceMode = 'dark' | 'light';
 export type UIAppearance = 'dark' | 'light' | 'system';
@@ -62,6 +67,7 @@ export type Themes = {
 
 // 主题枚举
 export enum EThemeName {
+  Custom = 0,
   Blue = 1,
   Red = 2,
   Orange = 3,
@@ -76,6 +82,7 @@ export enum EThemeName {
 export enum EAppIcon {
   Default = 'default',
   Dark = 'dark',
+  Orange = 'orange',
 }
 
 const BASE_COLORS: Pick<SystemColors, 'black' | 'white'> = {
@@ -204,6 +211,9 @@ function configureThemes(systemColors: SystemColors): {
     [EThemeName.Green]: {
       primary: systemColors.systemGreen,
     },
+    [EThemeName.Custom]: {
+      primary: uiStore?.customThemeColor,
+    },
   };
 }
 
@@ -220,4 +230,14 @@ export function getThemes(
 
 export function getColors(appearance: AppearanceMode): SystemColors {
   return colors[appearance];
+}
+
+const appIconSourceMap = {
+  [EAppIcon.Default]: IconAppIcon,
+  [EAppIcon.Dark]: IconAppIconDark,
+  [EAppIcon.Orange]: IconAppIconOrange,
+};
+
+export function getAppIcon(name: EAppIcon): React.FC<SvgProps> {
+  return appIconSourceMap[name] ?? appIconSourceMap[EAppIcon.Default];
 }

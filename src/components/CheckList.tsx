@@ -5,11 +5,12 @@ import IconCheckMark from '@/assets/icons/checkmark.svg';
 import { useStore } from '@/store';
 import { HapticFeedback } from '@/utils';
 import { useUpdateEffect } from '@/hooks';
-import List, { IListItem } from './List';
+import List, { IListItem, IListProps } from './List';
 
 type CheckValue = string | number;
 
-export interface ICheckList<T extends CheckValue = CheckValue> {
+export interface ICheckList<T extends CheckValue = CheckValue>
+  extends Pick<IListProps, 'header'> {
   options: ICheckListItem<T>[];
   defaultValue?: T;
   value?: T;
@@ -55,7 +56,7 @@ function CheckList(props: ICheckList): JSX.Element {
     [props.options, checkedValue, props.value],
   );
 
-  return <List data={data} />;
+  return <List data={data} header={props.header} />;
 }
 
 export default observer(CheckList);

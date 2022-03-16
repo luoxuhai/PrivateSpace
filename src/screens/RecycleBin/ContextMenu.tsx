@@ -6,9 +6,8 @@ import { ContextMenuView, MenuConfig } from 'react-native-ios-context-menu';
 
 import { showDeleteActionSheet } from '@/utils';
 import { IListFileData } from '@/services/api/local/type.d';
-import { FileStatus } from '@/services/db/file';
 import { services } from '@/services';
-import { useDeleteFile, useUpdateFile } from '@/hooks';
+import { useDeleteFile, useRestorePhoto } from '@/hooks';
 
 interface IContextMenuProps {
   item: IListFileData;
@@ -21,18 +20,18 @@ interface IContextMenuRef {
 }
 
 export const ContextMenu = observer<IContextMenuProps, IContextMenuRef>(
-  (props, ref) => {
+  props => {
     const { t } = useTranslation();
 
-    const { refetch: refetchFileList } = useQuery('recycle.bin.image.list', {
+    const { refetch: refetchFileList } = useQuery('recycle.bin.photos', {
       enabled: false,
     });
-    const { refetch: refetchAlbumList } = useQuery('list.album', {
+    const { refetch: refetchAlbumList } = useQuery('albums', {
       enabled: false,
     });
 
     const { mutateAsync } = useDeleteFile();
-    const { mutateAsync: updateFileAsync } = useUpdateFile();
+    const { mutateAsync: restoreAsync } = useRestorePhoto();
 
     const menuConfig: MenuConfig = useMemo(
       () => ({
@@ -68,13 +67,13 @@ export const ContextMenu = observer<IContextMenuProps, IContextMenuRef>(
               title: {
                 text: '恢复到到相册',
               },
-              async onDone({ id }) {
-                await updateFileAsync({
-                  id: props.item.id,
-                  data: {
-                    status: FileStatus.Normal,
+              async onDone({ id }: { id: string }) {
+                await restoreAsync({
+                  where: {
+                    id: props.item.id,
+                  },
+                  to: {
                     parent_id: id,
-                    ctime: Date.now(),
                   },
                 });
                 services.nav.screens?.dismissModal('FolderPicker');
@@ -85,7 +84,9 @@ export const ContextMenu = observer<IContextMenuProps, IContextMenuRef>(
             break;
           case 'delete':
             showDeleteActionSheet({
-              title: '删除图片',
+              title: `这${
+                props.item.mime?.startsWith('image/') ? '张照片' : '个视频'
+              }将被删除`,
               message: '此操作不可撤销',
               onConfirm: async () => {
                 await mutateAsync({ ids: [props.item.id], isMark: false });

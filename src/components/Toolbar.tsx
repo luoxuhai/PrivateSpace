@@ -6,12 +6,14 @@ import {
   Text,
   TextStyle,
   ViewProps,
+  ViewStyle,
 } from 'react-native';
 import { observer } from 'mobx-react-lite';
 import { SvgProps } from 'react-native-svg';
 import { useDeviceOrientation } from '@react-native-community/hooks';
 
 import { useStore } from '@/store';
+import { useUIFrame } from '@/hooks';
 import { VibrancyView } from '@react-native-community/blur';
 import { platformInfo } from '@/utils';
 
@@ -27,13 +29,36 @@ interface IToolbarProps extends ViewProps {
   visible: boolean;
   list: IToolbarItem[];
   disabled?: boolean;
+  hideBorder?: boolean;
   onPress?: (key: string | number) => void;
 }
 
 export const Toolbar = observer<IToolbarProps>(
-  ({ list, visible = false, disabled = false, ...rest }) => {
+  ({
+    list,
+    visible = false,
+    disabled = false,
+    hideBorder = false,
+    ...rest
+  }) => {
     const { ui } = useStore();
     const orientation = useDeviceOrientation();
+    const UIFrame = useUIFrame();
+
+    const displayStyle: ViewStyle = {
+      display: visible ? 'flex' : 'none',
+    };
+
+    const borderStyle: ViewStyle | undefined = hideBorder
+      ? undefined
+      : {
+          borderColor: ui.colors.separator,
+          borderTopWidth: StyleSheet.hairlineWidth,
+        };
+
+    const paddingStyle = {
+      paddingBottom: platformInfo.isPad || orientation.landscape ? 20 : 28,
+    };
 
     return (
       <View
@@ -41,12 +66,12 @@ export const Toolbar = observer<IToolbarProps>(
           styles.container,
           rest.style,
           {
-            borderColor: ui.colors.opaqueSeparator,
-            display: visible ? 'flex' : 'none',
+            borderColor: ui.colors.separator,
+            minHeight: UIFrame.bottomTabsHeight,
           },
-          (platformInfo.isPad || orientation.landscape) && {
-            paddingBottom: 20,
-          },
+          displayStyle,
+          borderStyle,
+          paddingStyle,
         ]}>
         <VibrancyView
           style={StyleSheet.absoluteFill}
@@ -116,9 +141,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     width: '100%',
-    borderTopWidth: StyleSheet.hairlineWidth,
-    paddingBottom: 26,
-    paddingTop: 6,
+    paddingTop: 5,
   },
   item: {
     alignItems: 'center',
@@ -129,7 +152,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: 17,
+    fontSize: 18,
   },
   titleWithIcon: {
     fontSize: 10,

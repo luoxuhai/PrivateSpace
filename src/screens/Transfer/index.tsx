@@ -20,8 +20,8 @@ import NetInfo, {
 import { HttpServer } from '@darkce/react-native-webserver';
 
 import { useStore } from '@/store';
-import { FileStatus } from '@/services/db/file';
-import { transformResult } from '@/screens/ImageList/AddButton';
+import { FileStatus } from '@/services/database/entities/file.entity';
+import { transformResult } from '@/screens/PhotoList/AddButton';
 import { createFiles } from '@/utils/initShare';
 import {
   platformInfo,
@@ -114,6 +114,7 @@ const TransferScreen: NavigationFunctionComponent =
           });
         }
       });
+      WebClient.update(true);
 
       return () => {
         global.setEnableMask(true);
@@ -149,17 +150,17 @@ const TransferScreen: NavigationFunctionComponent =
               filePath = join(WebClient.path, 'index.html');
             }
 
-            if (!(await FS.exists(filePath))) {
-              response.send(404);
+            if (await FS.exists(filePath)) {
+              response.sendFile(filePath);
               return;
             }
-            response.sendFile(filePath);
+            response.send(404);
           }
           // 获取相册
           else if (request.method === 'GET' && request.url === '/api/folders') {
             try {
-              const res = await services.api.local.listAlbum({
-                owner: user.userInfo!.id,
+              const res = await services.api.album.list({
+                status: FileStatus.Normal,
               });
               response.send(
                 200,
@@ -167,14 +168,12 @@ const TransferScreen: NavigationFunctionComponent =
                 JSON.stringify({
                   code: 0,
                   data: {
-                    list: res.data.list.map(item => {
+                    list: res.items.map(item => {
                       delete item.cover;
-                      delete item.owner;
                       delete item.extra;
-                      delete item.file_count;
                       return item;
                     }),
-                    total: res.data.total,
+                    total: res.total,
                   },
                 }),
               );
@@ -187,8 +186,7 @@ const TransferScreen: NavigationFunctionComponent =
             request.url.startsWith('/api/files')
           ) {
             try {
-              const res = await services.api.local.listFile({
-                owner: user.userInfo!.id,
+              const res = await services.api.photo.list({
                 parent_id: request.query.folderId as string,
                 status: FileStatus.Normal,
               });
@@ -198,13 +196,15 @@ const TransferScreen: NavigationFunctionComponent =
                 JSON.stringify({
                   code: 0,
                   data: {
-                    list: res.data.list.map(item => {
+                    list: res.items.map(item => {
                       const sourceUrl = `http://${ip}:${port}/api/source${
-                        item.uri.split('source')[1]
+                        item.uri?.split('source')[1]
                       }`;
-                      const thumbnailUrl = item.thumbnail.split('thumbnail')[1]
+                      const thumbnailUrl = (
+                        item.poster || item.thumbnail
+                      )?.split('thumbnail')[1]
                         ? `http://${ip}:${port}/api/thumbnail${
-                            item.thumbnail.split('thumbnail')[1]
+                            item.thumbnail?.split('thumbnail')[1]
                           }`
                         : sourceUrl;
 
@@ -216,10 +216,9 @@ const TransferScreen: NavigationFunctionComponent =
 
                       delete _item.uri;
                       delete _item.extra;
-                      delete _item.owner;
                       return _item;
                     }),
-                    total: res.data.total,
+                    total: res.total,
                   },
                 }),
               );

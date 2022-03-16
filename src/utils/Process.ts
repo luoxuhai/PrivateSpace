@@ -2,11 +2,11 @@ import { Like } from 'typeorm/browser';
 import * as FS from 'react-native-fs';
 
 import { services } from '@/services';
-import { FileType } from '@/services/db/file';
+import { FileStatus } from '@/services/database/entities/file.entity';
 
 interface ImageResult {
-  id: string;
-  uri: string;
+  id?: string;
+  uri?: string;
   labels?: FileLabel;
 }
 
@@ -53,19 +53,19 @@ class Process {
     });
   }
 
-  public async getAllImages() {
-    const images = await services.api.local.listFile({
+  public async getAllImages(): Promise<ImageResult[]> {
+    const images = await services.api.photo.list({
       mime: Like('image/%'),
     });
 
-    for (const [index, image] of images?.data?.list?.entries()) {
-      if (!(await FS.exists(image.uri))) {
-        images?.data.list.splice(index, 1);
+    for (const [index, image] of images?.items?.entries()) {
+      if (!image.uri || !(await FS.exists(image.uri))) {
+        images?.items.splice(index, 1);
       }
     }
 
     return (
-      images?.data.list.map(image => ({
+      images?.items.map(image => ({
         id: image.id,
         uri: image.uri,
         labels: image.labels,
@@ -73,18 +73,18 @@ class Process {
     );
   }
 
-  public async getAllFile() {
-    const files = await services.api.local.listFile({
-      type: FileType.File,
+  public async getAllPhoto(): Promise<API.PhotoWithSource[]> {
+    const res = await services.api.photo.list({
+      status: FileStatus.Normal,
     });
 
-    for (const [index, file] of files?.data?.list?.entries()) {
-      if (!(await FS.exists(file.uri))) {
-        files?.data.list.splice(index, 1);
+    for (const [index, file] of res?.items?.entries()) {
+      if (!file.uri || !(await FS.exists(file.uri))) {
+        res?.items.splice(index, 1);
       }
     }
 
-    return files?.data.list;
+    return res?.items;
   }
 }
 

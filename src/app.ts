@@ -1,11 +1,14 @@
 import { DevSettings, LogBox } from 'react-native';
+import { Navigation } from 'react-native-navigation';
 
 import { hydrateStores, clearPersistedStores } from '@/store';
 import { initServices, services, initDataDirectory } from '@/services';
 import { clearRecycleBin } from '@/screens/RecycleBin/clearRecycleBin';
 import { DynamicUpdate } from '@/utils/dynamicUpdate';
 import { CustomSentry } from '@/utils/customSentry';
+import analytics from '@/utils/analytics/firebase';
 import classifyImageProcess from '@/utils/classifyImageProcess';
+import blurhashImageProcess from '@/utils/blurhashImageProcess';
 
 if (__DEV__) {
   LogBox.ignoreAllLogs();
@@ -29,10 +32,22 @@ export const start = async (): PVoid => {
 
   clearRecycleBin();
   classifyImageProcess.start();
+  // blurhashImageProcess.start();
 
   if (!__DEV__) {
     DynamicUpdate.sync();
   }
+
+  Navigation.events().registerComponentDidAppearListener(
+    async ({ componentName, componentType }) => {
+      if (componentType === 'Component') {
+        await analytics().logScreenView({
+          screen_name: componentName,
+          screen_class: componentName,
+        });
+      }
+    },
+  );
 
   if (__DEV__) {
     DevSettings.addMenuItem('清除数据库', () => {

@@ -1,6 +1,7 @@
 #import "AppDelegate.h"
 #import "Orientation.h"
 #import "BaiduMobStat.h"
+#import <Firebase.h>
 #import <CodePush/CodePush.h>
 #import <ReactNativeNavigation/ReactNativeNavigation.h>
 #import <RNShortcuts.h>
@@ -34,6 +35,9 @@ static void InitializeFlipper(UIApplication *application) {
 #ifdef FB_SONARKIT_ENABLED
   InitializeFlipper(application);
 #endif
+  
+  // Firebase https://rnfirebase.io/#3-ios-setup
+  [FIRApp configure];
 
   RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
 [ReactNativeNavigation bootstrapWithBridge:bridge];

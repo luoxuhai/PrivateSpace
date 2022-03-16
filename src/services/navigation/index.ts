@@ -17,11 +17,11 @@ export default class Nav {
   }
 
   async start(): PVoid {
-    if (__DEV__) {
-      await this.startMainScreen();
-    } else {
-      await this.startLockScreen();
-    }
+    // if (__DEV__) {
+    //   await this.startMainScreen();
+    // } else {
+    await this.startLockScreen();
+    // }
     this.addAppStateListener();
     initShare();
   }
@@ -101,7 +101,7 @@ export default class Nav {
 
       switch (state) {
         case 'background':
-          if (!lockScreenVisible && !__DEV__) {
+          if (!lockScreenVisible) {
             clearTimeout(timer);
             timer = setTimeout(() => {
               stores.global.setLockScreenVisible(true);

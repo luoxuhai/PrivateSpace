@@ -13,7 +13,7 @@ interface IDataLoadStatus {
 
 export const DataLoadStatus = observer<IDataLoadStatus>(props => {
   return props.loading ? (
-    <ActivityIndicator style={styles.container} size="small" />
+    <ActivityIndicator style={styles.container} size="large" />
   ) : (
     <Empty style={styles.container} text={props.text} />
   );

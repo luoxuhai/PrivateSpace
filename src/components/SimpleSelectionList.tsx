@@ -29,16 +29,16 @@ function SimpleSelectionList(props: ISimpleSelectionList): JSX.Element {
         .filter(section => section)
         .map((selection: any) => (
           <Fragment key={selection.title}>
-            <ListTitle title={selection.title} />
             {props.listType === 'check' ? (
               <CheckList
                 options={selection.data as ICheckListItem<string>[]}
                 defaultValue={selection.defaultValue}
                 value={selection.value}
+                header={selection.title}
                 onChange={selection.onChange}
               />
             ) : (
-              <List data={selection.data} />
+              <List data={selection.data} header={selection.title} />
             )}
           </Fragment>
         ))}
@@ -47,30 +47,3 @@ function SimpleSelectionList(props: ISimpleSelectionList): JSX.Element {
 }
 
 export default SimpleSelectionList;
-
-export const ListTitle = observer(
-  ({ title }: { title?: string }): JSX.Element | null => {
-    const { colors } = useStore().ui;
-
-    return title ? (
-      <Text
-        style={[
-          styles.selectionTitle,
-          {
-            color: colors.secondaryLabel,
-          },
-        ]}>
-        {title}
-      </Text>
-    ) : null;
-  },
-);
-
-const styles = StyleSheet.create({
-  selectionTitle: {
-    fontSize: 13,
-    marginHorizontal: 32,
-    marginTop: 10,
-    marginBottom: -8,
-  },
-});

@@ -9,6 +9,8 @@ export class DynamicUpdate {
    * 检查并更新，不会重启应用
    */
   static sync(): void {
+    // TODO: 先取消
+    return;
     StatusBar.setNetworkActivityIndicatorVisible(true);
     if (stores.global.debug) {
       CodePush.sync(

@@ -266,6 +266,7 @@ export function CameraPage(props: Props): React.ReactElement {
                 isActive={isActive}
                 onInitialized={onInitialized}
                 onError={onError}
+                zoom={cameraAnimatedProps.zoom}
                 enableZoomGesture={false}
                 animatedProps={cameraAnimatedProps}
                 photo={true}

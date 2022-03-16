@@ -13,9 +13,10 @@ import { isUndefined } from 'lodash';
 import IconChevronRight from '@/assets/icons/chevron.right.svg';
 import { useStore, stores } from '@/store';
 
-interface IList {
+export interface IListProps {
   data?: IListItem[];
   style?: StyleProp<ViewStyle>;
+  header?: React.ReactNode;
 }
 
 type ExtraValue = JSX.Element | string;
@@ -24,23 +25,26 @@ const renderIconRight = () => (
   <IconChevronRight fill={stores.ui.colors.opaqueSeparator} height={12} />
 );
 
-function List(props: IList): JSX.Element {
+function List(props: IListProps): JSX.Element {
   const { colors } = useStore().ui;
 
   return (
-    <ListContainer style={props.style}>
-      {props.data?.map(
-        (item, index) =>
-          item.renderItem?.() ?? (
-            <TouchableHighlight
-              key={item.title}
-              underlayColor={colors.systemGray5}
-              onPress={item.onPress}>
-              {renderItem(item, index !== props.data!.length - 1)}
-            </TouchableHighlight>
-          ),
-      )}
-    </ListContainer>
+    <>
+      <ListTitle title={props.header} />
+      <ListContainer style={props.style}>
+        {props.data?.map(
+          (item, index) =>
+            item.renderItem?.() ?? (
+              <TouchableHighlight
+                key={item.title}
+                underlayColor={colors.systemGray5}
+                onPress={item.onPress}>
+                {renderItem(item, index !== props.data!.length - 1)}
+              </TouchableHighlight>
+            ),
+        )}
+      </ListContainer>
+    </>
   );
 }
 
@@ -71,6 +75,24 @@ export const ListContainer = observer(
         {children}
       </View>
     );
+  },
+);
+
+export const ListTitle = observer(
+  ({ title }: { title?: React.ReactNode }): JSX.Element | null => {
+    const { colors } = useStore().ui;
+
+    return title ? (
+      <Text
+        style={[
+          styles.selectionTitle,
+          {
+            color: colors.secondaryLabel,
+          },
+        ]}>
+        {title}
+      </Text>
+    ) : null;
   },
 );
 
@@ -176,5 +198,11 @@ const styles = StyleSheet.create({
   },
   extraText: {
     fontSize: 17,
+  },
+  selectionTitle: {
+    fontSize: 13,
+    marginHorizontal: 32,
+    marginTop: 10,
+    marginBottom: -8,
   },
 });

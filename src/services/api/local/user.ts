@@ -6,7 +6,7 @@ import {
 } from 'typeorm/browser';
 import { isUndefined } from 'lodash';
 
-import UserEntity, { EUserType } from '@/services/db/user';
+import UserEntity, { EUserType } from '@/services/database/entities/user.entity';
 import {
   IUpdateUserRequest,
   IUpdateUserResponse,

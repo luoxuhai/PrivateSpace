@@ -18,7 +18,7 @@ import {
   IOSPermission,
 } from 'react-native-permissions';
 
-import { SourceType } from '@/services/db/file';
+import { SourceType } from '@/services/database/entities/file.entity';
 import config from '@/config';
 import { stores } from '@/store';
 

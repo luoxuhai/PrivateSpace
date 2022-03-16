@@ -57,13 +57,6 @@ const MiniAppsScreen: NavigationFunctionComponent<
         handlePushPage('Transfer');
       },
     },
-    // TODO: 小应用模块（二期）
-    // {
-    //   title: '浏览器',
-    //   icon: <IconGlobe width={30} height={30} {...iconProps} />,
-    //   color: ui.colors.systemTeal,
-    //   onPress: () => handlePushPage('Browser'),
-    // },
   ];
 
   return (

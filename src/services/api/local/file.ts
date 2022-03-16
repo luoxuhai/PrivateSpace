@@ -17,7 +17,7 @@ import FileEntity, {
   FileType,
   FileStatus,
   SourceType,
-} from '@/services/db/file';
+} from '@/services/database/entities/file.entity';
 import { stores } from '@/store';
 import {
   IListAlbumRequest,
@@ -128,7 +128,6 @@ export async function listFile(
 ): Promise<IListFileResponse> {
   const order = params?.order;
   delete params?.order;
-  const refetchFileListTime = Date.now();
 
   const where = {
     type: FileType.File,

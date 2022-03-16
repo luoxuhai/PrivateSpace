@@ -4,28 +4,27 @@ import { Alert } from 'react-native';
 
 import { services } from '@/services';
 import {
-  IDeleteResult,
-  IUpdateFileRequest,
-  ICreateFileResponse,
-  ICreateFileRequest,
-} from '@/services/api/local/type.d';
-import { FileType } from '@/services/db/file';
+  CreatePhotoParams,
+  UpdatePhotoParams,
+  RestorePhotoParams,
+} from '@/services/api/photo/types.d';
 import { useStore, stores } from '@/store';
 
 export function useDeleteFile(): UseMutationResult<
-  IDeleteResult | void,
+  void,
   unknown,
   { ids: string[]; isMark?: boolean }
 > {
   const result = useMutation<
-    IDeleteResult | void,
+    void,
     unknown,
     { ids: string[]; isMark?: boolean }
   >(async ({ ids, isMark }) => {
     try {
-      const res = await services.api.local.deleteFile({
+      const res = await (isMark
+        ? services.api.photo.softDelete
+        : services.api.photo.delete)({
         ids,
-        isMark,
       });
       return res;
     } catch (error) {
@@ -37,15 +36,30 @@ export function useDeleteFile(): UseMutationResult<
 }
 
 export function useUpdateFile(): UseMutationResult<
-  IDeleteResult | void,
+  void,
   unknown,
-  IUpdateFileRequest
+  UpdatePhotoParams
 > {
-  const result = useMutation<IDeleteResult | void, unknown, IUpdateFileRequest>(
+  const result = useMutation<void, unknown, UpdatePhotoParams>(async params => {
+    try {
+      await services.api.photo.update(params);
+    } catch (error) {
+      console.error('error', error);
+    }
+  });
+
+  return result;
+}
+
+export function useRestorePhoto(): UseMutationResult<
+  void,
+  unknown,
+  RestorePhotoParams
+> {
+  const result = useMutation<void, unknown, RestorePhotoParams>(
     async params => {
       try {
-        const res = await services.api.local.updateFile(params);
-        return res;
+        await services.api.photo.restore(params);
       } catch (error) {
         console.error('error', error);
       }
@@ -56,7 +70,7 @@ export function useUpdateFile(): UseMutationResult<
 }
 
 export function useCreateAlbum(): UseMutationResult<
-  ICreateFileResponse | void,
+  API.CreateResult,
   unknown,
   { name: string }
 > {
@@ -64,20 +78,16 @@ export function useCreateAlbum(): UseMutationResult<
   const result = useMutation<void, unknown, { name: string }>(
     async ({ name }) => {
       try {
-        const { data: album } = await services.api.local.getFile({
-          where: {
-            name,
-            type: FileType.Folder,
-            owner: user.userInfo!.id,
-          },
+        const hasAlbum = await services.api.album.get({
+          name,
+          owner: user.current?.id,
         });
-        if (album) {
+        if (hasAlbum) {
           Alert.alert('该相册名已存在，请重新输入', '相册名称不能相同');
         } else {
-          await services.api.local.createFolder({
+          await services.api.album.create({
             name,
-            owner: user.userInfo!.id,
-            type: FileType.Folder,
+            owner: user.current?.id,
             extra: {
               is_album: true,
             },
@@ -93,40 +103,41 @@ export function useCreateAlbum(): UseMutationResult<
 }
 
 export function useCreateFile(): UseMutationResult<
-  ICreateFileResponse | void,
+  API.CreateResult,
   unknown,
-  ICreateFileRequest[]
+  CreatePhotoParams[]
 > {
   const { user, global } = useStore();
-  const result = useMutation<void, unknown, ICreateFileRequest[]>(
-    async files => {
-      const localIdentifiers: string[] = [];
-      try {
-        for (const file of files) {
-          await services.api.local.createFile({
-            ...file,
-            owner: user.userInfo!.id,
-          });
-          if (file.localIdentifier) {
-            localIdentifiers.push(file.localIdentifier);
-          }
-        }
-        if (global.settingInfo.autoClearOrigin) {
-          setTimeout(async () => {
-            stores.global.setEnableMask(false);
-            try {
-              await MediaLibrary.deleteAssetsAsync(localIdentifiers);
-              stores.global.setEnableMask(true);
-            } catch {
-              stores.global.setEnableMask(true);
-            }
-          }, 250);
-        }
-      } catch (error) {
-        console.error('error', error);
+  const result = useMutation<
+    void,
+    unknown,
+    (CreatePhotoParams & { localIdentifier?: string })[]
+  >(async files => {
+    const localIdentifiers: string[] = [];
+    try {
+      for (const file of files) {
+        file.localIdentifier && localIdentifiers.push(file.localIdentifier);
+        delete file.localIdentifier;
+        await services.api.photo.create({
+          ...file,
+          owner: user.current?.id,
+        });
       }
-    },
-  );
+      if (global.settingInfo.autoClearOrigin) {
+        setTimeout(async () => {
+          stores.global.setEnableMask(false);
+          try {
+            await MediaLibrary.deleteAssetsAsync(localIdentifiers);
+            stores.global.setEnableMask(true);
+          } catch {
+            stores.global.setEnableMask(true);
+          }
+        }, 250);
+      }
+    } catch (error) {
+      console.error('error', error);
+    }
+  });
 
   return result;
 }

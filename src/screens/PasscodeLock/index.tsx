@@ -1,11 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  Text,
-  AppState,
-} from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text, Alert } from 'react-native';
 import * as LocalAuthentication from 'expo-local-authentication';
 import { useTranslation, getI18n } from 'react-i18next';
 import { observer } from 'mobx-react';
@@ -15,24 +9,24 @@ import {
 } from 'react-native-navigation';
 import {
   useNavigationButtonPress,
-  useNavigationComponentDidAppear,
+  useNavigationComponentDidDisappear,
 } from 'react-native-navigation-hooks';
-import { useDeviceOrientation } from '@react-native-community/hooks';
+import {
+  useDeviceOrientation,
+  useAppState,
+} from '@react-native-community/hooks';
 
 import { useStore, stores } from '@/store';
-import IconCheckMark from '@/assets/icons/checkmark.svg';
-import { EUserType } from '@/services/db/user';
+import { EUserType } from '@/services/database/entities/user.entity';
 import { services } from '@/services';
 import { PermissionManager } from '@/utils';
-import { EAppIcon } from '@/utils/designSystem';
+import { getAppIcon } from '@/utils/designSystem';
 import PasscodeKeyboard from '@/components/PasscodeKeyboard';
 import { useUpdateEffect } from '@/hooks';
 import { AppLaunchType } from '@/config';
 
 import IconTouchID from '@/assets/icons/touchid.svg';
 import IconFaceID from '@/assets/icons/faceid.svg';
-import IconAppIcon from '@/assets/icons/app-icon/privatespace.svg';
-import IconAppIconDark from '@/assets/icons/app-icon/privatespace.dark.svg';
 
 /** 密码输入状态 */
 export const enum EInputType {
@@ -84,12 +78,15 @@ interface PasscodeLockOverlayComponent<T>
 function getTitle(type: EInputType, userType: EUserType, stage: EInputStage) {
   const t = getI18n().t;
   const fakePassText =
-    userType === EUserType.GHOST ? t('passcodeLock:fake') : '';
+    userType === EUserType.GHOST &&
+    stores.user.current?.type === EUserType.ADMIN
+      ? t('passcodeLock:fake')
+      : '';
   switch (stage) {
     case EInputStage.Confirm:
       return t('passcodeLock:confirm', { type: fakePassText });
     case EInputStage.Done:
-      return <IconCheckMark />;
+      return type === EInputType.Verify ? '通过' : '成功';
   }
 
   switch (type) {
@@ -101,6 +98,9 @@ function getTitle(type: EInputType, userType: EUserType, stage: EInputStage) {
       return t('passcodeLock:verify');
   }
 }
+
+let pauseLocalAuth = false;
+let isFirstOpen = true;
 
 const PasscodeLockOverlay: PasscodeLockOverlayComponent<IPasscodeLockProps> = (
   props: IPasscodeLockProps,
@@ -125,24 +125,41 @@ const PasscodeLockOverlay: PasscodeLockOverlayComponent<IPasscodeLockProps> = (
     [inputType, stage],
   );
 
-  useNavigationComponentDidAppear(() => {
-    if (
-      globalStore.settingInfo.autoLocalAuth &&
-      inputType === EInputType.Verify &&
-      props.userType !== EUserType.GHOST
-    ) {
+  const appState = useAppState();
+
+  useEffect(() => {
+    if (appState === 'active' || isFirstOpen) {
+      isFirstOpen = false;
       setTimeout(() => {
-        if (global.appLaunchType === AppLaunchType.QuickAction) {
-          global.appLaunchType = AppLaunchType.Unknown;
-        } else {
+        if (
+          inputType === EInputType.Verify &&
+          globalStore.settingInfo.autoLocalAuth &&
+          userStore.current?.type !== EUserType.GHOST
+        ) {
+          if (
+            pauseLocalAuth ||
+            global.appLaunchType === AppLaunchType.QuickAction
+          ) {
+            return;
+          }
+          pauseLocalAuth = true;
           handleLocalAuth();
         }
       }, 300);
+    } else if (appState === 'background') {
+      pauseLocalAuth = false;
+      global.appLaunchType = AppLaunchType.Unknown;
+    }
+  }, [appState, inputType]);
+
+  useNavigationComponentDidDisappear(() => {
+    if (appState !== 'background') {
+      pauseLocalAuth = true;
     }
   }, props.componentId);
 
   useEffect(() => {
-    if (!userStore.userInfo?.password && inputType === EInputType.Verify) {
+    if (!userStore.current?.password && inputType === EInputType.Verify) {
       setInputType(EInputType.Create);
     }
   }, []);
@@ -181,15 +198,15 @@ const PasscodeLockOverlay: PasscodeLockOverlayComponent<IPasscodeLockProps> = (
       return;
     }
 
-    const userResp = await services.api.local.getUser({
+    const user = await services.api.user.get({
       type: EUserType.ADMIN,
     });
     const result = await LocalAuthentication.authenticateAsync({
       promptMessage: t('navigator:privateSpace'),
     });
 
-    if (result.success && userResp.data) {
-      userStore.setUserInfo(userResp.data);
+    if (result.success && user) {
+      userStore.setCurrent(user);
       setTimeout(handleAuthSuccess, 200);
     }
   }
@@ -234,26 +251,24 @@ const PasscodeLockOverlay: PasscodeLockOverlayComponent<IPasscodeLockProps> = (
       if (stage === EInputStage.Confirm && value === password) {
         const userId =
           props.userType === EUserType.ADMIN
-            ? userStore.userInfo!.id
+            ? userStore.current!.id
             : userStore.ghostUser!.id;
         try {
-          const result = await services.api.local.updateUser({
+          await services.api.user.update({
             id: userId!,
             data: {
               password: value,
             },
           });
-          if (result.code === 0) {
-            if (
-              inputType === EInputType.Change ||
-              (inputType === EInputType.Create &&
-                props.userType === EUserType.GHOST)
-            ) {
-              handleCloseOverlay();
-            } else {
-              setUserInfo(userId!);
-              handleAuthSuccess();
-            }
+          if (
+            inputType === EInputType.Change ||
+            (inputType === EInputType.Create &&
+              props.userType === EUserType.GHOST)
+          ) {
+            handleCloseOverlay();
+          } else {
+            setCurrentUserInfo(userId!);
+            handleAuthSuccess();
           }
         } catch (error) {
           console.error(error);
@@ -265,15 +280,15 @@ const PasscodeLockOverlay: PasscodeLockOverlayComponent<IPasscodeLockProps> = (
       // 校验密码
     } else {
       try {
-        const result = await services.api.local.getUser({
+        const result = await services.api.user.get({
           password: value,
         });
         if (
-          result.data?.type === EUserType.ADMIN ||
-          (result.data?.type === EUserType.GHOST &&
+          result?.type === EUserType.ADMIN ||
+          (result?.type === EUserType.GHOST &&
             globalStore.settingInfo.fakePassword.enabled)
         ) {
-          userStore.setUserInfo(result.data);
+          userStore.setCurrent(result);
           handleAuthSuccess();
         } else {
           setStatus(EInputStatus.VerifyError);
@@ -283,12 +298,12 @@ const PasscodeLockOverlay: PasscodeLockOverlayComponent<IPasscodeLockProps> = (
     }
   }
 
-  async function setUserInfo(id: string) {
-    const result = await services.api.local.getUser({
+  async function setCurrentUserInfo(id: string) {
+    const result = await services.api.user.get({
       id,
     });
-    if (result.data) {
-      userStore.setUserInfo(result.data);
+    if (result) {
+      userStore.setCurrent(result);
     }
   }
 
@@ -310,6 +325,12 @@ const PasscodeLockOverlay: PasscodeLockOverlayComponent<IPasscodeLockProps> = (
       },
     });
   }
+
+  const extraButtonEnabled =
+    inputType === EInputType.Verify &&
+    userStore.current?.type === EUserType.GHOST
+      ? !globalStore.settingInfo.fakePassword?.hideLocalAuth
+      : true;
 
   return (
     <View style={[styles.container]}>
@@ -340,7 +361,7 @@ const PasscodeLockOverlay: PasscodeLockOverlayComponent<IPasscodeLockProps> = (
             )}
           </View>
         }
-        extraButton={inputType === EInputType.Verify && <LocalAuthIconButton />}
+        extraButton={extraButtonEnabled && <LocalAuthIconButton />}
       />
     </View>
   );
@@ -395,9 +416,7 @@ PasscodeLockOverlay.options = props => {
 function Logo() {
   const { ui } = useStore();
 
-  const AppIcon = useMemo(() => {
-    return ui.appIcon === EAppIcon.Dark ? IconAppIconDark : IconAppIcon;
-  }, [ui.appIcon]);
+  const AppIcon = useMemo(() => getAppIcon(ui.appIcon), [ui.appIcon]);
 
   return <AppIcon style={styles.logo} width={80} height={80} />;
 }

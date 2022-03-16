@@ -43,6 +43,7 @@ interface ISetting {
   hapticFeedback: boolean;
   fakePassword: {
     enabled: boolean;
+    hideLocalAuth: boolean;
   };
   /** 紧急切换 */
   urgentSwitchUrl: EAppOpenUrl | null;
@@ -76,6 +77,7 @@ export class GlobalStore implements IStore {
     hapticFeedback: true,
     fakePassword: {
       enabled: false,
+      hideLocalAuth: false,
     },
     urgentSwitchUrl: null,
     autoClearOrigin: true,

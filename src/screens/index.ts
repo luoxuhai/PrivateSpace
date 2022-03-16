@@ -5,12 +5,12 @@ import { OptionsModalPresentationStyle } from 'react-native-navigation';
 import { stores, withStores } from '@/store';
 import { withQueryClientProvider } from '@/services';
 import { withLargeTitle } from '@/services/navigation/options';
-import { EUserType } from '@/services/db/user';
+import { EUserType } from '@/services/database/entities/user.entity';
 import AlbumScreen from './Album';
 import TransferScreen from './Transfer';
 import SettingsScreen from './Settings';
 import MiniAppsScreen from './MiniApps';
-import ImageListScreen from './ImageList';
+import ImageListScreen from './PhotoList';
 import AlbumSettingModal from './Album/AlbumSetting';
 import AboutScreen from './About';
 import WebViewScreen from './WebView';
@@ -24,13 +24,13 @@ import AdvancedSettingScreen from './Settings/Advanced';
 import PasscodeLockScreen, { EInputType } from './PasscodeLock';
 import RecycleBinScreen from './RecycleBin';
 import RecycleBinSettingScreen from './RecycleBin/Setting';
-import ImageViewScreen from './ImageView';
+import ImageViewScreen from './PhotoView';
 import AlbumCoverScreen from './Album/AlbumCover';
-import FolderPickerScreen from './FolderPicker';
-import VideoPlayerScreen from './ImageList/VideoPlayer';
+import FolderPickerScreen from './AlbumPicker';
+import VideoPlayerScreen from './PhotoView/VideoPlayer';
 import PurchaseScreen from './Purchase';
 import DeveloperScreen from './About/Developer';
-import DescriptionFormScreen from './ImageView/DescriptionForm';
+import DescriptionFormScreen from './PhotoView/DescriptionForm';
 
 const t = getI18n().t;
 
@@ -83,9 +83,9 @@ export const getScreens = (): Screens<ScreenName> =>
             searchBar: {
               visible: true,
               hideTopBarOnFocus: true,
-              placeholder: '搜索',
+              hideOnScroll: false,
+              placeholder: '搜索相册、图片、视频',
               cancelText: '取消',
-              hideOnScroll: true,
               tintColor: stores.ui.themes.primary,
             },
           },
@@ -335,7 +335,7 @@ export const getScreens = (): Screens<ScreenName> =>
             rightButtons: [
               {
                 id: 'cancel',
-                text: t('common:cancel'),
+                text: t('common:done'),
                 color: stores.ui.themes.primary,
               },
             ],

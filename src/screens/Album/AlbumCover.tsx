@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { StyleSheet, View, SafeAreaView } from 'react-native';
 import {
   NavigationFunctionComponent,
@@ -11,16 +11,18 @@ import { useMutation, useQuery } from 'react-query';
 import { PagerView } from 'react-native-pager-view';
 import chroma from 'chroma-js';
 import { Asset } from 'expo-asset';
+import { useTranslation } from 'react-i18next';
 
 import { services } from '@/services';
-import FileEntity, { FileStatus } from '@/services/db/file';
+import FileEntity, {
+  FileStatus,
+} from '@/services/database/entities/file.entity';
 import { useStore } from '@/store';
-import { useUpdateEffect } from '@/hooks';
-import { GalleryList } from '@/screens/ImageList';
-import { ImageItemBlock } from '@/screens/ImageList/ImageItem';
+import { useUpdateEffect, useUIFrame } from '@/hooks';
+import { ImageItemBlock } from '@/screens/PhotoList/ImageItem';
 import IconCheckmarkCircle from '@/assets/icons/checkmark.circle.svg';
 import { DataLoadStatus } from '@/components/DataLoadStatus';
-import { useTranslation } from 'react-i18next';
+import GridList from '@/components/GridList';
 
 const image2 = Asset.fromModule(require('@/assets/images/cover-2.jpg')).uri;
 const image3 = Asset.fromModule(require('@/assets/images/cover-3.jpg')).uri;
@@ -70,16 +72,14 @@ const pageViews = [
 ];
 
 const AlbumCover: NavigationFunctionComponent<IAlbumCoverProps> = props => {
-  const { ui, user } = useStore();
+  const { ui } = useStore();
   const [selectedIndex, setSelectedIndex] = useState(0);
   const { t } = useTranslation();
-  const [selectedCoverId, setSelectedCoverId] = useState<string | undefined>(
-    props.album.extra?.cover,
-  );
-  const { topBarHeight } = services.nav.screens?.getConstants();
-  const pagerViewRef = useRef<{
-    setPage: (index: number) => void;
-  }>();
+  const [selectedCoverId, setSelectedCoverId] = useState<
+    string | undefined | null
+  >(props.album?.extra?.cover);
+  const UIFrame = useUIFrame();
+  const pagerViewRef = useRef<PagerView>(null);
 
   useNavigationButtonPress(handleCloseModal, props.componentId, 'cancel');
 
@@ -93,47 +93,42 @@ const AlbumCover: NavigationFunctionComponent<IAlbumCoverProps> = props => {
     }
   }, [selectedCoverId]);
 
-  const { refetch: refetchAlbumList } = useQuery('list.album', {
+  const { refetch: refetchAlbumList } = useQuery('albums', {
     enabled: false,
   });
 
-  const { mutate: handleUpdateCover } = useMutation<void, unknown>(
-    'album.cover.image.list',
-    async () => {
-      try {
-        await services.api.local.updateFile({
+  const { mutate: handleUpdateCover } = useMutation<void, unknown>(async () => {
+    try {
+      await services.api.album.update({
+        where: {
           id: props.album.id,
-          data: {
-            extra: {
-              cover: selectedCoverId,
-            },
+        },
+        data: {
+          extra: {
+            cover: selectedCoverId,
           },
-        });
-        refetchAlbumList();
-        handleCloseModal();
-      } catch (error) {}
-    },
-  );
+        },
+      });
+      refetchAlbumList();
+      handleCloseModal();
+    } catch (error) {}
+  });
 
   function handleCloseModal() {
     services.nav.screens?.N.dismissModal(props.componentId);
   }
 
   const { data: fileList, isLoading } = useQuery(
-    'album.cover.image.list',
+    [props.album.id, '.photos'],
     async () => {
-      let res;
-      try {
-        res = await services.api.local.listFile({
-          owner: user.userInfo!.id,
-          parent_id: props.album.id,
-          status: FileStatus.Normal,
-        });
-      } catch (error) {}
+      const res = await services.api.photo.list({
+        parent_id: props.album.id,
+        status: FileStatus.Normal,
+      });
 
       return {
-        list: res?.data?.list ?? [],
-        total: res?.data?.total ?? 0,
+        list: res?.items ?? [],
+        total: res?.total ?? 0,
       };
     },
     {
@@ -141,19 +136,49 @@ const AlbumCover: NavigationFunctionComponent<IAlbumCoverProps> = props => {
     },
   );
 
+  const renderItem = useCallback(
+    ({ item, index, page }) => {
+      return (
+        <>
+          <ImageItemBlock
+            index={index}
+            data={item}
+            onPress={() =>
+              setSelectedCoverId(
+                page.key === 0 ? item.extra.source_id : item.thumbnail,
+              )
+            }
+          />
+          {(page.key === 0 ? item.extra.source_id : item.thumbnail) ===
+            selectedCoverId && <SelectedMask />}
+        </>
+      );
+    },
+    [selectedCoverId],
+  );
+
   return (
-    <SafeAreaView
-      style={{
-        marginTop: topBarHeight,
-      }}>
-      <SegmentedControl
-        style={styles.segment}
-        values={pageViews.map(item => item.label)}
-        selectedIndex={selectedIndex}
-        onChange={event => {
-          setSelectedIndex(event.nativeEvent.selectedSegmentIndex);
-        }}
-      />
+    <SafeAreaView>
+      <View
+        style={[
+          styles.segmentContainer,
+          {
+            top: UIFrame.topBarHeight,
+            backgroundColor:
+              ui.appearance === 'dark'
+                ? ui.colors.secondarySystemBackground
+                : ui.colors.systemBackground,
+          },
+        ]}>
+        <SegmentedControl
+          style={styles.segment}
+          values={pageViews.map(item => item.label)}
+          selectedIndex={selectedIndex}
+          onChange={event => {
+            setSelectedIndex(event.nativeEvent.selectedSegmentIndex);
+          }}
+        />
+      </View>
 
       <PagerView
         style={styles.pagerView}
@@ -166,43 +191,27 @@ const AlbumCover: NavigationFunctionComponent<IAlbumCoverProps> = props => {
         }}>
         {pageViews.map(page => {
           return (
-            <GalleryList
+            <GridList
               style={[
                 styles.galleryList,
                 {
                   backgroundColor: ui.colors.systemBackground,
                 },
               ]}
-              data={page.key === 0 ? fileList?.list : localCovers}
+              data={page.key === 0 ? fileList?.list ?? [] : localCovers}
+              itemWidth={100}
+              gutter={2}
+              externalGutter={false}
+              gridEnabled
               ListEmptyComponent={
                 <DataLoadStatus
                   loading={isLoading}
                   text={t('imageList:noData')}
                 />
               }
-              renderItem={({ item, itemStyle, index }) => {
-                return (
-                  <>
-                    <ImageItemBlock
-                      style={{
-                        height: itemStyle.width,
-                      }}
-                      index={index}
-                      data={item}
-                      onPress={() =>
-                        setSelectedCoverId(
-                          page.key === 0
-                            ? item.extra.source_id
-                            : item.thumbnail,
-                        )
-                      }
-                    />
-                    {(page.key === 0
-                      ? item.extra.source_id
-                      : item.thumbnail) === selectedCoverId && <SelectedMask />}
-                  </>
-                );
-              }}
+              renderItem={({ item, index }) =>
+                renderItem({ page, item, index })
+              }
             />
           );
         })}
@@ -231,15 +240,21 @@ export const SelectedMask = observer((): JSX.Element => {
 const styles = StyleSheet.create({
   galleryList: {
     marginHorizontal: 0,
+    paddingTop: 40,
+    marginBottom: -40,
+  },
+
+  segmentContainer: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 1,
+    height: 40,
   },
   segment: {
-    ...StyleSheet.absoluteFillObject,
     marginHorizontal: '20%',
   },
   pagerView: {
     width: '100%',
     height: '100%',
-    marginTop: 50,
   },
   selectedMask: {
     ...StyleSheet.absoluteFillObject,

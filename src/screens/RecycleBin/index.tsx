@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { observer } from 'mobx-react-lite';
 import {
@@ -14,49 +14,48 @@ import { useQuery } from 'react-query';
 import FileViewer from 'react-native-file-viewer';
 
 import { services } from '@/services';
-import { GalleryList, SelectedMask } from '@/screens/ImageList';
-import { ImageItemBlock } from '@/screens/ImageList/ImageItem';
+import { SelectedMask } from '@/screens/PhotoList';
+import { ImageItemBlock } from '@/screens/PhotoList/ImageItem';
 import { IListFileData } from '@/services/api/local/type.d';
 import { useStore } from '@/store';
-import { FileStatus } from '@/services/db/file';
+import { FileStatus } from '@/services/database/entities/file.entity';
 import { ToolbarContainer } from './ToolbarContainer';
 import { useTranslation } from 'react-i18next';
 import { useUpdateEffect, useForceRender } from '@/hooks';
 import { ContextMenu } from './ContextMenu';
 import { DataLoadStatus } from '@/components/DataLoadStatus';
 import { clearRecycleBin } from './clearRecycleBin';
+import GridList from '@/components/GridList';
 
 const RecycleBinScreen: NavigationFunctionComponent<
   NavigationComponentProps
 > = props => {
-  const { ui, user, global } = useStore();
+  const { ui, global } = useStore();
   const { t } = useTranslation();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isSelectMode, setIsSelectMode] = useState(false);
-  const contextMenuRef = useRef<{ forceUpdate: () => void }>();
   const { visible, forceRender } = useForceRender();
 
   const {
     isLoading,
-    data: fileListResult,
+    data: photosData,
     refetch: refetchFileList,
   } = useQuery(
-    'recycle.bin.image.list',
+    'recycle.bin.photos',
     async () => {
       let res;
       try {
-        res = await services.api.local.listFile({
-          owner: user.userInfo!.id,
+        res = await services.api.photo.list({
           status: FileStatus.Deleted,
-          order: { mtime: 'DESC' },
+          order_by: { mtime: 'DESC' },
         });
       } catch (error) {
         console.log(error);
       }
 
       return {
-        list: res?.data?.list ?? [],
-        total: res?.data?.total ?? 0,
+        items: res?.items ?? [],
+        total: res?.total ?? 0,
       };
     },
     {
@@ -85,7 +84,7 @@ const RecycleBinScreen: NavigationFunctionComponent<
         .rightButtons![0]!;
     const rightButtons = [settingButton];
 
-    if (fileListResult?.total) {
+    if (photosData?.total) {
       rightButtons[1] = {
         id: 'select',
         text: t('common:select'),
@@ -99,7 +98,7 @@ const RecycleBinScreen: NavigationFunctionComponent<
         rightButtons,
       },
     });
-  }, [fileListResult?.total]);
+  }, [photosData?.total]);
 
   // 选择模式
   useUpdateEffect(() => {
@@ -210,44 +209,41 @@ const RecycleBinScreen: NavigationFunctionComponent<
     [ui.appearance, global.settingInfo.recycleBin],
   );
 
+  const renderItem = useCallback(
+    ({ item, index }) => {
+      return visible ? (
+        <ContextMenu item={item} disabled={isSelectMode}>
+          <ImageItemBlock
+            index={index}
+            data={item}
+            onPress={() => handleImagePress(item)}
+          />
+          {isSelectMode && selectedIds?.includes(item.id) && <SelectedMask />}
+        </ContextMenu>
+      ) : null;
+    },
+    [visible, isSelectMode, selectedIds],
+  );
+
   return (
     <>
-      <GalleryList
+      <GridList
         style={[
           styles.galleryList,
           {
             backgroundColor: ui.colors.systemBackground,
           },
         ]}
+        itemWidth={100}
+        gutter={2}
+        externalGutter={false}
+        gridEnabled
         ListHeaderComponent={ListHeaderComponent}
         ListEmptyComponent={
           <DataLoadStatus loading={isLoading} text={t('imageList:noData')} />
         }
-        data={fileListResult?.list}
-        renderItem={
-          visible
-            ? ({ item, itemStyle, index }) => {
-                return (
-                  <ContextMenu
-                    ref={contextMenuRef}
-                    item={item}
-                    disabled={isSelectMode}>
-                    <ImageItemBlock
-                      style={{
-                        height: itemStyle.width,
-                      }}
-                      index={index}
-                      data={item}
-                      onPress={() => handleImagePress(item)}
-                    />
-                    {isSelectMode && selectedIds?.includes(item.id) && (
-                      <SelectedMask />
-                    )}
-                  </ContextMenu>
-                );
-              }
-            : () => <></>
-        }
+        data={photosData?.items ?? []}
+        renderItem={renderItem}
       />
       <ToolbarContainer
         visible={isSelectMode}

@@ -33,18 +33,17 @@ const AlbumSettingModal: NavigationFunctionComponent<
     baidumobstat.onEvent('preview_page_album_setting', '事件1');
   }, []);
 
-  const { refetch: refetchAlbumList, data: albumResult } = useQuery(
-    'list.album',
-    {
-      enabled: false,
-    },
-  );
+  const { refetch: refetchAlbumList, data: albumResult } = useQuery('albums', {
+    enabled: false,
+  });
 
   const { mutate: updateAlbum } = useMutation<void, unknown, { name: string }>(
     async data => {
       try {
-        await services.api.local.updateFile({
-          id: props.album.id!,
+        await services.api.album.update({
+          where: {
+            id: props.album.id,
+          },
           data,
         });
         refetchAlbumList();
@@ -57,9 +56,10 @@ const AlbumSettingModal: NavigationFunctionComponent<
   const { mutate: handleDeleteAlbum } = useMutation<void, unknown, string>(
     async id => {
       try {
-        await services.api.local.deleteAlbum({
-          ids: [id],
-          isMark: global.settingInfo.recycleBin.enabled,
+        await (global.settingInfo.recycleBin.enabled
+          ? services.api.album.softDelete
+          : services.api.album.delete)({
+          id,
         });
         refetchAlbumList();
         handleDismissModal();
@@ -88,7 +88,7 @@ const AlbumSettingModal: NavigationFunctionComponent<
         <OperationList
           ui={ui}
           album={
-            albumResult?.list.find(item => item.id === props.album.id) ??
+            albumResult?.items.find(item => item.id === props.album.id) ??
             props.album
           }
           onChange={debounce(data => {

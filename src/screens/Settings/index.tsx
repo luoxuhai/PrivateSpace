@@ -2,7 +2,6 @@ import React from 'react';
 import {
   Switch,
   Share,
-  Linking,
   StyleSheet,
   Text,
   View,
@@ -11,7 +10,6 @@ import {
 import { observer } from 'mobx-react-lite';
 import { NavigationComponentProps } from 'react-native-navigation';
 import { useTranslation } from 'react-i18next';
-import * as StoreReview from 'expo-store-review';
 import { InAppBrowser } from 'react-native-inappbrowser-reborn';
 import * as LocalAuthentication from 'expo-local-authentication';
 import * as Application from 'expo-application';
@@ -24,7 +22,7 @@ import config from '@/config';
 import { useStore } from '@/store';
 import { UserRole } from '@/store/user';
 import { colors } from '@/utils/designSystem';
-import { EUserType } from '@/services/db/user';
+import { EUserType } from '@/services/database/entities/user.entity';
 import { IListItem } from '@/components/List';
 import CustomButton from '@/components/CustomButton';
 import PasscodeLockOverlay, { EInputType } from '@/screens/PasscodeLock';
@@ -35,7 +33,7 @@ import { SafeAreaScrollView } from '@/components';
 import { appearanceModeOptions } from './Theme';
 import { platformInfo } from '@/utils';
 import { DynamicUpdate } from '@/utils/dynamicUpdate';
-import baidumobstat from '@/utils/baidumobstat';
+import baidumobstat from '@/utils/analytics/baidumob';
 
 import { getAutoLockOptions } from './AutoLock';
 import { getUrgentOptions } from './Urgent';
@@ -81,14 +79,14 @@ function SettingsPage(props: NavigationComponentProps) {
           onPress() {
             PasscodeLockOverlay.open({
               type: EInputType.Change,
-              userType: user.userInfo?.type,
+              userType: user.current?.type,
             });
           },
         },
-        user.userInfo?.type === EUserType.ADMIN
+        user.current?.type === EUserType.ADMIN
           ? {
               title: t('fakePass:navigation.title'),
-              extra: global.settingInfo.fakePassword.enabled ? '已开启' : null,
+              extra: global.settingInfo.fakePassword.enabled ? '已启动' : null,
               onPress: () => handleToPage('FakePasswordSetting'),
             }
           : undefined,
@@ -99,7 +97,7 @@ function SettingsPage(props: NavigationComponentProps) {
           )?.title,
           onPress: () => handleToPage('AutoLockSetting'),
         },
-        user.userInfo?.type === EUserType.ADMIN && global.localAuthTypes?.length
+        user.current?.type === EUserType.ADMIN && global.localAuthTypes?.length
           ? {
               title: t('setting:autoLockAuth', {
                 authType: global.localAuthTypes?.includes(
@@ -185,58 +183,29 @@ function SettingsPage(props: NavigationComponentProps) {
     {
       data: [
         {
-          title: t('setting:grade'),
-          onPress: async () => {
-            try {
-              if (!(await StoreReview.hasAction())) {
-                await StoreReview.requestReview();
-              } else {
-                toAppStoreReview();
-              }
-            } catch {
-              toAppStoreReview();
-            }
-
-            function toAppStoreReview() {
-              Linking.openURL(
-                `https://apps.apple.com/app/apple-store/id${config.appId}?action=write-review`,
-              );
-            }
-          },
-        },
-        {
           title: t('setting:feedback'),
           onPress: async () => {
-            const updateMetadata = await DynamicUpdate.getUpdateMetadataAsync();
-            const ip = await platformInfo.getIpAddressAsync();
-            const networkType = await platformInfo.getNetworkStateTypeAsync();
-            const installationTime =
-              await Application.getInstallationTimeAsync();
+            let networkType: string | undefined;
+            try {
+              networkType = await platformInfo.getNetworkStateTypeAsync();
+            } catch {}
 
-            InAppBrowser.open(
-              encodeURI(
-                `${config.TXC_FEEDBACK_URL}?os=${platformInfo.os}&osVersion=${
-                  platformInfo.version
-                }&clientInfo=${JSON.stringify({
-                  label: updateMetadata?.label,
-                  installationTime,
-                })}&clientVersion=${
-                  Application.nativeApplicationVersion
-                }&netType=${networkType}&customInfo=${JSON.stringify({
-                  modelName: platformInfo.modelName,
-                  supportedCpuArchitectures:
-                    platformInfo.supportedCpuArchitectures,
-                  ip,
-                })}`,
-              ),
-              {
-                dismissButtonStyle: 'close',
-                preferredControlTintColor: ui.themes.primary,
-                modalEnabled: false,
-                animated: true,
-                enableBarCollapsing: true,
-              },
-            );
+            const url = `${config.TXC_FEEDBACK_URL}?os=${
+              platformInfo.os || '-'
+            }&osVersion=${platformInfo.version || '-'}&clientVersion=${
+              Application.nativeApplicationVersion || '-'
+            }&netType=${networkType || '-'}&customInfo=${JSON.stringify({
+              modelName: platformInfo.modelName || '-',
+              userId: user.current?.id || '-',
+            })}`;
+
+            InAppBrowser.open(encodeURI(url), {
+              dismissButtonStyle: 'close',
+              preferredControlTintColor: ui.themes.primary,
+              modalEnabled: false,
+              animated: true,
+              enableBarCollapsing: true,
+            });
           },
         },
         {

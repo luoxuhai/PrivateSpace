@@ -24,7 +24,7 @@ import useDoubleTapToZoom from '../../hooks/useDoubleTapToZoom';
 import useImageDimensions from '../../hooks/useImageDimensions';
 import { getImageStyles, getImageTransform } from '../../utils';
 import { ImageSource } from '../../@types';
-import { SourceType } from '@/services/db/file';
+import { SourceType } from '@/services/database/entities/file.entity';
 import { getSourceByMime } from '@/utils';
 import IconPlayCircleFill from '@/assets/icons/play.circle.fill.svg';
 import { useStore } from '@/store';

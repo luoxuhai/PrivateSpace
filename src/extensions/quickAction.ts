@@ -13,8 +13,8 @@ import { services, initAlbums } from '@/services';
 import { stores } from '@/store';
 import { UserRole } from '@/store/user';
 import { HapticFeedback, getDefaultAlbum } from '@/utils';
-import { FileImporter } from '@/screens/ImageList/FileImporter';
-import { transformResult } from '@/screens/ImageList/AddButton';
+import { FileImporter } from '@/screens/PhotoList/FileImporter';
+import { transformResult } from '@/screens/PhotoList/AddButton';
 import { AppLaunchType } from '@/config';
 
 const fileImporter = new FileImporter();
@@ -91,6 +91,9 @@ export class QuickAction {
           },
         },
         topBar: {
+          title: {
+            text: 'WI-FI 互传',
+          },
           rightButtons: [
             {
               id: 'cancel',
@@ -119,7 +122,7 @@ export class QuickAction {
   }
 
   openCamera() {
-    const owner = stores.user.userInfo?.id as string;
+    const owner = stores.user.current?.id as string;
     return fileImporter
       .camera(
         async file => {
@@ -131,7 +134,7 @@ export class QuickAction {
                 await getDefaultAlbum(owner)
               )?.id as string,
             );
-            await services.api.local.createFile({
+            await services.api.photo.create({
               ...res,
               owner,
             });
@@ -172,7 +175,6 @@ export class QuickAction {
   }
 
   removeAppStateListener(): void {
-    global.appLaunchType = AppLaunchType.Unknown;
     this.appStateEventSubscription?.remove();
   }
 }

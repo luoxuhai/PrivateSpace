@@ -6,8 +6,7 @@ import { useQuery } from 'react-query';
 import { showDeleteActionSheet } from '@/utils';
 import { Toolbar } from '../../components/Toolbar';
 import { services } from '@/services';
-import { FileStatus } from '@/services/db/file';
-import { useUpdateFile, useDeleteFile } from '@/hooks';
+import { useRestorePhoto, useDeleteFile } from '@/hooks';
 import { UIStore } from '@/store/ui';
 import { useStore } from '@/store';
 
@@ -62,29 +61,29 @@ export const ToolbarContainer = observer<IToolbarContainerProps>(props => {
     [t, ui, props.selectedIds.length],
   );
 
-  const { data: fileResult } = useQuery('recycle.bin.image.list', {
+  const { data: fileResult } = useQuery('recycle.bin.photos', {
     enabled: false,
   });
-  const { refetch: refetchAlbumList } = useQuery('list.album', {
+  const { refetch: refetchAlbumList } = useQuery('albums', {
     enabled: false,
   });
 
   const { mutateAsync } = useDeleteFile();
-  const { mutateAsync: updateFileAsync } = useUpdateFile();
+  const { mutateAsync: restoreAsync } = useRestorePhoto();
 
   async function handleToolbarPress(key: string | number) {
     switch (key) {
       case 'delete':
       case 'deleteAll':
         showDeleteActionSheet({
-          title: '删除图片',
+          title: '删除全部图片、视频',
           message: '此操作不可撤销',
           onConfirm: async () => {
             try {
               await mutateAsync({
                 ids:
                   key === 'deleteAll'
-                    ? fileResult?.list.map(item => item.id)
+                    ? fileResult?.items.map(item => item.id)
                     : props.selectedIds,
                 isMark: false,
               });
@@ -99,16 +98,16 @@ export const ToolbarContainer = observer<IToolbarContainerProps>(props => {
           title: {
             text: '恢复到到相册',
           },
-          async onDone({ id }) {
-            await updateFileAsync({
-              ids:
-                key === 'restoreAll'
-                  ? fileResult?.list.map(item => item.id)
-                  : props.selectedIds,
-              data: {
-                status: FileStatus.Normal,
+          async onDone({ id }: { id: string }) {
+            await restoreAsync({
+              where: {
+                ids:
+                  key === 'restoreAll'
+                    ? fileResult?.items.map(item => item.id)
+                    : props.selectedIds,
+              },
+              to: {
                 parent_id: id,
-                ctime: Date.now(),
               },
             });
             services.nav.screens?.dismissModal('FolderPicker');
@@ -120,6 +119,11 @@ export const ToolbarContainer = observer<IToolbarContainerProps>(props => {
   }
 
   return (
-    <Toolbar visible={props.visible} list={list} onPress={handleToolbarPress} />
+    <Toolbar
+      visible={props.visible}
+      list={list}
+      hideBorder
+      onPress={handleToolbarPress}
+    />
   );
 });

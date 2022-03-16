@@ -5,8 +5,8 @@ import { withQueryClientProvider } from '@/services';
 import BlurMask from '@/components/BlurMask';
 import { LoadingOverlay } from '@/components/LoadingOverlay';
 import { CameraPage } from '@/screens/Camera';
-import { MoreButton } from '@/screens/ImageList/MoreButton';
-import { ImageViewTitle } from '@/screens/ImageView/ImageViewTitle';
+import { MoreButton } from '@/screens/PhotoList/MoreButton';
+import { ImageViewTitle } from '@/screens/PhotoView/ImageViewTitle';
 
 export function getDefaultOptions(): Options {
   return {

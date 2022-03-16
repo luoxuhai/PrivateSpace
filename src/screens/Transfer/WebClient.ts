@@ -14,9 +14,9 @@ const FILE_NAME = 'transfer-client.zip';
 export default class WebClient {
   static path: string = SAVE_PATH;
 
-  static async update(): PVoid {
+  static async update(force?: boolean): PVoid {
     try {
-      if (await exists(SAVE_PATH)) {
+      if (!force && (await exists(join(SAVE_PATH, 'index.html')))) {
         return;
       }
 
@@ -30,9 +30,9 @@ export default class WebClient {
       await downloadFile({
         fromUrl: WEB_CLIENT_URL,
         toFile: join(TEMP_SAVE_PATH, FILE_NAME),
+        cacheable: true,
       }).promise;
 
-      await unlink(SAVE_PATH);
       const path = await unzip(
         join(TEMP_SAVE_PATH, FILE_NAME),
         SAVE_PATH,

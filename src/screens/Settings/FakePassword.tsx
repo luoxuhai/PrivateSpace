@@ -2,19 +2,26 @@ import React from 'react';
 import { Switch, StyleSheet } from 'react-native';
 import { observer } from 'mobx-react-lite';
 import { useTranslation } from 'react-i18next';
+import * as LocalAuthentication from 'expo-local-authentication';
 
 import { useStore } from '@/store';
 import { services } from '@/services';
 import List, { IListItem } from '@/components/List';
 import { SafeAreaScrollView } from '@/components';
 import PasscodeLock, { EInputType } from '@/screens/PasscodeLock';
-import { EUserType } from '@/services/db/user';
+import { EUserType } from '@/services/database/entities/user.entity';
 import { useStat } from '@/hooks';
 
 function FakePasswordSettingScreen(): JSX.Element {
   const { ui, global, user } = useStore();
   const { t } = useTranslation();
   useStat('FakePasswordSetting');
+
+  const localAuthText = global.localAuthTypes?.includes(
+    LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION,
+  )
+    ? t('common:faceID')
+    : t('common:touchID');
 
   const list: IListItem[] = [
     {
@@ -33,6 +40,7 @@ function FakePasswordSettingScreen(): JSX.Element {
                   if (password) {
                     global.setSettingInfo({
                       fakePassword: {
+                        ...global.settingInfo.fakePassword,
                         enabled: true,
                       },
                     });
@@ -45,10 +53,28 @@ function FakePasswordSettingScreen(): JSX.Element {
             } else {
               global.setSettingInfo({
                 fakePassword: {
+                  ...global.settingInfo.fakePassword,
                   enabled: value,
                 },
               });
             }
+          }}
+        />
+      ),
+    },
+    {
+      title: `隐藏解锁界面${localAuthText}解锁按钮`,
+      render: () => (
+        <Switch
+          disabled={!global.settingInfo.fakePassword?.enabled}
+          value={global.settingInfo.fakePassword?.hideLocalAuth ?? false}
+          onValueChange={value => {
+            global.setSettingInfo({
+              fakePassword: {
+                ...global.settingInfo.fakePassword,
+                hideLocalAuth: value,
+              },
+            });
           }}
         />
       ),
@@ -69,12 +95,16 @@ function FakePasswordSettingScreen(): JSX.Element {
   ];
 
   async function getUserPassword() {
-    const result = await services.api.local.getUser({
+    const result = await services.api.user.get({
       type: EUserType.GHOST,
     });
 
-    return result.data?.password;
+    return result?.password;
   }
+
+  const headerText = global.settingInfo.autoLocalAuth
+    ? `开启后将关闭自动${localAuthText}识别解锁功能`
+    : null;
 
   return (
     <SafeAreaScrollView
@@ -87,7 +117,7 @@ function FakePasswordSettingScreen(): JSX.Element {
               : ui.colors.secondarySystemBackground,
         },
       ]}>
-      <List data={list} />
+      <List data={list} header={headerText} />
     </SafeAreaScrollView>
   );
 }

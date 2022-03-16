@@ -6,9 +6,7 @@ import { SafeAreaScrollView } from '@/components';
 import { useStore } from '@/store';
 import { services } from '@/services';
 import { UserRole } from '@/store/user';
-import SimpleSelectionList, {
-  ISimpleSelectionListItem,
-} from '@/components/SimpleSelectionList';
+import SimpleSelectionList from '@/components/SimpleSelectionList';
 
 interface IAdvancedSettingProps {}
 

@@ -1,4 +1,10 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, {
+  useState,
+  useRef,
+  useCallback,
+  useEffect,
+  useMemo,
+} from 'react';
 import {
   Pressable,
   ScrollView,
@@ -9,7 +15,7 @@ import {
   View,
   PlatformColor,
 } from 'react-native';
-import FastImage, { FastImageStaticProperties } from 'react-native-fast-image';
+import FastImage from 'react-native-fast-image';
 import { createImageProgress } from 'react-native-image-progress';
 import { Blurhash } from 'react-native-blurhash';
 import Animated, { FadeOut } from 'react-native-reanimated';
@@ -34,18 +40,24 @@ export interface ImageViewProps
   renderExtraElements?: (
     loadStatus: LoadStatus,
   ) => JSX.Element | JSX.Element[] | null | undefined;
+  delayLongPress?: number;
+  delayDoublePress?: number;
   onPress?: () => void;
   onLongPress?: () => void;
   onDoublePress?: () => void;
   onZoomScaleChange?: (scale: number) => void;
 }
 
-// 开始缩放前的值
-let beginZoomScale: number;
 // onPressIn 事件值
 let pressInEvent: NativeSyntheticTouchEvent['nativeEvent'];
 
+export const DEFAULT_PROPS = {
+  delayDoublePress: 250,
+  delayLongPress: 500,
+};
+
 function ImageView(props: ImageViewProps): JSX.Element {
+  const mergedProps = useMemo(() => ({ ...DEFAULT_PROPS, ...props }), [props]);
   const [imageDimension, setImageDimension] = useState<Dimensions>();
   const [containerDimensions, setContainerDimensions] = useState<Dimensions>();
   const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.Loading);
@@ -57,6 +69,7 @@ function ImageView(props: ImageViewProps): JSX.Element {
     scrollViewRef,
     scaled,
     containerDimensions,
+    doublePressDelay: mergedProps.delayDoublePress,
     onDoublePress: props.onDoublePress,
     onPress: props.onPress,
   });
@@ -84,7 +97,7 @@ function ImageView(props: ImageViewProps): JSX.Element {
         exiting={FadeOut.duration(100)}
       />
     ) : (
-      <ActivityIndicator />
+      <ActivityIndicator size="large" />
     );
   }, [props.source.blurhash]);
 
@@ -100,7 +113,12 @@ function ImageView(props: ImageViewProps): JSX.Element {
 
   const handlePressOut = useCallback(
     (event: NativeSyntheticTouchEvent) => {
-      if (!loaded) return;
+      if (
+        !loaded ||
+        event.nativeEvent.timestamp - pressInEvent.timestamp >=
+          mergedProps.delayLongPress
+      )
+        return;
 
       const { locationX: lastX, locationY: lastY } = pressInEvent;
       const { locationX, locationY } = event.nativeEvent;
@@ -126,7 +144,6 @@ function ImageView(props: ImageViewProps): JSX.Element {
         pinchGestureEnabled
         scrollEnabled
         centerContent
-        bounces
         contentInsetAdjustmentBehavior="never"
         decelerationRate={0.8}
         showsHorizontalScrollIndicator={false}
@@ -134,10 +151,7 @@ function ImageView(props: ImageViewProps): JSX.Element {
         maximumZoomScale={maxScale}
         scrollEventThrottle={1}
         onScroll={handleScroll}
-        onScrollBeginDrag={event => {
-          beginZoomScale = event.nativeEvent.zoomScale;
-          props.onScrollBeginDrag?.(event);
-        }}
+        onScrollBeginDrag={props.onScrollBeginDrag}
         onScrollEndDrag={props.onScrollEndDrag}
         onLayout={event => {
           const { width, height } = event.nativeEvent.layout;
@@ -147,6 +161,7 @@ function ImageView(props: ImageViewProps): JSX.Element {
           });
         }}>
         <Pressable
+          delayLongPress={mergedProps.delayLongPress}
           onPressIn={event => {
             pressInEvent = event.nativeEvent;
           }}

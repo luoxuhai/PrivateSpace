@@ -1,0 +1,125 @@
+diff --git a/node_modules/react-native-color-picker-ios/.DS_Store b/node_modules/react-native-color-picker-ios/.DS_Store
+new file mode 100644
+index 0000000..b2d876b
+Binary files /dev/null and b/node_modules/react-native-color-picker-ios/.DS_Store differ
+diff --git a/node_modules/react-native-color-picker-ios/ios/ColorPicker.swift b/node_modules/react-native-color-picker-ios/ios/ColorPicker.swift
+index 063ec90..35daea5 100644
+--- a/node_modules/react-native-color-picker-ios/ios/ColorPicker.swift
++++ b/node_modules/react-native-color-picker-ios/ios/ColorPicker.swift
+@@ -3,16 +3,14 @@
+ class ColorPickerProxy: UIViewController, UIColorPickerViewControllerDelegate {
+         
+     var picker: UIColorPickerViewController!
+-    var supportsAlpha:Bool = false
+-    var initialColor:UIColor = UIColor(ciColor: .black)
++    var options: NSDictionary = [:]
+     var callback: RCTResponseSenderBlock!
+ 
+     @objc
+     func showColorPicker(_ options:NSDictionary, callback:@escaping RCTResponseSenderBlock){
+-        if (options["supportsAlpha"] as? NSNumber == 1) {
+-            self.supportsAlpha = true
+-        }
+-        self.initialColor=RCTConvert.uiColor(options["initialColor"])
++        self.options = ["initialColor": RCTConvert.uiColor(options["initialColor"] ?? UIColor(ciColor: .black))!,
++                        "supportsAlpha": options["supportsAlpha"] as? NSNumber == 1 ? true : false,
++                        "title": options["title"] as? String as Any]
+         self.callback=callback
+                                                         
+         DispatchQueue.main.async {
+@@ -23,9 +21,22 @@ class ColorPickerProxy: UIViewController, UIColorPickerViewControllerDelegate {
+     func launchColorPicker() {
+         self.picker = UIColorPickerViewController()
+         self.picker.delegate = self
+-                
+-        self.picker.supportsAlpha=self.supportsAlpha
+-        self.picker.selectedColor=self.initialColor
++      /*  if #available(iOS 15.0, *) {
++            if let sheet = self.picker.sheetPresentationController {
++                sheet.detents = [.medium(), .large()]
++              //  sheet.largestUndimmedDetentIdentifier = .medium
++                sheet.prefersGrabberVisible = true
++            }
++        } else {
++            // Fallback on earlier versions
++        } */
++        
++        self.picker.isModalInPresentation = true
++        self.picker.supportsAlpha = self.options["supportsAlpha"] as! Bool
++        self.picker.selectedColor = self.options["initialColor"] as! UIColor
++        if (self.options["title"] != nil) {
++            self.picker.title = self.options["title"] as? String
++        }
+         
+         if let root = RCTPresentedViewController() {
+             root.present(self.picker, animated: true, completion: nil)
+diff --git a/node_modules/react-native-color-picker-ios/ios/ColorPickerIos.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist b/node_modules/react-native-color-picker-ios/ios/ColorPickerIos.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
+new file mode 100644
+index 0000000..18d9810
+--- /dev/null
++++ b/node_modules/react-native-color-picker-ios/ios/ColorPickerIos.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
+@@ -0,0 +1,8 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
++<plist version="1.0">
++<dict>
++	<key>IDEDidComputeMac32BitWarning</key>
++	<true/>
++</dict>
++</plist>
+diff --git a/node_modules/react-native-color-picker-ios/ios/ColorPickerIos.xcodeproj/project.xcworkspace/xcuserdata/luoxuhai.xcuserdatad/UserInterfaceState.xcuserstate b/node_modules/react-native-color-picker-ios/ios/ColorPickerIos.xcodeproj/project.xcworkspace/xcuserdata/luoxuhai.xcuserdatad/UserInterfaceState.xcuserstate
+new file mode 100644
+index 0000000..3f36d20
+Binary files /dev/null and b/node_modules/react-native-color-picker-ios/ios/ColorPickerIos.xcodeproj/project.xcworkspace/xcuserdata/luoxuhai.xcuserdatad/UserInterfaceState.xcuserstate differ
+diff --git a/node_modules/react-native-color-picker-ios/ios/ColorPickerIos.xcodeproj/xcuserdata/luoxuhai.xcuserdatad/xcschemes/xcschememanagement.plist b/node_modules/react-native-color-picker-ios/ios/ColorPickerIos.xcodeproj/xcuserdata/luoxuhai.xcuserdatad/xcschemes/xcschememanagement.plist
+new file mode 100644
+index 0000000..6b03f03
+--- /dev/null
++++ b/node_modules/react-native-color-picker-ios/ios/ColorPickerIos.xcodeproj/xcuserdata/luoxuhai.xcuserdatad/xcschemes/xcschememanagement.plist
+@@ -0,0 +1,14 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
++<plist version="1.0">
++<dict>
++	<key>SchemeUserState</key>
++	<dict>
++		<key>ColorPickerIos.xcscheme_^#shared#^_</key>
++		<dict>
++			<key>orderHint</key>
++			<integer>0</integer>
++		</dict>
++	</dict>
++</dict>
++</plist>
+diff --git a/node_modules/react-native-color-picker-ios/lib/typescript/src/index.d.ts b/node_modules/react-native-color-picker-ios/lib/typescript/src/index.d.ts
+index a6070ac..2b44df7 100644
+--- a/node_modules/react-native-color-picker-ios/lib/typescript/src/index.d.ts
++++ b/node_modules/react-native-color-picker-ios/lib/typescript/src/index.d.ts
+@@ -12,6 +12,7 @@ declare type ColorPickerInputOptions = {
+      * initial color displayed on the picker
+      */
+     initialColor?: string;
++    title?: string;
+ };
+ declare const ColorPicker: {
+     showColorPicker: (options?: ColorPickerInputOptions | undefined, callback?: ((color: string) => void) | undefined) => void;
+diff --git a/node_modules/react-native-color-picker-ios/src/index.tsx b/node_modules/react-native-color-picker-ios/src/index.tsx
+index b49153b..1dee232 100644
+--- a/node_modules/react-native-color-picker-ios/src/index.tsx
++++ b/node_modules/react-native-color-picker-ios/src/index.tsx
+@@ -14,6 +14,7 @@ type ColorPickerInputOptions = {
+    * initial color displayed on the picker
+    */
+   initialColor?: string;
++  title?: string;
+ };
+ 
+ /**
+@@ -22,6 +23,7 @@ type ColorPickerInputOptions = {
+ type ColorPickerNativeOptions = {
+   supportsAlpha?: boolean;
+   initialColor?: number;
++  title?: string;
+ };
+ 
+ type ColorPickerMethods = {

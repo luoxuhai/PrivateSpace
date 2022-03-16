@@ -1,29 +1,16 @@
-import * as ClassifyImage from 'react-native-classify-image';
 import { Blurhash } from 'react-native-blurhash';
-import { Like } from 'typeorm/browser';
-import * as FS from 'react-native-fs';
 
 import { services } from '@/services';
 import { CustomSentry } from '@/utils/customSentry';
 import Process from './Process';
-
-interface ImageResult {
-  id: string;
-  uri: string;
-  labels?: FileLabel;
-  mime: string;
-  poster: string;
-}
 
 class BlurhashImageProcess extends Process {
   public async start(): PVoid {
     this.status = 'STARTED';
     this.sendEvent('start');
     try {
-      const files: ImageResult[] = await this.getAllImageAndVideo();
-      const untreatedImages = files.filter(
-        item => item.uri && !item.extra.blurhash,
-      );
+      const files = await this.getAllImageAndVideo();
+      const untreatedImages = files.filter(item => !item.extra?.blurhash);
       this.progress = files.length - untreatedImages.length;
 
       untreatedImages.forEach(async (file, index) => {
@@ -32,18 +19,36 @@ class BlurhashImageProcess extends Process {
         }
 
         try {
-          const result = await Blurhash.encode(
-            file.mime.startsWith('image/') ? file.uri : file.poster,
-            32,
-            32,
+          const imageUri = file.mime?.startsWith('image/')
+            ? file.uri
+            : file.poster || file.thumbnail;
+          if (!imageUri) return;
+
+          let componentsX = 32;
+          let componentsY = 32;
+
+          const width = file.extra?.width ?? file.metadata?.width ?? 0;
+          const height = file.extra?.height ?? file.metadata?.height ?? 0;
+
+          if (width > height) {
+            componentsY = Math.trunc(componentsX / (width / height));
+          } else if (width < height) {
+            componentsX = Math.trunc(componentsY * (width / height));
+          }
+          const blurhashStr = await Blurhash.encode(
+            `file://${encodeURI(imageUri)}`,
+            componentsX,
+            componentsY,
           );
-          await this.updateFileBlurhash(file.id, result);
+
+          await this.updateFileBlurhash(file.id as string, blurhashStr);
           this.sendEvent('progress', {
             progress: ++this.progress,
             total: files.length,
           });
           untreatedImages.splice(index, 1);
         } catch (error) {
+          console.log('--------------', error);
           this.sendEvent('error', error);
         }
       });
@@ -54,8 +59,11 @@ class BlurhashImageProcess extends Process {
   }
 
   private async updateFileBlurhash(id: string, blurhash?: string) {
-    return await services.api.local.updateFile({
-      id,
+    console.log(id, blurhash);
+    return await services.api.photo.update({
+      where: {
+        id,
+      },
       data: {
         extra: {
           blurhash,
@@ -65,15 +73,23 @@ class BlurhashImageProcess extends Process {
   }
 
   private async getAllImageAndVideo() {
-    const files = await this.getAllFile();
-    return files.filter(file => /(image\/|video\/).+/.test(file.mime!));
+    const files = await this.getAllPhoto();
+    return files.filter(
+      file => file.mime && /(image\/|video\/).+/.test(file.mime),
+    );
   }
 }
 
 const blurhashImageProcess = new BlurhashImageProcess();
 
+let errorCount = 0;
+
 blurhashImageProcess.on('error', error => {
-  CustomSentry.captureException(error);
+  errorCount++;
+  console.log(error);
+  if (errorCount <= 1) {
+    CustomSentry.captureException(error);
+  }
 });
 
 export default blurhashImageProcess;

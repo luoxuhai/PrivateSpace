@@ -34,6 +34,7 @@ import { Toolbar } from '@/components/Toolbar';
 import CustomButton from '@/components/CustomButton';
 import { LoadingOverlay } from '@/components/LoadingOverlay';
 import { useStat } from '@/hooks';
+import analytics from '@/utils/analytics/firebase';
 
 import { RNToasty } from 'react-native-toasty';
 import { UserRole } from '@/store/user';
@@ -71,6 +72,8 @@ setPurchaseListener();
 function handleDismiss() {
   services.nav.screens?.dismissModal('Purchase');
 }
+
+let products: InAppPurchases.IAPItemDetails[] | undefined;
 
 const PurchaseScreen: NavigationFunctionComponent =
   observer<NavigationComponentProps>(props => {
@@ -161,7 +164,7 @@ const PurchaseScreen: NavigationFunctionComponent =
       const { results, responseCode } = await InAppPurchases.getProductsAsync(
         config.inAppPurchasesProductIds,
       );
-
+      products = results;
       if (responseCode !== InAppPurchases.IAPResponseCode.OK) return;
 
       setProjectList([
@@ -185,14 +188,16 @@ const PurchaseScreen: NavigationFunctionComponent =
     async function handleRestorePurchasePress() {
       if (!inAppPurchaseConnected) return;
 
-      await LoadingOverlay.show({
+      LoadingOverlay.show({
         text: {
           visible: true,
           value: '正在恢复',
         },
       });
       const result = await InAppPurchases.getPurchaseHistoryAsync();
-      await LoadingOverlay.hide();
+      try {
+        await LoadingOverlay.hide();
+      } catch {}
       if (
         result?.results?.find(item =>
           config.inAppPurchasesProductIds.includes(item.productId),
@@ -216,8 +221,15 @@ const PurchaseScreen: NavigationFunctionComponent =
         await connectInAppPurchaseAsync();
       }
 
+      LoadingOverlay.show({
+        text: {
+          visible: true,
+          value: '购买中',
+        },
+      });
       await InAppPurchases.purchaseItemAsync(currentProject.productId);
       setPurchaseLoading(false);
+      LoadingOverlay.hide();
     }
 
     const isPerpetual = useMemo(
@@ -276,14 +288,7 @@ const PurchaseScreen: NavigationFunctionComponent =
           />
         )}
 
-        <Toolbar
-          visible
-          style={{
-            paddingTop: 10,
-          }}
-          list={toolbarList}
-          onPress={handleOpenBrowserPress}
-        />
+        <Toolbar visible list={toolbarList} onPress={handleOpenBrowserPress} />
       </>
     );
   });
@@ -456,7 +461,6 @@ const rightsList = [
 ];
 
 const Rights = ({ componentId }: { componentId: string }) => {
-  const { width } = useWindowDimensions();
   const { user } = useStore();
 
   const handlePress = useCallback(
@@ -673,7 +677,18 @@ function setPurchaseListener() {
                 },
               },
             });
+            try {
+              await LoadingOverlay.hide();
+            } catch {}
             handleDismiss();
+
+            const product = products?.find(
+              item => item.productId === config.inAppPurchasesProductIds[1],
+            );
+            analytics().logPurchase({
+              value: Number(product?.price.slice(1, product?.price?.length)),
+              currency: product?.priceCurrencyCode,
+            });
           }
           break;
         case InAppPurchases.IAPResponseCode.USER_CANCELED:

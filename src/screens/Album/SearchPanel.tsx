@@ -5,18 +5,19 @@ import React, {
   useEffect,
   useCallback,
 } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, ViewStyle } from 'react-native';
 import { observer } from 'mobx-react-lite';
 import { OptionsModalPresentationStyle } from 'react-native-navigation';
-import Animated, { FadeOut, FadeIn, FadeInUp } from 'react-native-reanimated';
+import Animated, { FadeOut, FadeIn, FadeInDown } from 'react-native-reanimated';
 import SegmentedControl from '@react-native-segmented-control/segmented-control';
 import { useQuery } from 'react-query';
 
 import { services } from '@/services';
-import { FileType, FileStatus } from '@/services/db/file';
+import { FileType } from '@/services/database/entities/file.entity';
 import { useStore } from '@/store';
-import { GalleryList } from '@/screens/ImageList';
-import { ImageItemBlock } from '@/screens/ImageList/ImageItem';
+import { useUIFrame } from '@/hooks';
+import GridList from '@/components/GridList';
+import { ImageItemBlock } from '@/screens/PhotoList/ImageItem';
 import { AlbumCard } from './index';
 import { Empty } from '@/components/Empty';
 
@@ -46,10 +47,11 @@ export const SearchPanel = observer(
   (props, ref) => {
     const [visible, setVisible] = useState(false);
     const [value, setValue] = useState<string | undefined>();
-    const { ui, user } = useStore();
+    const { ui } = useStore();
     const [selectedTypeIndex, setSelectedTypeIndex] = useState<number>(
       filterOptions[0].key,
     );
+    const UIFrame = useUIFrame();
 
     useEffect(() => {
       if (!visible) {
@@ -62,11 +64,10 @@ export const SearchPanel = observer(
       setValue(undefined);
     }, []);
 
-    const statusBarHeight =
-      services.nav.screens?.getConstants()?.statusBarHeight;
+    const statusBarHeight = UIFrame.statusBarHeight;
 
     const segmentedControlTop = useMemo(
-      () => statusBarHeight! + 60,
+      () => statusBarHeight + 60,
       [statusBarHeight],
     );
 
@@ -110,17 +111,15 @@ export const SearchPanel = observer(
       ['search.panel', value, searchExtraCondition],
       async () => {
         const res = value
-          ? await services.api.local.searchFile({
-              keywords: value!,
-              status: FileStatus.Normal,
-              owner: user.userInfo?.id,
+          ? await services.api.global.search({
+              keyword: value,
               ...searchExtraCondition,
             })
           : null;
 
         return {
-          list: res?.data.list,
-          total: res?.data.total ?? 0,
+          list: res?.items ?? [],
+          total: res?.total ?? 0,
         };
       },
       {
@@ -133,7 +132,7 @@ export const SearchPanel = observer(
       [searchResult?.list],
     );
 
-    function handlePress(item, index?: number) {
+    function handlePress(item) {
       switch (item.type) {
         case FileType.Folder:
           services.nav.screens?.push(
@@ -142,7 +141,11 @@ export const SearchPanel = observer(
             {
               albumName: item.name,
               albumId: item.id,
-              hasImage: !!item.file_count,
+              hasImage: !!item.item_total,
+              count: {
+                image: item.image_total,
+                video: item.video_total,
+              },
             },
             {
               bottomTabs: {
@@ -167,17 +170,43 @@ export const SearchPanel = observer(
       }
     }
 
+    const viewStyle: ViewStyle = useMemo(
+      () => ({
+        display: visible ? 'flex' : 'none',
+        backgroundColor: ui.colors.systemBackground,
+      }),
+      [visible, ui.colors.systemBackground],
+    );
+
+    const renderItem = useCallback(({ item, index }) => {
+      return (
+        <>
+          {item.extra?.is_album ? (
+            <AlbumCard
+              footerStyle={{
+                height: 40,
+              }}
+              data={item}
+              onPress={() => handlePress(item)}
+            />
+          ) : (
+            <ImageItemBlock
+              index={index}
+              data={item}
+              onPress={() => {
+                handlePress(item, index);
+              }}
+            />
+          )}
+        </>
+      );
+    }, []);
+
     return (
       <Animated.View
         entering={FadeIn}
         exiting={FadeOut}
-        style={[
-          styles.container,
-          {
-            display: visible ? 'flex' : 'none',
-            backgroundColor: ui.colors.systemBackground,
-          },
-        ]}>
+        style={[styles.container, viewStyle]}>
         {visible && (
           <AnimatedSegmentedControl
             style={[
@@ -186,7 +215,7 @@ export const SearchPanel = observer(
                 top: segmentedControlTop,
               },
             ]}
-            entering={FadeInUp.duration(200).delay(100)}
+            entering={FadeInDown.duration(200).delay(100)}
             values={filterOptions.map(item => item.label)}
             selectedIndex={selectedTypeIndex}
             onChange={event => {
@@ -199,18 +228,22 @@ export const SearchPanel = observer(
           style={[
             styles.result,
             {
-              marginTop: statusBarHeight! + 110,
+              marginTop: statusBarHeight + 110,
             },
           ]}
           entering={FadeIn}
           exiting={FadeOut}>
-          <GalleryList
+          <GridList
             style={[
               {
                 backgroundColor: ui.colors.systemBackground,
               },
             ]}
-            data={searchResult?.list}
+            data={searchResult?.list ?? []}
+            itemWidth={100}
+            gutter={2}
+            externalGutter={false}
+            gridEnabled
             ListEmptyComponent={
               searchResult?.list && (
                 <Empty
@@ -220,35 +253,7 @@ export const SearchPanel = observer(
                 />
               )
             }
-            renderItem={({ item, itemStyle, index }) => {
-              return (
-                <>
-                  {item.extra?.is_album ? (
-                    <AlbumCard
-                      style={{
-                        height: itemStyle.width,
-                      }}
-                      footerStyle={{
-                        height: 40,
-                      }}
-                      data={item}
-                      onPress={() => handlePress(item)}
-                    />
-                  ) : (
-                    <ImageItemBlock
-                      style={{
-                        height: itemStyle.width,
-                      }}
-                      index={index}
-                      data={item}
-                      onPress={() => {
-                        handlePress(item, index);
-                      }}
-                    />
-                  )}
-                </>
-              );
-            }}
+            renderItem={renderItem}
           />
         </Animated.View>
       </Animated.View>

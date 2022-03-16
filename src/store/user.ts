@@ -6,7 +6,7 @@ import {
 } from 'mobx-persist-store';
 import { InAppPurchase } from 'expo-in-app-purchases';
 
-import User from '@/services/db/user';
+import User from '@/services/database/entities/user.entity';
 
 export const enum UserRole {
   /** 普通用户 */
@@ -15,8 +15,8 @@ export const enum UserRole {
   VIP,
 }
 
-export class UserStore {
-  @observable userInfo?: User;
+export class UserStore implements IStore {
+  @observable current?: User;
   @observable ghostUser?: Partial<User>;
   @observable purchaseResults?: InAppPurchase[];
 
@@ -33,8 +33,8 @@ export class UserStore {
     });
   }
 
-  @action setUserInfo(user: User): void {
-    this.userInfo = user;
+  @action setCurrent(user: User): void {
+    this.current = user;
   }
 
   @action setPurchaseResults(purchaseResults: InAppPurchase[]): void {

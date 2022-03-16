@@ -1,5 +1,5 @@
-import FileEntity from '@/services/db/file';
-import UserEntity, { EUserType } from '@/services/db/user';
+import FileEntity from '@/services/database/entities/file.entity';
+import UserEntity, { EUserType } from '@/services/database/entities/user.entity';
 import { InsertResult, UpdateResult, DeleteResult } from 'typeorm/browser';
 
 export interface IListAlbumRequest {

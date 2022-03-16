@@ -11,14 +11,13 @@ import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { CustomSentry } from '@/utils/customSentry';
 import Navigation from './navigation';
 import { SOURCE_PATH, THUMBNAIL_PATH, TEMP_PATH, STATIC_PATH } from '@/config';
-import DB from './db';
+import DB from './database';
 import Locale from './locale';
-import { EUserType } from './db/user';
-import { FileType } from './db/file';
-import * as localApi from './api/local';
+import { EUserType } from './database/entities/user.entity';
+import * as API from './api';
 import config from '@/config';
 import { stores } from '@/store';
-import { generateID, getDefaultAlbum } from '@/utils';
+import { generateID } from '@/utils';
 import { QuickAction } from '@/extensions/quickAction';
 
 interface IService {
@@ -31,9 +30,7 @@ export const services = {
   locale: new Locale(),
   db: new DB(),
   nav: new Navigation(),
-  api: {
-    local: localApi,
-  },
+  api: API,
   quickAction: new QuickAction(),
 };
 
@@ -64,21 +61,18 @@ export const initAlbums = async (): PVoid => {
     try {
       const owner =
         userType === EUserType.ADMIN
-          ? stores.user.userInfo?.id
+          ? stores.user.current?.id
           : stores.user.ghostUser?.id;
-      const result = await services.api.local.getFile({
-        where: {
-          name: config.defaultAlbum[0].name,
-          type: FileType.Folder,
-          owner,
-        },
+      const result = await services.api.album.get({
+        name: config.defaultAlbum[0].name,
+        owner,
       });
 
-      if (result?.data) {
+      if (result) {
         return;
       }
 
-      await services.api.local.createFolder({
+      await services.api.album.create({
         id: generateID(),
         name: config.defaultAlbum[0].name,
         owner,

@@ -28,6 +28,7 @@ export class UIStore implements IStore {
   @observable appearance: AppearanceMode = 'light';
   @observable colors: SystemColors = getColors(this.appearance);
   @observable themeName: EThemeName = EThemeName.Blue;
+  @observable customThemeColor: string = this.themes.primary;
 
   @observable language: Language = 'zh-CN';
   @observable isSystemLanguage = this.language === 'system';
@@ -50,6 +51,7 @@ export class UIStore implements IStore {
         'isSystemLanguage',
         'themeName',
         'appIcon',
+        'customThemeColor',
       ],
     });
     this.addSystemAppearanceChangeListener();
@@ -73,9 +75,12 @@ export class UIStore implements IStore {
     services.nav.updateOptions();
   };
 
-  @action.bound setTheme(name: EThemeName): void {
+  @action.bound setTheme(name: EThemeName, color?: string): void {
     this.themeName = name;
 
+    if (color) {
+      this.customThemeColor = color;
+    }
     services.nav.updateOptions();
   }
 

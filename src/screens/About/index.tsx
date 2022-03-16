@@ -11,6 +11,7 @@ import { InAppBrowser } from 'react-native-inappbrowser-reborn';
 import { useQuery } from 'react-query';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { RNToasty } from 'react-native-toasty';
+import * as StoreReview from 'expo-store-review';
 
 import { useStore } from '@/store';
 import { services } from '@/services';
@@ -18,11 +19,8 @@ import config from '@/config';
 import { ELanguage } from '@/services/locale';
 import SimpleSelectionList from '@/components/SimpleSelectionList';
 import { SafeAreaScrollView } from '@/components';
-import { EAppIcon } from '@/utils/designSystem';
+import { getAppIcon } from '@/utils/designSystem';
 import { DynamicUpdate } from '@/utils/dynamicUpdate';
-
-import IconAppIcon from '@/assets/icons/app-icon/privatespace.svg';
-import IconAppIconDark from '@/assets/icons/app-icon/privatespace.dark.svg';
 
 const AboutScreen: NavigationFunctionComponent<
   NavigationComponentProps
@@ -61,11 +59,24 @@ const AboutScreen: NavigationFunctionComponent<
           // }),
         },
         {
-          title: t('about:moreApps'),
-          onPress: () =>
-            Linking.openURL(
-              `https://apps.apple.com/developer/id${config.developerId}`,
-            ),
+          title: t('setting:grade'),
+          onPress: async () => {
+            try {
+              if (!(await StoreReview.hasAction())) {
+                await StoreReview.requestReview();
+              } else {
+                toAppStoreReview();
+              }
+            } catch {
+              toAppStoreReview();
+            }
+
+            function toAppStoreReview() {
+              Linking.openURL(
+                `https://apps.apple.com/app/apple-store/id${config.appId}?action=write-review`,
+              );
+            }
+          },
         },
       ],
     },
@@ -116,6 +127,13 @@ const AboutScreen: NavigationFunctionComponent<
         },
       ],
     },
+    // {
+    //   title: t('about:moreApps'),
+    //   onPress: () =>
+    //     Linking.openURL(
+    //       `https://apps.apple.com/developer/id${config.developerId}`,
+    //     ),
+    // },
   ];
 
   return (
@@ -141,9 +159,7 @@ const IconCover = observer(() => {
     return await DynamicUpdate.getUpdateMetadataAsync();
   });
 
-  const AppIcon = useMemo(() => {
-    return ui.appIcon === EAppIcon.Dark ? IconAppIconDark : IconAppIcon;
-  }, [ui.appIcon]);
+  const AppIcon = useMemo(() => getAppIcon(ui.appIcon), [ui.appIcon]);
 
   return (
     <View style={styles.iconCoverContainer}>

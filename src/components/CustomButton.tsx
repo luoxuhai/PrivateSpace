@@ -81,6 +81,5 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 17,
-    fontWeight: '500',
   },
 });

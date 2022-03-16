@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import {
   StyleSheet,
   View,
-  Pressable,
   Image,
   ScrollView,
   TouchableOpacity,
@@ -11,15 +10,16 @@ import {
 import { observer } from 'mobx-react-lite';
 import { useTranslation, getI18n } from 'react-i18next';
 import AppIconManager from 'react-native-dynamic-app-icon';
+import ColorPicker from 'react-native-color-picker-ios';
 
 import { useStore } from '@/store';
 import { ICheckListItem } from '@/components/CheckList';
 import { SafeAreaScrollView } from '@/components';
-import { ListContainer } from '@/components/List';
+import { ListContainer, ListTitle } from '@/components/List';
+import Icon from '@/components/Icon';
 import { platformInfo, HapticFeedback } from '@/utils';
 import SimpleSelectionList, {
   ISimpleSelectionListItem,
-  ListTitle,
 } from '@/components/SimpleSelectionList';
 import {
   AppearanceMode,
@@ -92,6 +92,11 @@ const AppIconList = observer(() => {
       title: '深色',
       name: EAppIcon.Dark,
       icon: require('@/assets/icons/app-icon/privatespace.dark.png'),
+    },
+    {
+      title: '橙色',
+      name: EAppIcon.Orange,
+      icon: require('@/assets/icons/app-icon/privatespace.orange.png'),
     },
   ];
 
@@ -187,19 +192,54 @@ const ThemeColorList = observer(() => {
       name: EThemeName.Green,
       color: ui.colors.systemGreen,
     },
+    parseInt(platformInfo.version, 10) >= 14 && {
+      title: '自定义',
+      name: EThemeName.Custom,
+      color: ui.customThemeColor,
+    },
   ];
+
+  function handleColorPicker() {
+    ColorPicker.showColorPicker(
+      {
+        supportsAlpha: false,
+        initialColor: ui.customThemeColor,
+        title: '自定义主题色',
+      },
+      color => {
+        console.log(color);
+        ui.setTheme(EThemeName.Custom, color);
+      },
+    );
+  }
+
+  const iconColor =
+    ui.appearance === 'dark'
+      ? ui.colors.secondarySystemBackground
+      : ui?.colors?.systemBackground;
 
   return (
     <ListContainer style={styles.listContainer}>
       <>
-        {themeSections.map(item => {
-          const checked = ui.themes.primary === item.color;
+        {(
+          themeSections.filter(item => item) as {
+            title: string;
+            name: EThemeName;
+            color: string;
+          }[]
+        ).map(item => {
+          const checked = ui.themeName === item.name;
           return (
-            <Pressable
+            <TouchableOpacity
               key={item.name}
+              activeOpacity={0.8}
               onPress={() => {
                 HapticFeedback.impactAsync.light();
-                ui.setTheme(item.name);
+                if (item.name === EThemeName.Custom) {
+                  handleColorPicker();
+                } else {
+                  ui.setTheme(item.name);
+                }
               }}>
               <View
                 style={[
@@ -209,20 +249,22 @@ const ThemeColorList = observer(() => {
                     backgroundColor: item.color,
                   },
                 ]}>
-                {checked && (
-                  <IconCheckMark
-                    style={styles.iconCheckMark}
-                    fill={
-                      ui.appearance === 'dark'
-                        ? ui.colors.secondarySystemBackground
-                        : ui?.colors?.systemBackground
-                    }
-                    width={16}
-                    height={16}
-                  />
+                {item.name === EThemeName.Custom && !checked && (
+                  <Icon name="ios-brush-outline" size={20} color={iconColor} />
                 )}
+                {checked &&
+                  (item.name === EThemeName.Custom ? (
+                    <Icon name="ios-brush" size={20} color={iconColor} />
+                  ) : (
+                    <IconCheckMark
+                      style={styles.iconCheckMark}
+                      fill={iconColor}
+                      width={16}
+                      height={16}
+                    />
+                  ))}
               </View>
-            </Pressable>
+            </TouchableOpacity>
           );
         })}
         <View style={styles.themeItem} />

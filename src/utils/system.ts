@@ -8,8 +8,10 @@ import {
 import * as Haptics from 'expo-haptics';
 import * as Device from 'expo-device';
 import * as Network from 'expo-network';
+import { NavigationConstants } from 'react-native-navigation';
 
 import { Language } from '@/services/locale';
+import { services } from '@/services';
 import { stores } from '@/store';
 
 export function getLocalLanguage(): Language {
@@ -95,4 +97,8 @@ export class HapticFeedback implements IHapticFeedback {
         );
     },
   };
+}
+
+export function getUIFrame(): NavigationConstants {
+  return services.nav.screens!.getConstants();
 }
