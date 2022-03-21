@@ -41,7 +41,6 @@ import { CaptureButton } from './CaptureButton';
 import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import IonIcon from 'react-native-vector-icons/Ionicons';
 
-import { useStat } from '@/hooks';
 import { services } from '@/services';
 
 const ReanimatedCamera = Reanimated.createAnimatedComponent(Camera);
@@ -83,8 +82,6 @@ export function CameraPage(props: Props): React.ReactElement {
     if (device?.formats == null) return [];
     return device.formats.sort(sortFormats);
   }, [device?.formats]);
-
-  useStat('Camera');
 
   //#region Memos
   const [is60Fps, setIs60Fps] = useState(false);

@@ -4,57 +4,96 @@ import React, {
   useMemo,
   useEffect,
   useCallback,
+  useRef,
 } from 'react';
-import { StyleSheet, ViewStyle } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { observer } from 'mobx-react-lite';
-import { OptionsModalPresentationStyle } from 'react-native-navigation';
+import { useTranslation } from 'react-i18next';
+import {
+  OptionsModalPresentationStyle,
+  NavigationComponentProps,
+} from 'react-native-navigation';
 import Animated, { FadeOut, FadeIn, FadeInDown } from 'react-native-reanimated';
 import SegmentedControl from '@react-native-segmented-control/segmented-control';
 import { useQuery } from 'react-query';
+import {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+} from 'react-native-reanimated';
 
 import { services } from '@/services';
 import { FileType } from '@/services/database/entities/file.entity';
 import { useStore } from '@/store';
 import { useUIFrame } from '@/hooks';
-import GridList from '@/components/GridList';
+import { GridSectionList } from '@/components/GridList';
 import { ImageItemBlock } from '@/screens/PhotoList/ImageItem';
 import { AlbumCard } from './index';
 import { Empty } from '@/components/Empty';
+import { isEmpty } from 'lodash';
 
 const AnimatedSegmentedControl =
   Animated.createAnimatedComponent(SegmentedControl);
 
-const filterOptions = [
-  {
-    label: '全部',
-    key: 0,
-  },
-  {
-    label: '相册',
-    key: 1,
-  },
-  {
-    label: '图片',
-    key: 2,
-  },
-  {
-    label: '视频',
-    key: 3,
-  },
-];
+type SearchPanelProps = NavigationComponentProps;
 
-export const SearchPanel = observer(
+interface SearchPanelInstance {
+  show: () => void;
+  search: (v: string) => void;
+  hide: () => void;
+}
+
+export const SearchPanel = observer<SearchPanelProps, SearchPanelInstance>(
   (props, ref) => {
     const [visible, setVisible] = useState(false);
     const [value, setValue] = useState<string | undefined>();
     const { ui } = useStore();
+    const { t } = useTranslation();
+    const UIFrame = useUIFrame();
+    const photos = useRef<API.PhotoWithSource[]>();
+    const containerOpacity = useSharedValue(0.5);
+
+    const filterOptions = useMemo(
+      () => [
+        {
+          label: t('common:all'),
+          key: 0,
+        },
+        {
+          label: t('fileManage:file.type.album'),
+          key: 1,
+        },
+        {
+          label: t('fileManage:file.type.image'),
+          key: 2,
+        },
+        {
+          label: t('fileManage:file.type.video'),
+          key: 3,
+        },
+      ],
+      [t],
+    );
+
     const [selectedTypeIndex, setSelectedTypeIndex] = useState<number>(
       filterOptions[0].key,
     );
-    const UIFrame = useUIFrame();
+
+    const containerStyle = useAnimatedStyle(() => {
+      return {
+        opacity: withTiming(containerOpacity.value, {
+          duration: 100,
+        }),
+        display: visible ? 'flex' : 'none',
+        backgroundColor: ui.colors.systemBackground,
+      };
+    }, [visible, ui.colors.systemBackground]);
 
     useEffect(() => {
-      if (!visible) {
+      if (visible) {
+        containerOpacity.value = 1;
+      } else {
+        containerOpacity.value = 0;
         reset();
       }
     }, [visible]);
@@ -127,12 +166,61 @@ export const SearchPanel = observer(
       },
     );
 
-    const images = useMemo(
-      () => searchResult?.list?.filter(item => item.type === FileType.File),
+    const renderAlbumItem = useCallback(
+      ({ item }) => (
+        <AlbumCard
+          footerStyle={styles.albumFooter}
+          style={styles.album}
+          data={item}
+          onPress={() => handlePress(item)}
+        />
+      ),
+      [],
+    );
+
+    const renderPhotoItem = useCallback(
+      ({ item, index }) => (
+        <ImageItemBlock
+          index={index}
+          data={item}
+          onPress={() => handlePress(item)}
+        />
+      ),
+      [],
+    );
+
+    const sections = useMemo(
+      () =>
+        [
+          {
+            key: 'album',
+            title: t('fileManage:file.type.album'),
+            data: searchResult?.list?.filter(
+              item => item.type === FileType.Folder,
+            ),
+            itemHeight: styles.album.height,
+            externalGutter: true,
+            gutter: 4,
+            itemWidth: 120,
+            renderItem: renderAlbumItem,
+          },
+          {
+            key: 'photo',
+            title: '图片/视频',
+            data: searchResult?.list?.filter(
+              item => item.type === FileType.File,
+            ),
+            renderItem: renderPhotoItem,
+          },
+        ] ?? [],
       [searchResult?.list],
     );
 
-    function handlePress(item) {
+    useEffect(() => {
+      photos.current = sections?.[1]?.data ?? [];
+    }, [sections]);
+
+    function handlePress(item: any) {
       switch (item.type) {
         case FileType.Folder:
           services.nav.screens?.push(
@@ -158,8 +246,10 @@ export const SearchPanel = observer(
           services.nav.screens?.show(
             'ImageView',
             {
-              initialIndex: images?.findIndex(images => images.id === item.id),
-              images,
+              initialIndex: photos.current?.findIndex(
+                photo => photo.id === item.id,
+              ),
+              images: photos.current,
               onRefetch: refetchSearch,
             },
             {
@@ -170,43 +260,36 @@ export const SearchPanel = observer(
       }
     }
 
-    const viewStyle: ViewStyle = useMemo(
-      () => ({
-        display: visible ? 'flex' : 'none',
-        backgroundColor: ui.colors.systemBackground,
-      }),
-      [visible, ui.colors.systemBackground],
+    const renderSectionHeader = useCallback(
+      ({ section }) => {
+        return section.key === 'photo' &&
+          selectedTypeIndex === 0 &&
+          !isEmpty(sections[0].data) &&
+          !isEmpty(section.data) ? (
+          <View
+            style={[
+              styles.sectionHeader,
+              {
+                backgroundColor: ui.colors.systemBackground,
+              },
+            ]}>
+            {/* <Text
+            style={[
+              styles.sectionHeaderText,
+              {
+                color: ui.colors.label,
+              },
+            ]}>
+            {section.title}
+          </Text> */}
+          </View>
+        ) : null;
+      },
+      [selectedTypeIndex, sections],
     );
 
-    const renderItem = useCallback(({ item, index }) => {
-      return (
-        <>
-          {item.extra?.is_album ? (
-            <AlbumCard
-              footerStyle={{
-                height: 40,
-              }}
-              data={item}
-              onPress={() => handlePress(item)}
-            />
-          ) : (
-            <ImageItemBlock
-              index={index}
-              data={item}
-              onPress={() => {
-                handlePress(item, index);
-              }}
-            />
-          )}
-        </>
-      );
-    }, []);
-
     return (
-      <Animated.View
-        entering={FadeIn}
-        exiting={FadeOut}
-        style={[styles.container, viewStyle]}>
+      <Animated.View style={[styles.container, containerStyle]}>
         {visible && (
           <AnimatedSegmentedControl
             style={[
@@ -228,32 +311,24 @@ export const SearchPanel = observer(
           style={[
             styles.result,
             {
-              marginTop: statusBarHeight + 110,
+              marginTop: statusBarHeight + 105,
             },
           ]}
           entering={FadeIn}
           exiting={FadeOut}>
-          <GridList
+          <GridSectionList
             style={[
               {
                 backgroundColor: ui.colors.systemBackground,
               },
             ]}
-            data={searchResult?.list ?? []}
+            sections={sections}
             itemWidth={100}
             gutter={2}
             externalGutter={false}
+            stickySectionHeadersEnabled={false}
             gridEnabled
-            ListEmptyComponent={
-              searchResult?.list && (
-                <Empty
-                  style={{
-                    marginTop: segmentedControlTop + 40,
-                  }}
-                />
-              )
-            }
-            renderItem={renderItem}
+            renderSectionHeader={renderSectionHeader}
           />
         </Animated.View>
       </Animated.View>
@@ -279,5 +354,20 @@ const styles = StyleSheet.create({
   },
   result: {
     flex: 1,
+  },
+  albumFooter: {
+    height: 40,
+  },
+  album: {
+    height: 160,
+  },
+  sectionHeader: {
+    height: 20,
+    justifyContent: 'center',
+    paddingLeft: 5,
+  },
+  sectionHeaderText: {
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });

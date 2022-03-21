@@ -7,11 +7,9 @@ import {
 import { observer } from 'mobx-react-lite';
 import { useNavigationButtonPress } from 'react-native-navigation-hooks';
 import { useMutation, useQuery } from 'react-query';
-import baidumobstat from 'react-native-baidumobstat';
 
 import { debounce } from 'lodash';
 import { services } from '@/services';
-import { IListAlbumData } from '@/services/api/local/type.d';
 import { useStore } from '@/store';
 import { HapticFeedback, showDeleteActionSheet } from '@/utils';
 import { UIStore } from '@/store/ui';
@@ -20,7 +18,7 @@ import SafeAreaScrollView from '@/components/SafeAreaScrollView';
 import List from '@/components/List';
 
 interface IAlbumSettingModalProps extends NavigationComponentProps {
-  album: IListAlbumData;
+  album: API.AlbumWithSource;
   onComplete: () => void;
 }
 
@@ -28,10 +26,6 @@ const AlbumSettingModal: NavigationFunctionComponent<
   IAlbumSettingModalProps
 > = props => {
   const { ui, global } = useStore();
-
-  useEffect(() => {
-    baidumobstat.onEvent('preview_page_album_setting', '事件1');
-  }, []);
 
   const { refetch: refetchAlbumList, data: albumResult } = useQuery('albums', {
     enabled: false,
@@ -102,7 +96,7 @@ const AlbumSettingModal: NavigationFunctionComponent<
             showDeleteActionSheet({
               title: '删除相册',
               onConfirm: () => {
-                handleDeleteAlbum(props.album.id!);
+                handleDeleteAlbum(props.album.id as string);
               },
             });
             HapticFeedback.impactAsync.medium();
@@ -118,7 +112,7 @@ export default observer(AlbumSettingModal);
 
 interface IOperationListProps {
   ui: UIStore;
-  album: IListAlbumData;
+  album: API.AlbumWithSource;
   onPress?: () => void;
   onChange?: (data: { name?: string }) => void;
 }
@@ -148,6 +142,7 @@ function OperationList({
           enablesReturnKeyAutomatically
           keyboardAppearance={ui.appearance === 'dark' ? 'dark' : 'light'}
           returnKeyType="done"
+          selectionColor={ui.themes.primary}
           onChangeText={value => {
             onChange?.({
               name: value,

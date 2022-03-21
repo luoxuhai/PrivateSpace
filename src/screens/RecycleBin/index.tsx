@@ -16,7 +16,6 @@ import FileViewer from 'react-native-file-viewer';
 import { services } from '@/services';
 import { SelectedMask } from '@/screens/PhotoList';
 import { ImageItemBlock } from '@/screens/PhotoList/ImageItem';
-import { IListFileData } from '@/services/api/local/type.d';
 import { useStore } from '@/store';
 import { FileStatus } from '@/services/database/entities/file.entity';
 import { ToolbarContainer } from './ToolbarContainer';
@@ -169,7 +168,7 @@ const RecycleBinScreen: NavigationFunctionComponent<
     'config',
   );
 
-  async function handleImagePress(item: IListFileData) {
+  async function handleImagePress(item: API.PhotoWithSource) {
     if (isSelectMode) {
       setSelectedIds(prev => {
         const newData = prev?.includes(item.id)

@@ -1,7 +1,7 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { Switch } from 'react-native';
-
+import { useTranslation } from 'react-i18next';
 import { SafeAreaScrollView } from '@/components';
 import { useStore } from '@/store';
 import { services } from '@/services';
@@ -12,6 +12,7 @@ interface IAdvancedSettingProps {}
 
 const AdvancedSetting = observer<IAdvancedSettingProps>(() => {
   const { ui, global, user } = useStore();
+  const { t } = useTranslation();
 
   function canOpen() {
     if (user.userRole !== UserRole.VIP) {
@@ -24,10 +25,10 @@ const AdvancedSetting = observer<IAdvancedSettingProps>(() => {
 
   const list = [
     {
-      title: '智能搜索',
+      title: t('setting:advanced.navigation.title'),
       data: [
         {
-          title: '开启智能搜索',
+          title: t('setting:advanced.smartSearch.title'),
           render: () => (
             <Switch
               value={global.settingInfo.advanced?.smartSearch?.enabled ?? false}

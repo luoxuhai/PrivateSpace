@@ -15,7 +15,7 @@ import { useDeviceOrientation } from '@react-native-community/hooks';
 import { useStore } from '@/store';
 import { useUIFrame } from '@/hooks';
 import { VibrancyView } from '@react-native-community/blur';
-import { platformInfo } from '@/utils';
+import { systemInfo } from '@/utils';
 
 interface IToolbarItem {
   title: string;
@@ -57,7 +57,7 @@ export const Toolbar = observer<IToolbarProps>(
         };
 
     const paddingStyle = {
-      paddingBottom: platformInfo.isPad || orientation.landscape ? 20 : 28,
+      paddingBottom: systemInfo.isPad || orientation.landscape ? 20 : 28,
     };
 
     return (
@@ -82,7 +82,7 @@ export const Toolbar = observer<IToolbarProps>(
             <TouchableOpacity
               disabled={disabled}
               style={[
-                platformInfo.isPad || orientation.landscape
+                systemInfo.isPad || orientation.landscape
                   ? styles.itemRow
                   : styles.item,
                 {
@@ -109,7 +109,7 @@ export const Toolbar = observer<IToolbarProps>(
                 style={[
                   styles.title,
                   item.icon &&
-                    (platformInfo.isPad || orientation.landscape
+                    (systemInfo.isPad || orientation.landscape
                       ? styles.titleWithIconRow
                       : styles.titleWithIcon),
                   item.titleStyle,

@@ -17,7 +17,7 @@ import { ICheckListItem } from '@/components/CheckList';
 import { SafeAreaScrollView } from '@/components';
 import { ListContainer, ListTitle } from '@/components/List';
 import Icon from '@/components/Icon';
-import { platformInfo, HapticFeedback } from '@/utils';
+import { HapticFeedback } from '@/utils';
 import SimpleSelectionList, {
   ISimpleSelectionListItem,
 } from '@/components/SimpleSelectionList';
@@ -57,9 +57,7 @@ function ThemeSettingScreen(): JSX.Element {
               : ui.colors.secondarySystemBackground,
         },
       ]}>
-      {parseInt(platformInfo.version, 10) >= 13 && (
-        <SimpleSelectionList listType="check" sections={appearanceSections} />
-      )}
+      <SimpleSelectionList listType="check" sections={appearanceSections} />
       <ListTitle title={t('appearance:theme')} />
       <ThemeColorList />
       <ListTitle title={t('appearance:appIcon')} />
@@ -115,6 +113,7 @@ const AppIconList = observer(() => {
                 HapticFeedback.impactAsync.light();
                 const isSupported =
                   await AppIconManager.supportsDynamicAppIcon();
+
                 if (isSupported) {
                   AppIconManager.setAppIcon(
                     item.name === EAppIcon.Default ? null : item.name,
@@ -163,19 +162,19 @@ const ThemeColorList = observer(() => {
       color: ui.colors.systemBlue,
     },
     {
+      title: '红色',
+      name: EThemeName.Red,
+      color: ui.colors.systemRed,
+    },
+    {
       title: '橘色',
       name: EThemeName.Orange,
       color: ui.colors.systemOrange,
     },
     {
-      title: '紫色',
-      name: EThemeName.Purple,
-      color: ui.colors.systemPurple,
-    },
-    {
-      title: '红色',
-      name: EThemeName.Red,
-      color: ui.colors.systemRed,
+      title: '绿色',
+      name: EThemeName.Green,
+      color: ui.colors.systemGreen,
     },
     {
       title: '水鸭蓝',
@@ -188,11 +187,16 @@ const ThemeColorList = observer(() => {
       color: ui.colors.systemIndigo,
     },
     {
-      title: '绿色',
-      name: EThemeName.Green,
-      color: ui.colors.systemGreen,
+      title: '紫色',
+      name: EThemeName.Purple,
+      color: ui.colors.systemPurple,
     },
-    parseInt(platformInfo.version, 10) >= 14 && {
+    {
+      title: '粉色',
+      name: EThemeName.Pink,
+      color: ui.colors.systemPink,
+    },
+    {
       title: '自定义',
       name: EThemeName.Custom,
       color: ui.customThemeColor,
@@ -207,7 +211,6 @@ const ThemeColorList = observer(() => {
         title: '自定义主题色',
       },
       color => {
-        console.log(color);
         ui.setTheme(EThemeName.Custom, color);
       },
     );

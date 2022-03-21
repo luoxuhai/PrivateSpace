@@ -13,9 +13,6 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		15D7FB4FAB40B7E5D0DF999E /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1E2C5B80BD4825275885624 /* ExpoModulesProvider.swift */; };
 		355ED7BF27366133005ABB3E /* Bridging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 355ED7BE27366133005ABB3E /* Bridging.swift */; };
-		3560591827898C4600B6DCA4 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3560591727898C3F00B6DCA4 /* libz.tbd */; };
-		3560591A27898C5A00B6DCA4 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3560591927898C5600B6DCA4 /* libc++.tbd */; };
-		3560591C27898C6700B6DCA4 /* libicucore.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3560591B27898C6300B6DCA4 /* libicucore.tbd */; };
 		3580A9EE27E40F1200713C9B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3580A9ED27E40F1200713C9B /* GoogleService-Info.plist */; };
 		3580A9F127E9521900713C9B /* orange152x152.png in Resources */ = {isa = PBXBuildFile; fileRef = 3580A9F027E9521900713C9B /* orange152x152.png */; };
 		3580A9F527E9522500713C9B /* orange120x120.png in Resources */ = {isa = PBXBuildFile; fileRef = 3580A9F227E9522400713C9B /* orange120x120.png */; };
@@ -136,9 +133,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				35D1892A2776F72200C1C94B /* StoreKit.framework in Frameworks */,
-				3560591C27898C6700B6DCA4 /* libicucore.tbd in Frameworks */,
-				3560591A27898C5A00B6DCA4 /* libc++.tbd in Frameworks */,
-				3560591827898C4600B6DCA4 /* libz.tbd in Frameworks */,
 				6172F2D35A4C3AA820D92908 /* libPods-PrivateSpace.a in Frameworks */,
 				35D18917276E3DA800C1C94B /* CloudKit.framework in Frameworks */,
 			);
@@ -826,13 +820,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_ENABLE_MODULES = YES;
 				CODEPUSH_HOST = "https://ps.fastools.cn/hot";
 				CODEPUSH_KEY = MFyX4heENvUCg0eYozWkGa3Xsn3I4ksvOXqog;
 				CODE_SIGN_ENTITLEMENTS = PrivateSpace/PrivateSpaceDebug.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 21;
+				CURRENT_PROJECT_VERSION = 81;
 				DEVELOPMENT_TEAM = MH9G89WBAL;
 				ENABLE_BITCODE = NO;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
@@ -841,7 +836,7 @@
 					"$(SRCROOT)/../node_modules/react-native-device-angles/RNDeviceAngles",
 				);
 				INFOPLIST_FILE = PrivateSpace/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -851,7 +846,7 @@
 					"$(PROJECT_DIR)",
 				);
 				MACH_O_TYPE = mh_execute;
-				MARKETING_VERSION = 1.3.0;
+				MARKETING_VERSION = 1.3.2;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -873,11 +868,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_ENABLE_MODULES = YES;
 				CODEPUSH_HOST = "https://ps.fastools.cn/hot";
 				CODEPUSH_KEY = vqKQU1AZ6FhavtJYvllw2JUVqfvO4ksvOXqog;
 				CODE_SIGN_ENTITLEMENTS = PrivateSpace/PrivateSpace.entitlements;
-				CURRENT_PROJECT_VERSION = 21;
+				CURRENT_PROJECT_VERSION = 81;
 				DEVELOPMENT_TEAM = MH9G89WBAL;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
 				HEADER_SEARCH_PATHS = (
@@ -885,7 +881,7 @@
 					"$(SRCROOT)/../node_modules/react-native-device-angles/RNDeviceAngles",
 				);
 				INFOPLIST_FILE = PrivateSpace/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -895,7 +891,7 @@
 					"$(PROJECT_DIR)",
 				);
 				MACH_O_TYPE = mh_execute;
-				MARKETING_VERSION = 1.3.0;
+				MARKETING_VERSION = 1.3.2;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -931,7 +927,7 @@
 				INFOPLIST_FILE = ShareExtension/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = ShareExtension;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -980,7 +976,7 @@
 				INFOPLIST_FILE = ShareExtension/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = ShareExtension;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1055,7 +1051,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					/usr/lib/swift,
 					"$(inherited)",
@@ -1116,7 +1112,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					/usr/lib/swift,
 					"$(inherited)",

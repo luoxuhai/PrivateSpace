@@ -1,20 +1,13 @@
 import { DevSettings, LogBox } from 'react-native';
-import { Navigation } from 'react-native-navigation';
 
+import '@/locales';
 import { hydrateStores, clearPersistedStores } from '@/store';
 import { initServices, services, initDataDirectory } from '@/services';
 import { clearRecycleBin } from '@/screens/RecycleBin/clearRecycleBin';
-import { DynamicUpdate } from '@/utils/dynamicUpdate';
 import { CustomSentry } from '@/utils/customSentry';
-import analytics from '@/utils/analytics/firebase';
-import classifyImageProcess from '@/utils/classifyImageProcess';
-import blurhashImageProcess from '@/utils/blurhashImageProcess';
-
-if (__DEV__) {
-  LogBox.ignoreAllLogs();
-} else {
-  CustomSentry.init();
-}
+import classifyImageProcess from '@/utils/process/classifyImageProcess';
+import thumbnailProcess from '@/utils/process/thumbnailProcess';
+import blurhashImageProcess from '@/utils/process/blurhashImageProcess';
 
 export const start = async (): PVoid => {
   const { nav } = services;
@@ -30,26 +23,15 @@ export const start = async (): PVoid => {
   // start app
   await nav.start();
 
-  clearRecycleBin();
-  classifyImageProcess.start();
-  // blurhashImageProcess.start();
-
-  if (!__DEV__) {
-    DynamicUpdate.sync();
-  }
-
-  Navigation.events().registerComponentDidAppearListener(
-    async ({ componentName, componentType }) => {
-      if (componentType === 'Component') {
-        await analytics().logScreenView({
-          screen_name: componentName,
-          screen_class: componentName,
-        });
-      }
-    },
-  );
+  setTimeout(() => {
+    clearRecycleBin();
+    classifyImageProcess.start();
+    blurhashImageProcess.start();
+    thumbnailProcess.start();
+  }, 1000 * 5);
 
   if (__DEV__) {
+    LogBox.ignoreAllLogs();
     DevSettings.addMenuItem('清除数据库', () => {
       services.db.clear();
       DevSettings.reload();
@@ -61,5 +43,7 @@ export const start = async (): PVoid => {
       clearPersistedStores();
       DevSettings.reload();
     });
+  } else {
+    CustomSentry.init();
   }
 };

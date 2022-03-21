@@ -11,7 +11,8 @@ import {
  * 资源类型
  */
 export const enum SourceType {
-  Text = 1,
+  Unknown = 0,
+  Text,
   Image,
   Audio,
   Video,

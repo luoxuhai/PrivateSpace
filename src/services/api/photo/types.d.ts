@@ -1,12 +1,11 @@
 import FileEntity from '@/services/database/entities/file.entity';
-
+import { FindOperator } from 'typeorm/browser';
 export interface ListPhotos
   extends Partial<
-    Pick<
-      FileEntity,
-      'name' | 'status' | 'id' | 'parent_id' | 'owner' | 'type' | 'mime'
-    >
+    Pick<FileEntity, 'name' | 'id' | 'parent_id' | 'owner' | 'type'>
   > {
+  status?: FileEntity['status'] | FindOperator<FileEntity['status']>;
+  mime?: FileEntity['mime'] | FindOperator<FileEntity['mime']>;
   order_by?: API.OrderBy<Partial<FileEntity>>;
   select?: (keyof FileEntity & ('thumbnail' | 'uri'))[];
 }

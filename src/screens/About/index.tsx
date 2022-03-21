@@ -6,20 +6,19 @@ import {
 } from 'react-native-navigation';
 import { observer } from 'mobx-react-lite';
 import { useTranslation } from 'react-i18next';
-import * as Application from 'expo-application';
 import { InAppBrowser } from 'react-native-inappbrowser-reborn';
 import { useQuery } from 'react-query';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { RNToasty } from 'react-native-toasty';
-import * as StoreReview from 'expo-store-review';
 
 import { useStore } from '@/store';
 import { services } from '@/services';
 import config from '@/config';
-import { ELanguage } from '@/services/locale';
+import { ELanguage } from '@/locales';
 import SimpleSelectionList from '@/components/SimpleSelectionList';
 import { SafeAreaScrollView } from '@/components';
 import { getAppIcon } from '@/utils/designSystem';
+import { applicationInfo } from '@/utils';
 import { DynamicUpdate } from '@/utils/dynamicUpdate';
 
 const AboutScreen: NavigationFunctionComponent<
@@ -61,21 +60,9 @@ const AboutScreen: NavigationFunctionComponent<
         {
           title: t('setting:grade'),
           onPress: async () => {
-            try {
-              if (!(await StoreReview.hasAction())) {
-                await StoreReview.requestReview();
-              } else {
-                toAppStoreReview();
-              }
-            } catch {
-              toAppStoreReview();
-            }
-
-            function toAppStoreReview() {
-              Linking.openURL(
-                `https://apps.apple.com/app/apple-store/id${config.appId}?action=write-review`,
-              );
-            }
+            Linking.openURL(
+              `https://apps.apple.com/app/apple-store/id${config.appId}?action=write-review`,
+            );
           },
         },
       ],
@@ -99,33 +86,35 @@ const AboutScreen: NavigationFunctionComponent<
       ],
     },
     {
-      title: '联系我们',
+      title: t('about:connect'),
       data: [
-        {
-          title: 'QQ反馈群',
-          extra: config.qqGroup,
-          onPress: async () => {
-            if (await Linking.canOpenURL('mqq://')) {
-              Linking.openURL(
-                `mqq://card/show_pslcard?src_type=internal&version=1&uin=${config.qqGroup}&key=d6758f2f4dee2c7e73a455f674a888651b0c05e24904f7001cbad20f7f859f82&card_type=group&source=external`,
-              );
-            } else {
-              Clipboard.setString(config.qqGroup);
-              RNToasty.Show({
-                title: '已复制群号',
-                position: 'top',
-              });
+        i18n.language === ELanguage.ZH_CN
+          ? {
+              title: t('about:QQgroup'),
+              extra: config.qqGroup,
+              onPress: async () => {
+                if (await Linking.canOpenURL('mqq://')) {
+                  Linking.openURL(
+                    `mqq://card/show_pslcard?src_type=internal&version=1&uin=${config.qqGroup}&key=d6758f2f4dee2c7e73a455f674a888651b0c05e24904f7001cbad20f7f859f82&card_type=group&source=external`,
+                  );
+                } else {
+                  Clipboard.setString(config.qqGroup);
+                  RNToasty.Show({
+                    title: '已复制群号',
+                    position: 'top',
+                  });
+                }
+              },
             }
-          },
-        },
+          : null,
         {
-          title: t('开发者邮箱'),
+          title: t('about:email'),
           extra: config.email,
           onPress: () => {
             Linking.openURL(`mailto:${config.email}`);
           },
         },
-      ],
+      ].filter(item => item),
     },
     // {
     //   title: t('about:moreApps'),
@@ -153,7 +142,7 @@ const AboutScreen: NavigationFunctionComponent<
 
 const IconCover = observer(() => {
   const { ui, global } = useStore();
-  const { nativeApplicationVersion: appVersion, applicationName } = Application;
+  const { version: appVersion, name: applicationName } = applicationInfo;
 
   const { data: updateMetadata } = useQuery('update.metadata', async () => {
     return await DynamicUpdate.getUpdateMetadataAsync();
@@ -192,7 +181,7 @@ const IconCover = observer(() => {
         V{appVersion}
         {updateMetadata?.label && ` (${updateMetadata.label.replace('v', '')})`}
       </Text>
-      {global.debug && (
+      {(global.debug || __DEV__) && (
         <Pressable
           onPress={() => {
             services.nav.screens?.show('Developer');

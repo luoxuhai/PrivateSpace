@@ -30,7 +30,7 @@ interface IFolderPickerProps extends NavigationComponentProps {
 const FolderPicker: NavigationFunctionComponent<IFolderPickerProps> = props => {
   const { ui } = useStore();
   const { t } = useTranslation();
-  const addAlbumDialogRef = useRef<IAddAlbumDialogRef>();
+  const addAlbumDialogRef = useRef<IAddAlbumDialogRef>(null);
 
   useNavigationButtonPress(handleCloseModal, props.componentId, 'cancel');
   useNavigationButtonPress(

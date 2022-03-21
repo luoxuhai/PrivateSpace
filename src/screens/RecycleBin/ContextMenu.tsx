@@ -5,12 +5,11 @@ import { useTranslation } from 'react-i18next';
 import { ContextMenuView, MenuConfig } from 'react-native-ios-context-menu';
 
 import { showDeleteActionSheet } from '@/utils';
-import { IListFileData } from '@/services/api/local/type.d';
 import { services } from '@/services';
 import { useDeleteFile, useRestorePhoto } from '@/hooks';
 
 interface IContextMenuProps {
-  item: IListFileData;
+  item: API.PhotoWithSource;
   disabled?: boolean;
   children?: React.ReactNode;
 }

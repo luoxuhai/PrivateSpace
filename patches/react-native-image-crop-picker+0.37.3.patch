@@ -1,0 +1,83 @@
+diff --git a/node_modules/react-native-image-crop-picker/index.d.ts b/node_modules/react-native-image-crop-picker/index.d.ts
+index b1fcef9..0b4a38a 100644
+--- a/node_modules/react-native-image-crop-picker/index.d.ts
++++ b/node_modules/react-native-image-crop-picker/index.d.ts
+@@ -343,6 +343,14 @@ declare module "react-native-image-crop-picker" {
+          * @default 'MediumQuality'
+          */
+         compressVideoPreset?: CompressVideoPresets;
++
++                /**
++         * When set to false, does not compress videos. This is useful to improve performance.
++         *
++         * @platform iOS only
++         * @default true
++         */
++                 compressVideo?: boolean;
+     };
+ 
+     type AnyOptions = Omit<ImageOptions, 'mediaType'> & Omit<VideoOptions, 'mediaType'> & {
+diff --git a/node_modules/react-native-image-crop-picker/ios/src/ImageCropPicker.m b/node_modules/react-native-image-crop-picker/ios/src/ImageCropPicker.m
+index 7101410..0bf4949 100644
+--- a/node_modules/react-native-image-crop-picker/ios/src/ImageCropPicker.m
++++ b/node_modules/react-native-image-crop-picker/ios/src/ImageCropPicker.m
+@@ -55,7 +55,6 @@ - (instancetype)init
+             @"writeTempFile": @YES,
+             @"includeBase64": @NO,
+             @"includeExif": @NO,
+-            @"compressVideo": @YES,
+             @"minFiles": @1,
+             @"maxFiles": @5,
+             @"width": @200,
+@@ -64,6 +63,7 @@ - (instancetype)init
+             @"useFrontCamera": @NO,
+             @"avoidEmptySpaceAroundImage": @YES,
+             @"compressImageQuality": @0.8,
++            @"compressVideo": @YES,
+             @"compressVideoPreset": @"MediumQuality",
+             @"loadingLabelText": @"Processing assets...",
+             @"mediaType": @"any",
+@@ -419,10 +419,42 @@ - (void)showActivityIndicator:(void (^)(UIActivityIndicatorView*, UIView*))handl
+ 
+ - (void) handleVideo:(AVAsset*)asset withFileName:(NSString*)fileName withLocalIdentifier:(NSString*)localIdentifier completion:(void (^)(NSDictionary* image))completion {
+     NSURL *sourceURL = [(AVURLAsset *)asset URL];
+-    
+     // create temp file
+     NSString *tmpDirFullPath = [self getTmpDirectory];
+     NSString *filePath = [tmpDirFullPath stringByAppendingString:[[NSUUID UUID] UUIDString]];
++    
++    if (![[self.options objectForKey:@"compressVideo"] boolValue]) {
++        NSString *extensionName = [sourceURL.pathExtension lowercaseString];
++        filePath = [filePath stringByAppendingPathExtension:extensionName];
++        NSURL *outputURL = [NSURL fileURLWithPath:filePath];
++        [NSFileManager.defaultManager copyItemAtURL:sourceURL toURL:outputURL error:nil];
++        
++        AVAssetTrack *track = [[asset tracksWithMediaType:AVMediaTypeVideo] firstObject];
++        NSNumber *fileSizeValue = nil;
++        [outputURL getResourceValue:&fileSizeValue
++                             forKey:NSURLFileSizeKey
++                              error:nil];
++        CMTime time = asset.duration;
++        int milliseconds = ceil(time.value/time.timescale) * 1000;
++        
++        completion([self createAttachmentResponse:[outputURL absoluteString]
++                                         withExif:nil
++                                    withSourceURL:[sourceURL absoluteString]
++                              withLocalIdentifier:localIdentifier
++                                     withFilename:fileName
++                                        withWidth:[NSNumber numberWithFloat:track.naturalSize.width]
++                                       withHeight:[NSNumber numberWithFloat:track.naturalSize.height]
++                                         withMime:[@"video/" stringByAppendingString: extensionName]
++                                         withSize:fileSizeValue
++                                     withDuration:[NSNumber numberWithFloat:milliseconds]
++                                         withData:nil
++                                         withRect:CGRectNull
++                                 withCreationDate:nil
++                             withModificationDate:nil
++                    ]);
++        return;
++    }
++    
+     filePath = [filePath stringByAppendingString:@".mp4"];
+     NSURL *outputURL = [NSURL fileURLWithPath:filePath];
+     

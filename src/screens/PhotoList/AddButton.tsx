@@ -22,7 +22,7 @@ import IconPlusCircleFill from '@/assets/icons/plus.circle.fill.svg';
 import { FileImporter, IResult } from './FileImporter';
 import { BottomSheet, IBottomSheetPropsRef } from '@/components/BottomSheet';
 import { LoadingOverlay } from '@/components/LoadingOverlay';
-import classifyImageProcess from '@/utils/classifyImageProcess';
+import classifyImageProcess from '@/utils/process/classifyImageProcess';
 
 const fileImporter = new FileImporter();
 
@@ -39,16 +39,16 @@ export async function transformResult(
   item: Partial<IResult>,
   parentId: string,
 ): Promise<any> {
-  let metadata = {
+  let metadata: Partial<FileMetadata> = {
     width: item.width,
     height: item.height,
     duration: item.duration,
   };
   if (
-    getSourceByMime(item.mime!) === SourceType.Video &&
+    getSourceByMime(item.mime) === SourceType.Video &&
     (!metadata.duration || !metadata.width)
   ) {
-    metadata = await getMediaInfo(item.uri!);
+    metadata = (await getMediaInfo(item.uri)) ?? metadata;
   }
 
   return {
@@ -56,7 +56,7 @@ export async function transformResult(
     size: item.size,
     name: item.name,
     uri: item.uri,
-    mime: item.mime!,
+    mime: item.mime,
     metadata,
     localIdentifier: item.localIdentifier,
   };
@@ -127,6 +127,7 @@ function AddButton(props: IAddButtonProps): JSX.Element {
 
     if (result?.length) {
       LoadingOverlay.show();
+      const time = Date.now();
       await createFiles(
         await Promise.all(
           result.map(res => transformResult(res, props.albumId)),
@@ -165,6 +166,7 @@ function AddButton(props: IAddButtonProps): JSX.Element {
         <View style={[styles.bottomSheetWrapper, styles.bottomSheetContent]}>
           {list.map(item => (
             <TouchableOpacity
+              key={item.title}
               style={styles.item}
               onPress={async () => {
                 bottomSheetRef.current?.close();

@@ -3,10 +3,20 @@ import isUUID from 'validator/es/lib/isUUID';
 import FS from 'react-native-fs';
 import { Asset } from 'expo-asset';
 
-import { getThumbnailPath, join, getSourcePath } from '@/utils';
+import {
+  getThumbnailPath,
+  join,
+  getSourcePath,
+  getSourceByMime,
+  getPosterPath,
+} from '@/utils';
 import { SOURCE_PATH } from '@/config';
 import PhotoController from '../photo/photo.controller';
-import { FileStatus, FileType } from '@/services/database/entities/file.entity';
+import {
+  FileStatus,
+  FileType,
+  SourceType,
+} from '@/services/database/entities/file.entity';
 import { stores } from '@/store';
 
 const defaultCover = Asset.fromModule(
@@ -40,15 +50,13 @@ export async function getAlbumCover(
         : (await FS.readDir(join(SOURCE_PATH, cover)))[0].path;
     }
   } else {
-    const sort = stores.album.photoViewConfig?.sort;
+    const orderBy = stores.album.orderBy;
     // 获取首张图片作为封面
     const photo = await PhotoController.get({
       status: FileStatus.Normal,
       parent_id: album.id,
       // TODO
-      order_by: {
-        [sort?.field ?? 'ctime']: sort?.order === 'desc' ? 'DESC' : 'ASC',
-      },
+      order_by: orderBy,
     });
 
     coverUri = photo?.thumbnail || photo?.poster || photo?.uri;
@@ -77,7 +85,10 @@ export async function getPhotoThumbnailPath(
     thumbnailPath = sourcePath;
   }
 
-  return [thumbnailPath, sourcePath];
+  return [
+    (await FS.exists(thumbnailPath)) ? thumbnailPath : undefined,
+    sourcePath,
+  ];
 }
 
 export async function setPhotoSource(
@@ -91,12 +102,10 @@ export async function setPhotoSource(
     newPhoto[index].thumbnail = thumbnail;
     newPhoto[index].uri = uri;
     // TODO 视频的 `poster` 暂时取 `thumbnail`
-    if (item.mime?.startsWith('video/')) {
-      newPhoto[index].poster = thumbnail;
+    if (getSourceByMime(item.mime) === SourceType.Video) {
+      const sourceId = item.extra?.source_id;
+      const poster = getPosterPath(sourceId)!;
+      newPhoto[index].poster = (await FS.exists(poster)) ? poster : thumbnail;
     }
   }
 }
-
-// export async function setAlbumExtra(params: type) {
-
-// }

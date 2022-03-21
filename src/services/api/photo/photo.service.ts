@@ -1,6 +1,7 @@
 import { getRepository } from 'typeorm/browser';
 import FS from 'react-native-fs';
 import { isEmpty } from 'lodash';
+import { getMimeType } from '@qeepsake/react-native-file-utils';
 
 import { SOURCE_PATH, THUMBNAIL_PATH } from '@/config';
 import * as Types from './types.d';
@@ -17,6 +18,7 @@ import {
   getThumbnailPath,
   getSourcePath,
   getImageSize,
+  getPosterPath,
 } from '@/utils';
 import { setPhotoSource } from '../common/utils';
 import { stores } from '@/store';
@@ -78,6 +80,7 @@ class PhotoService {
     const { width, height, duration } = metadata;
     const imgSize = width ? { width, height } : await getImageSize(params.uri);
     const size = params.size ?? Number((await FS.stat(params.uri)).size);
+    const mime = params.mime || (await getMimeType(`file://${params.uri}`));
 
     metadata = {
       duration: duration,
@@ -86,16 +89,10 @@ class PhotoService {
     };
 
     let thumbnail: { path: string } | undefined | null;
-    if (
-      getSourceByMime(params.mime!) === SourceType.Image &&
-      imgSize.width < 400
-    ) {
+    if (getSourceByMime(mime) === SourceType.Image && imgSize.width < 400) {
       thumbnail = undefined;
     } else {
-      thumbnail = await generateThumbnail(
-        params.uri,
-        getSourceByMime(params.mime!),
-      );
+      thumbnail = await generateThumbnail(params.uri, getSourceByMime(mime));
     }
 
     await FS.mkdir(sourceDir);
@@ -104,7 +101,12 @@ class PhotoService {
     await FS.moveFile(params.uri, sourcePath);
 
     if (thumbnail) {
-      await FS.moveFile(thumbnail.path, thumbnailPath);
+      if (getSourceByMime(mime) === SourceType.Video) {
+        const posterPath = getPosterPath(sourceId) as string;
+        await FS.moveFile(thumbnail.path, posterPath);
+      } else {
+        await FS.moveFile(thumbnail.path, thumbnailPath);
+      }
     }
 
     const ctime = params.ctime || Date.now();
@@ -115,10 +117,10 @@ class PhotoService {
       mtime: ctime,
       name: params.name,
       parent_id: params.parent_id,
-      mime: params.mime,
+      mime,
       size,
       type: FileType.File,
-      owner: params.owner,
+      owner: params.owner ?? stores.user.current?.id,
       extra: {
         source_id: sourceId,
         in_album: true,

@@ -48,8 +48,8 @@ function generateStyles({
   containerDimension,
   spacing,
   fixed,
-  horizontal,
   fixedSpacing,
+  horizontal = false,
   externalGutter = true,
 }) {
   let rowStyle = {

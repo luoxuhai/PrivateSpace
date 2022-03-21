@@ -1,10 +1,9 @@
 import * as Sentry from '@sentry/react-native';
 import { Navigation } from 'react-native-navigation';
-import * as Device from 'expo-device';
 import { DeviceMotion } from 'expo-sensors';
-import * as Network from 'expo-network';
 import { CaptureContext } from '@sentry/types';
 
+import { systemInfo } from '@/utils/system';
 import config from '@/config';
 import { DynamicUpdate } from '@/utils/dynamicUpdate';
 
@@ -21,15 +20,18 @@ export async function initSentry(): PVoid {
       }),
     ],
   });
-  const networkState = await Network.getNetworkStateAsync();
+  const networkState = await systemInfo.getNetworkStateTypeAsync();
   const updateMetadata = await DynamicUpdate.getUpdateMetadataAsync();
   const motionAvailable = await DeviceMotion.isAvailableAsync();
+  const usedMemory = await systemInfo.getUsedMemory();
 
   Sentry.setContext('deviceExtra', {
-    arch: Device.supportedCpuArchitectures,
+    arch: systemInfo.supportedCpuArchitectures,
     networkState,
     motionAvailable,
+    usedMemory,
   });
+
   Sentry.setContext('appExtra', {
     dynamicUpdateMeta: {
       label: updateMetadata?.label,

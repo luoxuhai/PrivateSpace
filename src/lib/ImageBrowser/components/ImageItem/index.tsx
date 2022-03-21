@@ -155,7 +155,6 @@ const ImageItem = memo<ImageItemProps>(
           //     scrollEnabled: true,
           //   });
           // }
-          // console.log(e.nativeEvent);
         }}
         {...(swipeToCloseEnabled && {
           onScroll,

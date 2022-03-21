@@ -7,7 +7,7 @@ import {
 } from 'mobx-persist-store';
 import { getI18n } from 'react-i18next';
 import * as RNLocalize from 'react-native-localize';
-import UserInterfaceStyle from 'react-native-user-interface-style';
+import overrideColorScheme from 'react-native-override-color-scheme';
 
 import {
   getColors,
@@ -19,7 +19,7 @@ import {
   EThemeName,
   EAppIcon,
 } from '@/utils/designSystem';
-import { Language } from '@/services/locale';
+import { Language } from '@/locales';
 import { services } from '@/services';
 import { getLocalLanguage, getSystemAppearance } from '@/utils';
 
@@ -64,9 +64,12 @@ export class UIStore implements IStore {
     this.colors = getColors(this.appearance);
 
     setTimeout(() => {
-      UserInterfaceStyle.setStyle(
-        this.isSystemAppearance ? 'unspecified' : this.appearance,
+      overrideColorScheme.setScheme(
+        this.isSystemAppearance ? null : this.appearance,
       );
+      // UserInterfaceStyle.setStyle(
+      //   this.isSystemAppearance ? 'unspecified' : this.appearance,
+      // );
       StatusBar.setBarStyle(
         this.appearance === 'dark' ? 'light-content' : 'dark-content',
         true,

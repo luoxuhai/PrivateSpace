@@ -14,9 +14,9 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
-import durationPlugin from 'dayjs/plugin/duration';
 import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { useDeviceOrientation } from '@react-native-community/hooks';
+import { observer } from 'mobx-react-lite';
 
 import { useStore } from '@/store';
 import {
@@ -25,14 +25,12 @@ import {
   formatFileSize,
   getImageSize,
   getSourcePath,
+  formatDuration,
 } from '@/utils';
 import FileEntity, {
   SourceType,
 } from '@/services/database/entities/file.entity';
 import { BottomSheet, IBottomSheetPropsRef } from '@/components/BottomSheet';
-import { observer } from 'mobx-react-lite';
-
-dayjs.extend(durationPlugin);
 
 interface IFileDetailProps {
   item?: FileEntity;
@@ -110,12 +108,12 @@ export const FileDetail = observer<IFileDetailProps>(
           sourceType === SourceType.Video && {
             type: 'duration',
             label: t('fileManage:info:duration'),
-            value: duration ? dayjs.duration(duration).format('mm:ss') : '-',
+            value: duration ? formatDuration(duration) : '-',
           },
           {
             type: 'ctime',
             label: t('fileManage:ctime'),
-            value: dayjs(item?.ctime).format('MM月DD日 HH:mm'),
+            value: dayjs(item?.ctime).format('YYYY年MM月DD日 HH:mm'),
           },
         ].filter(v => v),
       [item, dime, duration, sourceType],
@@ -165,7 +163,7 @@ export const FileDetail = observer<IFileDetailProps>(
                   color: ui.colors.label,
                 },
               ]}>
-              描述：
+              {t('fileManage:info.desc')}：
             </Text>
             <Text
               selectable

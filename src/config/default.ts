@@ -43,7 +43,7 @@ export default {
   appId: '1597534147',
   developerId: '1572453992',
   enableDebugModeKey: 'a1a9ac8f80b62',
-  email: '1852067571@qq.com',
+  email: 'darkce97@gmail.com',
   qqGroup: '168380697',
   fundebugApiKey:
     '740fabe1c51a8ef0cf52195956a707e05c24d471da5d33703d69513d40f36990',

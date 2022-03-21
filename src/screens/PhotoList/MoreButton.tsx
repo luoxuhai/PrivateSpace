@@ -1,36 +1,28 @@
-import React, { useCallback, useMemo, useRef } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { TouchableOpacity, StyleSheet } from 'react-native';
 import { observer } from 'mobx-react-lite';
 import { useTranslation } from 'react-i18next';
-import { ContextMenuButton } from 'react-native-ios-context-menu';
-
+import { MenuConfig } from 'react-native-ios-context-menu';
+import { PopoverMenu } from '@/components/PopoverMenu';
 import { useStore } from '@/store';
-import { platformInfo } from '@/utils';
-import { PopoverMenu, MenuItem } from '@/components/PopoverMenu';
-import { IListFileData } from '@/services/api/local/type.d';
 import IconEllipsisCircle from '@/assets/icons/ellipsis.circle.svg';
-import IconSquareGrid from '@/assets/icons/square.grid.2x2.svg';
-import IconListBullet from '@/assets/icons/list.bullet.svg';
-import IconChevronUp from '@/assets/icons/chevron.up.svg';
-import IconChevronDown from '@/assets/icons/chevron.down.svg';
-import IconCheckmark from '@/assets/icons/checkmark.svg';
 
 interface IContextMenuProps {
-  item: IListFileData;
+  item: API.PhotoWithSource;
   albumId?: string;
   disabled?: boolean;
   children?: React.ReactNode;
-  onScrollToTop?: () => void;
   onRefetch?: (onCallback?: () => void) => void;
+  onSelect?: () => void;
 }
 
 const getDefaultOrder = (key: string) => {
   switch (key) {
     case 'size':
     case 'ctime':
-      return 'desc';
+      return 'DESC';
     default:
-      return 'asc';
+      return 'ASC';
   }
 };
 
@@ -39,124 +31,69 @@ const getMenuState = (value: boolean) => (value ? 'on' : 'off');
 export const MoreButton = observer<IContextMenuProps>(props => {
   const { t } = useTranslation();
   const { ui, album } = useStore();
-  const popoverRef = useRef();
 
-  // const { refetch: refetchFileList } = useQuery(
-  //   ['image.list.list.item', props.albumId],
-  //   {
-  //     enabled: false,
-  //   },
-  // );
+  const handleMenuItemPress = useCallback(
+    (key: string) => {
+      switch (key) {
+        case 'name':
+        case 'ctime':
+        case 'size':
+          const order = album.orderBy?.[key];
 
-  const iconProps = useMemo(
-    () => ({
-      width: 14,
-      fill: ui.colors.label,
-    }),
-    [ui.colors],
+          album.setOrderBy({
+            [key]: order
+              ? order === 'ASC'
+                ? 'DESC'
+                : 'ASC'
+              : getDefaultOrder(key),
+          });
+          props.onRefetch?.();
+          break;
+        case 'gallery':
+        case 'list':
+          album.setView(key);
+          break;
+        case 'select':
+          props.onSelect?.();
+      }
+    },
+    [album.view, album.orderBy],
   );
 
-  const menus: MenuItem[] = useMemo(
-    () =>
-      [
-        {
-          key: 'gallery',
-          title: t('fileManage:gallery'),
-          checked: album.photoViewConfig?.view === 'gallery',
-          icon: <IconSquareGrid {...iconProps} width={16} height={16} />,
-        },
-        {
-          key: 'list',
-          title: t('fileManage:list'),
-          checked: album.photoViewConfig?.view === 'list',
-          icon: <IconListBullet {...iconProps} width={16} height={16} />,
-          withSeparator: true,
-        },
-        {
-          key: 'ctime',
-          title: t('fileManage:ctime'),
-          checked: album.photoViewConfig?.sort.field === 'ctime',
-        },
-        {
-          key: 'name',
-          title: t('fileManage:name'),
-          checked: album.photoViewConfig?.sort.field === 'name',
-        },
-        {
-          key: 'size',
-          title: t('fileManage:size'),
-          checked: album.photoViewConfig?.sort.field === 'size',
-        },
-      ].map(menu => ({
-        ...menu,
-        icon:
-          menu.icon ??
-          (menu.checked &&
-            (album.photoViewConfig?.sort.order === 'asc' ? (
-              <IconChevronUp {...iconProps} />
-            ) : (
-              <IconChevronDown {...iconProps} />
-            ))),
-        checkedIcon: menu.checked && (
-          <IconCheckmark {...iconProps} width={12} />
-        ),
-        onPress: () => handleMenuItemPress(menu.key),
-      })),
-
-    [t, album.photoViewConfig],
-  );
-
-  const handleMenuItemPress = useCallback((key: string) => {
-    switch (key) {
-      case 'name':
-      case 'ctime':
-      case 'size':
-        album.setPhotoViewConfig({
-          sort: {
-            field: key,
-            order:
-              album.photoViewConfig?.sort.field === key
-                ? album.photoViewConfig?.sort.order === 'asc'
-                  ? 'desc'
-                  : 'asc'
-                : getDefaultOrder(key),
-          },
-        });
-        props.onRefetch?.(() => {
-          props.onScrollToTop?.();
-        });
-        break;
-      case 'gallery':
-      case 'list':
-        album.setPhotoViewConfig({
-          view: key,
-        });
-        break;
-    }
-    popoverRef.current?.setVisibility(false);
-    props.onScrollToTop?.();
-  }, []);
-
-  const menuConfig = {
+  const menuConfig: MenuConfig = {
     menuTitle: '',
     menuItems: [
       {
-        actionKey: 'gallery',
-        actionTitle: t('fileManage:gallery'),
-        menuState: getMenuState(album.photoViewConfig?.view === 'gallery'),
+        actionKey: 'select',
+        actionTitle: t('common:select'),
         icon: {
           iconType: 'SYSTEM',
-          iconValue: 'square.grid.2x2',
+          iconValue: 'checkmark.circle',
         },
       },
       {
-        actionKey: 'list',
-        actionTitle: t('fileManage:list'),
-        menuState: getMenuState(album.photoViewConfig?.view === 'list'),
-        icon: {
-          iconType: 'SYSTEM',
-          iconValue: 'list.bullet',
-        },
+        menuTitle: '',
+        menuOptions: ['displayInline'],
+        menuItems: [
+          {
+            actionKey: 'gallery',
+            actionTitle: t('fileManage:gallery'),
+            menuState: getMenuState(album.view === 'gallery'),
+            icon: {
+              iconType: 'SYSTEM',
+              iconValue: 'square.grid.2x2',
+            },
+          },
+          {
+            actionKey: 'list',
+            actionTitle: t('fileManage:list'),
+            menuState: getMenuState(album.view === 'list'),
+            icon: {
+              iconType: 'SYSTEM',
+              iconValue: 'list.bullet',
+            },
+          },
+        ],
       },
       {
         menuTitle: '',
@@ -165,23 +102,17 @@ export const MoreButton = observer<IContextMenuProps>(props => {
           {
             actionKey: 'ctime',
             actionTitle: t('fileManage:ctime'),
-            menuState: getMenuState(
-              album.photoViewConfig?.sort.field === 'ctime',
-            ),
+            menuState: getMenuState(!!album.orderBy?.ctime),
           },
           {
             actionKey: 'name',
             actionTitle: t('fileManage:name'),
-            menuState: getMenuState(
-              album.photoViewConfig?.sort.field === 'name',
-            ),
+            menuState: getMenuState(!!album.orderBy?.name),
           },
           {
             actionKey: 'size',
             actionTitle: t('fileManage:size'),
-            menuState: getMenuState(
-              album.photoViewConfig?.sort.field === 'size',
-            ),
+            menuState: getMenuState(!!album.orderBy?.size),
           },
         ].map(item => ({
           ...item,
@@ -189,7 +120,7 @@ export const MoreButton = observer<IContextMenuProps>(props => {
             iconType: 'SYSTEM',
             iconValue:
               item.menuState === 'on' &&
-              (album.photoViewConfig?.sort.order === 'asc'
+              (album.orderBy?.[item.actionKey] === 'ASC'
                 ? 'chevron.up'
                 : 'chevron.down'),
           },
@@ -213,37 +144,20 @@ export const MoreButton = observer<IContextMenuProps>(props => {
   );
 
   return (
-    <>
-      {platformInfo.os === 'ios' && parseInt(platformInfo.version, 10) >= 14 ? (
-        <ContextMenuButton
-          isMenuPrimaryAction
-          menuConfig={menuConfig}
-          style={styles.contextMenuButton}
-          onMenuDidShow={() => {
-            album.setMoreContextVisible(true);
-          }}
-          onMenuWillHide={() => {
-            album.setMoreContextVisible(false);
-          }}
-          onPressMenuItem={({ nativeEvent }) =>
-            handleMenuItemPress(nativeEvent.actionKey)
-          }>
-          {button}
-        </ContextMenuButton>
-      ) : (
-        <PopoverMenu
-          ref={popoverRef}
-          menus={menus}
-          permittedArrowDirections={['up']}>
-          <TouchableOpacity
-            onPress={() => {
-              popoverRef.current?.setVisibility(true);
-            }}>
-            {button}
-          </TouchableOpacity>
-        </PopoverMenu>
-      )}
-    </>
+    <PopoverMenu
+      menus={menuConfig}
+      style={styles.contextMenuButton}
+      onMenuWillShow={() => {
+        album.setMoreContextVisible(true);
+      }}
+      onMenuWillHide={() => {
+        album.setMoreContextVisible(false);
+      }}
+      onPressMenuItem={({ nativeEvent }) =>
+        handleMenuItemPress(nativeEvent.actionKey)
+      }>
+      {button}
+    </PopoverMenu>
   );
 });
 

@@ -5,6 +5,7 @@ import {
   clearPersistedStore,
 } from 'mobx-persist-store';
 import { InAppPurchase } from 'expo-in-app-purchases';
+import * as CloudStore from 'react-native-cloud-store';
 
 import User from '@/services/database/entities/user.entity';
 
@@ -31,6 +32,7 @@ export class UserStore implements IStore {
       name: 'User',
       properties: ['purchaseResults'],
     });
+    // CloudStore.onICloudKVStoreRemoteChange(data => {});
   }
 
   @action setCurrent(user: User): void {

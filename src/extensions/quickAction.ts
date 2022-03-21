@@ -22,8 +22,8 @@ const fileImporter = new FileImporter();
 const getShortcuts = (): ShortcutItem[] => [
   {
     type: 'quick.transfer',
-    title: 'WI-FI 互传',
-    shortTitle: '互传',
+    title: getI18n().t('quickAction:transfer.title'),
+    shortTitle: getI18n().t('quickAction:transfer.shortTitle'),
     iconType: 'system',
     iconName: 'wifi',
   },

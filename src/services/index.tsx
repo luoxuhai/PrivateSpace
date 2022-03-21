@@ -5,14 +5,12 @@ import {
   NavigationFunctionComponent,
 } from 'react-native-navigation';
 import FS from 'react-native-fs';
-// import { HoldMenuProvider } from '@/lib/context-menu/src';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 
 import { CustomSentry } from '@/utils/customSentry';
 import Navigation from './navigation';
 import { SOURCE_PATH, THUMBNAIL_PATH, TEMP_PATH, STATIC_PATH } from '@/config';
 import DB from './database';
-import Locale from './locale';
 import { EUserType } from './database/entities/user.entity';
 import * as API from './api';
 import config from '@/config';
@@ -27,7 +25,6 @@ interface IService {
 type Services = Record<string, IService>;
 
 export const services = {
-  locale: new Locale(),
   db: new DB(),
   nav: new Navigation(),
   api: API,

@@ -17,7 +17,6 @@ import SimpleSelectionList, {
 } from '@/components/SimpleSelectionList';
 import { ICheckListItem } from '@/components/CheckList';
 import { SafeAreaScrollView } from '@/components';
-import { useStat } from '@/hooks';
 import IconXmarkCircle from '@/assets/icons/xmark.circle.svg';
 
 const appIconStyle = {
@@ -46,7 +45,6 @@ const AppIcon = ({
 function UrgentSettingScreen(): JSX.Element {
   const { ui, global } = useStore();
   const { t } = useTranslation();
-  useStat('UrgentSetting');
 
   const options: ISimpleSelectionListItem<
     ICheckListItem<EAppOpenUrl | null>

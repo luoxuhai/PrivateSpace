@@ -15,10 +15,6 @@ declare module 'react-native-dynamic-app-icon' {
   export default reactNativeDynamicAppIcon;
 }
 
-declare module 'react-native-ios-popover' {
-  export const PopoverView: React.FC;
-}
-
 declare module 'react-native-popover-menu' {
   const content: React.FC;
   export default content;

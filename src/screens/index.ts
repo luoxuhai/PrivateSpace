@@ -14,7 +14,7 @@ import ImageListScreen from './PhotoList';
 import AlbumSettingModal from './Album/AlbumSetting';
 import AboutScreen from './About';
 import WebViewScreen from './WebView';
-import BrowserScreen from './Browser';
+// import ICloudScreen from './ICloud';
 import LanguageSettingScreen from './Settings/Language';
 import ThemeSettingScreen from './Settings/Theme';
 import AutoLockSettingScreen from './Settings/AutoLock';
@@ -26,7 +26,7 @@ import RecycleBinScreen from './RecycleBin';
 import RecycleBinSettingScreen from './RecycleBin/Setting';
 import ImageViewScreen from './PhotoView';
 import AlbumCoverScreen from './Album/AlbumCover';
-import FolderPickerScreen from './AlbumPicker';
+import FolderPickerScreen from './Album/AlbumPicker';
 import VideoPlayerScreen from './PhotoView/VideoPlayer';
 import PurchaseScreen from './Purchase';
 import DeveloperScreen from './About/Developer';
@@ -44,7 +44,7 @@ export type ScreenName =
   | 'FeedBack'
   | 'About'
   | 'WebView'
-  | 'Browser'
+  | 'ICloud'
   | 'LanguageSetting'
   | 'ThemeSetting'
   | 'FakePasswordSetting'
@@ -84,8 +84,8 @@ export const getScreens = (): Screens<ScreenName> =>
               visible: true,
               hideTopBarOnFocus: true,
               hideOnScroll: false,
-              placeholder: '搜索相册、图片、视频',
-              cancelText: '取消',
+              placeholder: t('search:placeholder'),
+              cancelText: t('search:cancel'),
               tintColor: stores.ui.themes.primary,
             },
           },
@@ -219,6 +219,9 @@ export const getScreens = (): Screens<ScreenName> =>
               },
             ],
           },
+          bottomTabs: {
+            animate: true,
+          },
         },
       },
 
@@ -233,16 +236,16 @@ export const getScreens = (): Screens<ScreenName> =>
         },
       },
 
-      Browser: {
-        component: BrowserScreen,
-        options: {
-          topBar: {
-            title: {
-              text: '隐私浏览器',
-            },
-          },
-        },
-      },
+      // ICloud: {
+      //   component: ICloudScreen,
+      //   options: {
+      //     topBar: {
+      //       title: {
+      //         text: 'iCloud 备份',
+      //       },
+      //     },
+      //   },
+      // },
 
       Transfer: {
         component: TransferScreen,
@@ -318,7 +321,7 @@ export const getScreens = (): Screens<ScreenName> =>
         options: {
           topBar: {
             title: {
-              text: '高级功能',
+              text: t('setting:advanced.navigation.title'),
             },
           },
         },

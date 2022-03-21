@@ -12,14 +12,12 @@ import {
   StyleSheet,
   ActivityIndicator,
   Text,
-  View,
   PlatformColor,
+  View,
 } from 'react-native';
-import FastImage from 'react-native-fast-image';
-import { createImageProgress } from 'react-native-image-progress';
-import { Blurhash } from 'react-native-blurhash';
-import Animated, { FadeOut } from 'react-native-reanimated';
 
+import BlurhashView from '@/components/BlurhashView';
+import FastImageProgress from '@/components/FastImageProgress';
 import { useUpdateEffect } from '@/hooks';
 import { useDoubleTapToZoom, useMaxScale } from './hooks';
 import {
@@ -29,9 +27,7 @@ import {
   ImageSource,
   LoadStatus,
 } from './type.d';
-
-const Image = createImageProgress(FastImage);
-const AnimatedBlurhash = Animated.createAnimatedComponent(Blurhash);
+import { getSourceByMime } from '@/utils';
 
 export interface ImageViewProps
   extends Pick<ScrollViewProps, 'onScrollEndDrag' | 'onScrollBeginDrag'> {
@@ -89,12 +85,14 @@ function ImageView(props: ImageViewProps): JSX.Element {
   }, [props.inViewport]);
 
   const renderIndicator = useCallback(() => {
-    const { blurhash } = props.source;
+    const { blurhash, width, height } = props.source;
     return blurhash ? (
-      <AnimatedBlurhash
-        style={styles.blurhash}
+      <BlurhashView
         blurhash={blurhash}
-        exiting={FadeOut.duration(100)}
+        {...(width &&
+          height && {
+            ratio: width / height,
+          })}
       />
     ) : (
       <ActivityIndicator size="large" />
@@ -102,7 +100,11 @@ function ImageView(props: ImageViewProps): JSX.Element {
   }, [props.source.blurhash]);
 
   const renderError = useCallback(() => {
-    return <Text style={styles.loadFailed}>加载失败！</Text>;
+    return (
+      <View style={styles.loadFailed}>
+        <Text style={styles.loadFailedText}>加载失败！</Text>
+      </View>
+    );
   }, []);
 
   function handleScroll(event: NativeSyntheticScrollEvent) {
@@ -167,10 +169,13 @@ function ImageView(props: ImageViewProps): JSX.Element {
           }}
           onPressOut={handlePressOut}
           onLongPress={() => loaded && props.onLongPress?.()}>
-          <Image
+          <FastImageProgress
             style={[styles.image]}
             source={{
-              uri: props.source.poster || props.source.uri,
+              uri:
+                props.source.poster ||
+                props.source.uri ||
+                props.source.thumbnail,
             }}
             resizeMode="contain"
             threshold={20}
@@ -216,6 +221,12 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   loadFailed: {
+    height: '100%',
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadFailedText: {
     fontSize: 16,
     color: PlatformColor('systemRed'),
   },

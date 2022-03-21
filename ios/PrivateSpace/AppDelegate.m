@@ -1,6 +1,5 @@
 #import "AppDelegate.h"
 #import "Orientation.h"
-#import "BaiduMobStat.h"
 #import <Firebase.h>
 #import <CodePush/CodePush.h>
 #import <ReactNativeNavigation/ReactNativeNavigation.h>
@@ -8,6 +7,7 @@
 #import <React/RCTBridge.h>
 #import <React/RCTBundleURLProvider.h>
 #import <RNShareMenu/ShareMenuManager.h>
+#import <OverrideColorScheme.h>
 
 #ifdef FB_SONARKIT_ENABLED
 #import <FlipperKit/FlipperClient.h>
@@ -36,20 +36,17 @@ static void InitializeFlipper(UIApplication *application) {
   InitializeFlipper(application);
 #endif
   
-  // Firebase https://rnfirebase.io/#3-ios-setup
-  [FIRApp configure];
-
   RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
 [ReactNativeNavigation bootstrapWithBridge:bridge];
+  [super application:application didFinishLaunchingWithOptions:launchOptions];
+
+  [OverrideColorScheme enableAlertSupport];
 
 #if !DEBUG
-  // 百度移动统计
-  BaiduMobStat *baiduMobStat = [BaiduMobStat defaultStat];
-  baiduMobStat.platformType = 1;
-  [baiduMobStat startWithAppId:@"8ef53e8289"];
+  // Firebase https://rnfirebase.io/#3-ios-setup
+  [FIRApp configure];
 #endif
 
-  [super application:application didFinishLaunchingWithOptions:launchOptions];
   return YES;
 }
 

@@ -102,7 +102,7 @@ export const ToolbarContainer = observer<IToolbarContainerProps>(props => {
             text: '移动到相册',
           },
           excludedFolder: [props.albumId],
-          async onDone({ id }) {
+          async onDone({ id }: { id: string }) {
             await updateFile({
               where: {
                 ids: props.selectedIds,

@@ -23,10 +23,8 @@ import {
 } from 'react-native';
 import { observer } from 'mobx-react-lite';
 import { FlatGrid } from 'react-native-super-grid';
-import baidumobstat from '@/utils/analytics/baidumob';
 
 import { services, queryClient } from '@/services';
-import { IListAlbumData } from '@/services/api/local/type.d';
 import { appUpdateCheck } from '@/utils';
 import { useStore } from '@/store';
 import { queryImage } from '@/screens/PhotoList';
@@ -51,7 +49,6 @@ const AlbumScreen: NavigationFunctionComponent<
     if (e.isFocused) {
       searchPanelRef.current.show();
       searchPanelRef.current.search(e.text);
-      baidumobstat.onEvent('preview_page_search');
       services.nav.screens?.N.mergeOptions(props.componentId, {
         topBar: {
           noBorder: true,
@@ -204,7 +201,7 @@ export default observer(AlbumScreen);
 
 interface IAlbumCardProps {
   componentId?: string;
-  data: IListAlbumData;
+  data: API.PhotoWithSource;
   style?: ViewStyle;
   footerStyle?: ViewStyle;
   onPress?: () => void;

@@ -75,7 +75,6 @@ export default class Nav {
               ...btn,
               color: primaryColor,
             })),
-            searchBarTintColor: primaryColor,
           },
 
           bottomTab: bottomTabIcon

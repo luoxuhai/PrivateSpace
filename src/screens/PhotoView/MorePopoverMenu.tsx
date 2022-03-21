@@ -1,65 +1,46 @@
-import React, { useCallback, useMemo, useRef } from 'react';
+import React, { useCallback } from 'react';
 import { TouchableOpacity, Alert } from 'react-native';
 import FS from 'react-native-fs';
 import { observer } from 'mobx-react-lite';
+import { cloneDeep } from 'lodash';
 
-import { useStore } from '@/store';
-import { PopoverMenu, MenuItem } from '@/components/PopoverMenu';
+import { PopoverMenu, MenuConfig } from '@/components/PopoverMenu';
 import { useUpdateFile } from '@/hooks';
-import { IListFileData } from '@/services/api/local/type.d';
 import { services } from '@/services';
 import { extname, getSourcePath } from '@/utils';
 
-import IconPencil from '@/assets/icons/pencil.svg';
-import IconTextBubble from '@/assets/icons/text.bubble.svg';
-import { cloneDeep } from 'lodash';
-
 interface IContextMenuProps {
-  item: IListFileData;
-  images: any[];
+  item: API.PhotoWithSource;
+  images: API.PhotoWithSource[];
   disabled?: boolean;
   children?: React.ReactNode;
   onChange?: (value: any) => void;
 }
 
 export const MorePopoverMenu = observer<IContextMenuProps>(props => {
-  const { ui } = useStore();
-  const popoverRef = useRef();
-
   const { mutateAsync: updateFile } = useUpdateFile();
 
-  const iconProps = useMemo(
-    () => ({
-      width: 14,
-      fill: ui.colors.label,
-    }),
-    [ui.colors],
-  );
-
-  const menus: MenuItem[] = useMemo(
-    () =>
-      [
-        {
-          key: 'rename',
-          title: '重命名',
-          icon: <IconPencil {...iconProps} width={16} height={16} />,
+  const menus: MenuConfig = {
+    menuTitle: '',
+    menuItems: [
+      {
+        actionKey: 'description',
+        actionTitle: '描述',
+        icon: {
+          iconType: 'SYSTEM',
+          iconValue: 'text.bubble',
         },
-        {
-          key: 'description',
-          title: '描述',
-          icon: <IconTextBubble {...iconProps} width={16} height={16} />,
+      },
+      {
+        actionKey: 'rename',
+        actionTitle: '重命名',
+        icon: {
+          iconType: 'SYSTEM',
+          iconValue: 'pencil',
         },
-        // {
-        //   key: 'label',
-        //   title: t('fileManage:list'),
-        //   icon: <IconListBullet {...iconProps} width={16} height={16} />,
-        // },
-      ].map(item => ({
-        ...item,
-        onPress: () => handleMenuItemPress(item.key),
-      })),
-    [],
-  );
+      },
+    ],
+  };
 
   function setCurrentFile(values: any) {
     const newImage = cloneDeep(props.images);
@@ -94,6 +75,7 @@ export const MorePopoverMenu = observer<IContextMenuProps>(props => {
                 if (!name || name === props.item.name) return;
 
                 const fullName = `${name}${extname(props.item.name)}`;
+                const sourceId = props.item.extra?.source_id as string;
                 await updateFile({
                   where: {
                     id: props.item.id,
@@ -103,8 +85,8 @@ export const MorePopoverMenu = observer<IContextMenuProps>(props => {
                   },
                 });
                 FS.moveFile(
-                  props.item.uri,
-                  getSourcePath(props.item.extra!.source_id!, fullName),
+                  props.item.uri as string,
+                  getSourcePath(sourceId, fullName),
                 );
 
                 props.onChange?.(
@@ -118,7 +100,6 @@ export const MorePopoverMenu = observer<IContextMenuProps>(props => {
           'plain-text',
           props.item.name.replace(/\..+$/, ''),
         );
-        popoverRef.current?.setVisibility(false);
         break;
       case 'description':
         services.nav.screens?.show('DescriptionForm', {
@@ -138,24 +119,19 @@ export const MorePopoverMenu = observer<IContextMenuProps>(props => {
               }),
             );
           },
-          onDismiss() {
-            popoverRef.current?.setVisibility(false);
-          },
         });
     }
   }, []);
 
   return (
     <PopoverMenu
-      ref={popoverRef}
       menus={menus}
-      permittedArrowDirections={['down']}>
-      <TouchableOpacity
-        onPress={() => {
-          popoverRef.current?.setVisibility(true);
-        }}>
-        {props.children}
-      </TouchableOpacity>
+      onPressMenuItem={event => {
+        if (event?.nativeEvent.actionKey) {
+          handleMenuItemPress(event?.nativeEvent.actionKey);
+        }
+      }}>
+      <TouchableOpacity>{props.children}</TouchableOpacity>
     </PopoverMenu>
   );
 });

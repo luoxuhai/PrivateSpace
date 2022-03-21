@@ -1,17 +1,15 @@
 import { Image } from 'react-native';
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
-import { FFprobeKit, FFmpegKit, ReturnCode } from 'ffmpeg-kit-react-native';
+import { FFprobeKit } from 'ffmpeg-kit-react-native';
+import * as Toolkit from 'react-native-app-toolkit';
 
 import { CustomSentry } from '@/utils/customSentry';
-import config, { SOURCE_PATH, THUMBNAIL_PATH, TEMP_PATH } from '@/config';
+import config, { SOURCE_PATH, THUMBNAIL_PATH } from '@/config';
 import FileEntity, {
   SourceType,
-  FileType,
 } from '@/services/database/entities/file.entity';
-import { getFile } from '@/services/api/local/file';
-import { initAlbums } from '@/services';
+import { initAlbums, services } from '@/services';
 import { join } from './path';
-import { generateID } from './common';
 
 /**
  * 获取资源文件地址
@@ -22,6 +20,16 @@ import { generateID } from './common';
  */
 export function getSourcePath(sourceId: string, filename?: string): string {
   return join(SOURCE_PATH, sourceId, filename);
+}
+
+/**
+ * 获取视频封面地址
+ *
+ * @param sourceId
+ * @returns 本地路径
+ */
+export function getPosterPath(sourceId?: string) {
+  return sourceId ? join(SOURCE_PATH, sourceId, 'poster.jpg') : undefined;
 }
 
 /**
@@ -93,26 +101,21 @@ export async function generateThumbnail(
         return null;
       }
     case SourceType.Video: {
-      const outputPath = join(TEMP_PATH, `${generateID()}.jpg`);
+      // const outputPath = join(TEMP_PATH, `${generateID()}.jpg`);
       // 截取时间，ms
-      const stime = 100 / 1000;
-
-      const session = await FFmpegKit.execute(
-        `-ss ${stime} -i ${path.replace(
-          /^file:\/\//,
-          '',
-        )} -frames:v 1 -an -q:v 1 -vcodec mjpeg ${outputPath}`,
-      );
+      const stime = 1000;
 
       try {
-        const code = await session.getReturnCode();
-        if (ReturnCode.isSuccess(code)) {
-          return {
-            path: outputPath,
-          };
-        } else {
-          throw await session.getAllLogsAsString();
-        }
+        const result = await Toolkit.getVideoThumbnail(
+          path.startsWith('file://') ? path : `file://${path}`,
+          {
+            time: stime,
+          },
+        );
+
+        return {
+          path: result.uri,
+        };
       } catch (error) {
         CustomSentry.captureException(error, {
           extra: {
@@ -130,12 +133,16 @@ export async function resizeImage({
   width,
   compress = 0.5,
 }: {
-  uri: string;
-  width: number;
+  uri?: string;
+  width?: number;
   compress?: number;
-}): Promise<{
-  path: string;
-} | null> {
+}): Promise<
+  | {
+      path: string;
+    }
+  | undefined
+> {
+  if (!uri) return;
   const res = await manipulateAsync(
     uri,
     [
@@ -169,12 +176,17 @@ export function getImageSize(
   });
 }
 
-export async function getMediaInfo(path: string): Promise<{
-  /** 毫秒 */
-  duration: number;
-  width: number;
-  height: number;
-} | null> {
+export async function getMediaInfo(path?: string): Promise<
+  | {
+      /** 毫秒 */
+      duration: number;
+      width: number;
+      height: number;
+    }
+  | undefined
+> {
+  if (!path) return;
+
   const session = await FFprobeKit.getMediaInformation(path);
 
   try {
@@ -188,21 +200,22 @@ export async function getMediaInfo(path: string): Promise<{
       height: stream.height,
     };
   } catch (error) {
-    return null;
+    return;
   }
 }
 
+/**
+ * 获取默认相册
+ */
 export async function getDefaultAlbum(
   owner: string,
 ): Promise<FileEntity | undefined> {
   await initAlbums();
-  const result = await getFile({
-    where: {
-      name: config.defaultAlbum[0].name,
-      type: FileType.Folder,
-      owner,
-    },
+
+  const result = services.api.album.get({
+    name: config.defaultAlbum[0].name,
+    owner,
   });
 
-  return result.data;
+  return result;
 }

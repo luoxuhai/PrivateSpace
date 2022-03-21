@@ -1,104 +1,60 @@
-import React from 'react';
-import { View, Text, TouchableHighlight, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, StyleSheet, ViewStyle, useWindowDimensions } from 'react-native';
 import { observer } from 'mobx-react-lite';
-import { PopoverView } from 'react-native-ios-popover';
-import Popover from 'react-native-popover-view';
-import chroma from 'chroma-js';
+import {
+  ContextMenuButton,
+  MenuConfig,
+  OnPressMenuItemEventObject,
+} from 'react-native-ios-context-menu';
 
-import { useStore } from '@/store';
-
-interface IContextMenuProps {
-  menus: MenuItem[];
+interface PopoverMenuProps {
+  menus: MenuConfig;
   permittedArrowDirections?: string[];
   children?: React.ReactNode;
+  style?: ViewStyle;
+  onPressMenuItem?: (event?: OnPressMenuItemEventObject) => void;
+  onMenuWillShow?: () => void;
+  onMenuWillHide?: () => void;
 }
 
-export interface MenuList {
-  title?: string;
-  onChange?: (key: string) => void;
-  data: MenuItem[];
-}
-
-export interface MenuItem {
-  key?: string;
-  title?: string;
-  subTitle?: string;
-  icon?: JSX.Element;
-  checkedIcon?: JSX.Element;
-  /**
-   * @default 'default'
-   */
-  type?: 'destructive' | 'default';
-  /**
-   * 是否禁用
-   * @default false
-   */
-  disabled?: boolean;
-  /**
-   * 是否显示分段
-   * @default false
-   */
-  withSeparator?: boolean;
-  onPress?: () => void;
-}
+export type { MenuConfig };
 
 export const PopoverMenu = observer<
-  IContextMenuProps,
+  PopoverMenuProps,
   { toggleVisibility: () => void }
 >(
   (props, ref) => {
-    const { ui } = useStore();
+    const [visibleOutside, setVisibleOutside] = useState(false);
+    const window = useWindowDimensions();
+
+    function hideOutsideView() {
+      setVisibleOutside(false);
+    }
+
+    function showOutsideView() {
+      setVisibleOutside(true);
+    }
+
+    const maskStyle: ViewStyle = {
+      display: visibleOutside ? 'flex' : 'none',
+      top: -window.width * 2,
+      left: -window.width * 2,
+      right: -window.width * 2,
+      bottom: -window.height * 2,
+    };
 
     return (
-      <PopoverView
-        ref={ref}
-        lazyPopover={false}
-        permittedArrowDirections={props.permittedArrowDirections ?? []}
-        popoverBackgroundColor={chroma(ui.colors.systemBackground)
-          .alpha(0.4)
-          .css()}
-        renderPopoverContent={() => (
-          <View style={styles.menuContainer}>
-            {props.menus?.map((menu, index) => (
-              <TouchableHighlight
-                key={menu.key ?? menu.title}
-                underlayColor={ui.colors.systemGray4}
-                onPress={menu.onPress}>
-                <View
-                  style={[
-                    styles.menuItem,
-                    index !== props.menus.length - 1 && {
-                      borderBottomWidth: StyleSheet.hairlineWidth,
-                      borderBottomColor: ui.colors.separator,
-                    },
-                    menu.withSeparator &&
-                      StyleSheet.flatten([
-                        styles.separator,
-                        {
-                          borderBottomColor: ui.colors.systemGray4,
-                        },
-                      ]),
-                  ]}>
-                  {menu.checkedIcon && (
-                    <View style={styles.menuIcon}>{menu.checkedIcon}</View>
-                  )}
-                  <Text
-                    style={[
-                      styles.menuTitle,
-                      {
-                        color: ui.colors.label,
-                      },
-                    ]}>
-                    {menu.title}
-                  </Text>
-                  {menu.icon}
-                </View>
-              </TouchableHighlight>
-            ))}
-          </View>
-        )}>
-        {props.children}
-      </PopoverView>
+      <>
+        <ContextMenuButton
+          isMenuPrimaryAction
+          menuConfig={props.menus}
+          onMenuWillShow={showOutsideView}
+          onMenuWillHide={hideOutsideView}
+          {...props}>
+          {props.children}
+        </ContextMenuButton>
+        <View style={[styles.mask, maskStyle]} />
+      </>
     );
   },
   {
@@ -107,25 +63,8 @@ export const PopoverMenu = observer<
 );
 
 const styles = StyleSheet.create({
-  menuContainer: {
-    width: 250,
-  },
-  menuItem: {
-    padding: 16,
-    paddingVertical: 14,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  menuTitle: {
-    fontSize: 17,
-    marginRight: 'auto',
-    marginLeft: 4,
-  },
-  menuIcon: {
-    width: 16,
-  },
-  separator: {
-    borderBottomWidth: 8,
+  mask: {
+    opacity: 0,
+    ...StyleSheet.absoluteFillObject,
   },
 });

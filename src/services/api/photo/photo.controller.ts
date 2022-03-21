@@ -59,7 +59,6 @@ class PhotoController {
     try {
       return await PhotoService.create(params);
     } catch (error) {
-      console.log(error);
       CustomSentry.captureException(error, {
         extra: {
           title: '创建图片/视频失败',

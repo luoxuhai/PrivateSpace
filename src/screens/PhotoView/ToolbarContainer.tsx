@@ -24,11 +24,10 @@ import { useStore } from '@/store';
 import FileEntity, {
   SourceType,
 } from '@/services/database/entities/file.entity';
-import { ICreateFileRequest } from '@/services/api/local/type.d';
 import { services } from '@/services';
 import { FileDetail } from './FileDetail';
 import { MorePopoverMenu } from './MorePopoverMenu';
-import classifyImageProcess from '@/utils/classifyImageProcess';
+import classifyImageProcess from '@/utils/process/classifyImageProcess';
 import { CreatePhotoParams } from '@/services/api/photo/types.d';
 
 interface IToolbarContainerProps {

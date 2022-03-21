@@ -1,14 +1,12 @@
 import ShareMenu, { ShareData } from 'react-native-share-menu';
 
 import { transformResult } from '@/screens/PhotoList/AddButton';
-import { createFile } from '@/services/api/local/file';
-import albumStore from '@/store/album';
-import userStore from '@/store/user';
+import { services } from '@/services';
+import { stores } from '@/store';
 import { LoadingOverlay } from '@/components/LoadingOverlay';
 import { RNToasty } from 'react-native-toasty';
 import { randomNum, extname, getDefaultAlbum } from '@/utils';
-import baidumobstat from '@/utils/analytics/baidumob';
-import classifyImageProcess from '@/utils/classifyImageProcess';
+import classifyImageProcess from '@/utils/process/classifyImageProcess';
 
 export function initShare(): void {
   ShareMenu.getInitialShare(handleShare);
@@ -36,13 +34,13 @@ const handleShare = async (shareData?: ShareData) => {
               name: `IMG_${randomNum(10)}${extname(item.data)}`,
             },
             (
-              await getDefaultAlbum(userStore.current!.id)
+              await getDefaultAlbum(stores.user.current!.id)
             )?.id as string,
           ),
         ) ?? [],
       ),
     );
-    albumStore.setRefetchAlbum(albumStore.refetchAlbum + 1);
+    stores.album.setRefetchAlbum(stores.album.refetchAlbum + 1);
   } catch {
     RNToasty.Show({
       title: '保存失败',
@@ -50,7 +48,6 @@ const handleShare = async (shareData?: ShareData) => {
     });
   }
 
-  baidumobstat.onEvent('operate_share');
   LoadingOverlay.hide();
   classifyImageProcess.start();
 };
@@ -58,10 +55,7 @@ const handleShare = async (shareData?: ShareData) => {
 export const createFiles = async files => {
   try {
     for (const file of files) {
-      await createFile({
-        ...file,
-        owner: userStore.current!.id ?? '',
-      });
+      await services.api.photo.create(file);
     }
   } catch (error) {
     console.error('error', error);

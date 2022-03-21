@@ -132,7 +132,7 @@ const PasscodeLockOverlay: PasscodeLockOverlayComponent<IPasscodeLockProps> = (
       isFirstOpen = false;
       setTimeout(() => {
         if (
-          inputType === EInputType.Verify &&
+          userStore.current?.password &&
           globalStore.settingInfo.autoLocalAuth &&
           userStore.current?.type !== EUserType.GHOST
         ) {
@@ -145,12 +145,12 @@ const PasscodeLockOverlay: PasscodeLockOverlayComponent<IPasscodeLockProps> = (
           pauseLocalAuth = true;
           handleLocalAuth();
         }
-      }, 300);
+      }, 250);
     } else if (appState === 'background') {
       pauseLocalAuth = false;
       global.appLaunchType = AppLaunchType.Unknown;
     }
-  }, [appState, inputType]);
+  }, [appState]);
 
   useNavigationComponentDidDisappear(() => {
     if (appState !== 'background') {
@@ -198,11 +198,12 @@ const PasscodeLockOverlay: PasscodeLockOverlayComponent<IPasscodeLockProps> = (
       return;
     }
 
-    const user = await services.api.user.get({
-      type: EUserType.ADMIN,
-    });
     const result = await LocalAuthentication.authenticateAsync({
       promptMessage: t('navigator:privateSpace'),
+    });
+
+    const user = await services.api.user.get({
+      type: EUserType.ADMIN,
     });
 
     if (result.success && user) {
@@ -328,9 +329,9 @@ const PasscodeLockOverlay: PasscodeLockOverlayComponent<IPasscodeLockProps> = (
 
   const extraButtonEnabled =
     inputType === EInputType.Verify &&
-    userStore.current?.type === EUserType.GHOST
+    (userStore.current?.type === EUserType.GHOST
       ? !globalStore.settingInfo.fakePassword?.hideLocalAuth
-      : true;
+      : true);
 
   return (
     <View style={[styles.container]}>

@@ -2,6 +2,7 @@ export default {
   app: {
     name: '隐私空间',
   },
+
   album: {
     navigation: {
       title: '相册',
@@ -14,10 +15,19 @@ export default {
     noData: '无相册',
   },
 
+  search: {
+    cancel: '取消',
+    placeholder: '搜索相册、图片、视频',
+  },
+
   quickAction: {
     capture: {
       title: '快速拍摄',
       shortTitle: '拍摄',
+    },
+    transfer: {
+      title: 'WI-FI 互传',
+      shortTitle: '互传',
     },
   },
 
@@ -65,18 +75,30 @@ export default {
     immediate: '立即',
     hapticFeedback: '触觉反馈',
     autoClearOrigin: '导入后提示删除原文件',
+    advanced: {
+      navigation: {
+        title: '高级设置',
+      },
+      smartSearch: {
+        title: '开启智能搜索',
+        header: '智能搜索',
+      },
+    },
   },
+
   albumCover: {
     navigation: {
       title: '相册封面',
     },
   },
+
   urgent: {
     navigation: {
       title: '紧急切换',
     },
     tableViewHeader: '当手机屏幕朝下时会跳转到以下指定应用',
   },
+
   autoLock: {
     navigation: {
       title: '自动锁定',
@@ -84,6 +106,7 @@ export default {
     immediate: '立即',
     tableViewHeader: '切换到其他APP后，超过以下选定到时间间隔后会自动锁定',
   },
+
   appearance: {
     navigation: {
       title: '外观',
@@ -94,17 +117,22 @@ export default {
     light: '浅色模式',
     dark: '深色模式',
   },
+
   langSetting: {
     navigation: {
       title: '语言设置',
     },
   },
+
   fakePass: {
     navigation: {
       title: '伪装密码',
     },
     enable: '开启',
+    header: '开启后将关闭自动{{localAuthText}}识别解锁功能',
+    hideAuthBtn: '隐藏解锁界面{{localAuthText}}解锁按钮',
   },
+
   albumSetting: {
     navigation: {
       title: '相册设置',
@@ -114,19 +142,20 @@ export default {
       msg: '请输入相册名称',
     },
   },
+
   about: {
     navigation: {
       title: '关于我们',
-    },
-    add: {
-      title: '创建相册',
-      msg: '请输入相册名称',
     },
     changelog: '更新日志',
     private: '隐私政策',
     agreement: '用户协议',
     moreApps: '我的其他应用',
+    connect: '联系我们',
+    QQgroup: 'QQ反馈群',
+    email: '开发者邮箱',
   },
+
   common: {
     emptyDataText: '暂无数据',
     mySpace: '我的空间',
@@ -159,7 +188,9 @@ export default {
     restore: '恢复',
     restoreAll: '恢复全部',
     noData: '无数据',
+    all: '全部',
   },
+
   permission: {
     camera: '相机',
     microphone: '麦克风',
@@ -170,6 +201,7 @@ export default {
     unavailable: '{{permission}}功能不可用',
     blocked: '请前往设置授予{{permissions}}权限，才能正常使用该功能',
   },
+
   passcodeLock: {
     create: '创建{{type}}密码',
     change: '修改{{type}}密码',
@@ -179,6 +211,7 @@ export default {
     fake: '伪装',
     reset: '重设密码',
   },
+
   // 文件管理
   fileManage: {
     gallery: '画廊',
@@ -190,8 +223,16 @@ export default {
     info: {
       name: '文件名',
       type: '类型',
-      dime: '分辨率',
+      dime: '尺寸',
       duration: '时长',
+      desc: '描述',
+    },
+    file: {
+      type: {
+        image: '图片',
+        video: '视频',
+        album: '相册',
+      },
     },
   },
 };

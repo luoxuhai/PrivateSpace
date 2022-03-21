@@ -31,6 +31,9 @@ export function getDefaultOptions(): Options {
       },
       animateRightButtons: false,
       animateLeftButtons: false,
+      searchBar: {
+        tintColor: stores.ui.themes.primary,
+      },
     },
     bottomTabs: {
       translucent: true,

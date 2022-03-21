@@ -1,57 +1,72 @@
-import React, { useMemo, memo } from 'react';
-import { ViewStyle, StyleSheet, Pressable, View, Text } from 'react-native';
+import React, { useMemo, memo, useCallback } from 'react';
+import {
+  ViewStyle,
+  StyleSheet,
+  Pressable,
+  View,
+  Text,
+  TextStyle,
+} from 'react-native';
 import { observer } from 'mobx-react-lite';
 import FastImage from 'react-native-fast-image';
 import dayjs from 'dayjs';
-import durationPlugin from 'dayjs/plugin/duration';
-import Animated, {
-  FadeOut,
-  FadeIn,
-  SequencedTransition,
-  Layout,
-} from 'react-native-reanimated';
 
-import { IListFileData } from '@/services/api/local/type.d';
 import { useStore, stores } from '@/store';
-import { formatFileSize } from '@/utils';
-
-dayjs.extend(durationPlugin);
-
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+import { formatFileSize, formatDuration } from '@/utils';
+import BlurhashView from '@/components/BlurhashView';
+import FastImageProgress from '@/components/FastImageProgress';
 
 interface IImageItemProps {
   style?: ViewStyle;
   index: number;
-  data: IListFileData;
+  data: API.PhotoWithSource;
   onPress?: (index: number) => void;
-  onLongPress?: (data: IListFileData) => void;
+  onLongPress?: (data: API.PhotoWithSource) => void;
 }
 
-interface IImageItemBlockProps {
-  style?: ViewStyle;
-  index: number;
-  data: IListFileData;
-  onPress?: (index: number) => void;
-  onLongPress?: (data: IListFileData) => void;
-}
+type IImageItemBlockProps = IImageItemProps;
 
 export const ImageItemBlock = memo(
   (props: IImageItemBlockProps): JSX.Element => {
+    const renderIndicator = useCallback(() => {
+      const extra = props.data?.extra;
+      if (!extra) return <></>;
+
+      const { blurhash, width, height } = extra;
+
+      return blurhash ? (
+        <BlurhashView
+          blurhash={blurhash}
+          decodeWidth={8}
+          resizeMode="cover"
+          decodeAsync
+          {...(width &&
+            height && {
+              ratio: width / height,
+            })}
+        />
+      ) : (
+        <></>
+      );
+    }, []);
+
     return (
       <Pressable
         style={[styles.blockContainer, props.style]}
         onPress={() => props.onPress?.(props.index)}
         onLongPress={() => props.onLongPress?.(props.data)}>
-        <FastImage
+        <FastImageProgress
           style={styles.blockImage}
           source={{
-            uri: props.data.thumbnail,
+            uri: props.data.thumbnail || props.data.poster || props.data.uri,
+            priority: FastImage.priority.high,
           }}
-          nativeID={`image.${props.data.id}`}
+          threshold={200}
+          renderIndicator={renderIndicator}
         />
         {props.data.extra?.duration && (
           <Text style={styles.duration}>
-            {dayjs.duration(props.data.extra?.duration).format('mm:ss')}
+            {formatDuration(props.data.extra.duration)}
           </Text>
         )}
       </Pressable>
@@ -69,6 +84,14 @@ export const ImageItemLine = observer<IImageItemProps>(props => {
     [ui.colors],
   );
 
+  const durationStyle: TextStyle = {
+    fontSize: 9,
+    right: 2,
+    textAlign: 'center',
+  };
+
+  const duration = props.data.extra?.duration;
+
   return (
     <Pressable
       onPress={() => props.onPress?.(props.index)}
@@ -78,13 +101,18 @@ export const ImageItemLine = observer<IImageItemProps>(props => {
           <FastImage
             style={styles.lineImage}
             source={{
-              uri: props.data.thumbnail,
+              uri: props.data.thumbnail || props.data.poster || props.data.uri,
               priority: FastImage.priority.high,
             }}
           />
-          {props.data.extra?.duration && (
-            <Text style={[styles.duration, styles.durationLine]}>
-              {dayjs.duration(props.data.extra?.duration).format('mm:ss')}
+          {!!duration && (
+            <Text
+              style={[
+                styles.duration,
+                styles.durationLine,
+                duration >= 3600 * 1000 ? durationStyle : null,
+              ]}>
+              {formatDuration(duration)}
             </Text>
           )}
         </View>

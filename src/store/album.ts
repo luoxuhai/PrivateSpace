@@ -5,28 +5,14 @@ import {
   clearPersistedStore,
 } from 'mobx-persist-store';
 
-interface IPhotoViewConfig {
-  // 视图
-  view: 'list' | 'gallery';
-  //排序
-  sort: {
-    field: string;
-    /**
-     * desc： 倒序
-     *
-     * asc：正序
-     */
-    order: 'desc' | 'asc';
-  };
-}
+type PhotoView = 'list' | 'gallery';
+
+type OrderBy = Partial<API.OrderBy<API.AlbumType>>;
 
 export class AlbumStore implements IStore {
-  @observable photoViewConfig?: IPhotoViewConfig = {
-    view: 'gallery',
-    sort: {
-      field: 'ctime',
-      order: 'desc',
-    },
+  @observable view: PhotoView = 'gallery';
+  @observable orderBy: OrderBy = {
+    ctime: 'DESC',
   };
   // 更多菜单显隐
   @observable moreContextVisible = false;
@@ -36,12 +22,16 @@ export class AlbumStore implements IStore {
     makeObservable(this);
     makePersistable(this, {
       name: 'Album',
-      properties: ['photoViewConfig'],
+      properties: ['view', 'orderBy'],
     });
   }
 
-  @action setPhotoViewConfig(photoViewConfig: Partial<IPhotoViewConfig>): void {
-    this.photoViewConfig = { ...this.photoViewConfig, ...photoViewConfig };
+  @action setOrderBy(orderBy: OrderBy): void {
+    this.orderBy = orderBy;
+  }
+
+  @action setView(view: PhotoView) {
+    this.view = view;
   }
 
   @action setMoreContextVisible(visible: boolean): void {

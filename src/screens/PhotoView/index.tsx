@@ -41,6 +41,7 @@ import { services } from '@/services';
 import ImageBrowser, {
   ImageBrowserInstance,
   LoadStatus,
+  ImageSource,
 } from '@/components/ImageBrowser';
 import { useStore } from '@/store';
 import { HapticFeedback, getSourceByMime } from '@/utils';
@@ -59,12 +60,7 @@ const iconPlaySize = {
 };
 
 interface IImageViewProps extends NavigationComponentProps {
-  images: {
-    name: string;
-    uri: string;
-    id: string;
-    mime: string;
-  }[];
+  images: API.PhotoWithSource[];
   initialIndex: number;
   onRefetch?: () => void;
 }
@@ -79,11 +75,29 @@ const ImageView: NavigationFunctionComponent<IImageViewProps> = props => {
   const currentItem = useMemo(() => images[index], [index, images]);
   const iconPlayOpacity = useSharedValue(1);
 
+  const imageSources = useMemo<ImageSource[]>(
+    () =>
+      images.map(image => ({
+        id: image.id as string,
+        uri: image.uri as string,
+        thumbnail: image.thumbnail,
+        blurhash: image.extra?.blurhash,
+        poster: image.poster,
+        width: image.extra?.width,
+        height: image.extra?.height,
+      })),
+    [images],
+  );
+
   useEffect(() => {
     if (currentItem) {
+      const ctime = currentItem?.ctime ? dayjs(currentItem?.ctime) : null;
       services.nav.screens?.N.updateProps('ImageViewTitle', {
         title: currentItem.name,
-        subtitle: dayjs(currentItem?.ctime).format('MM月DD日 HH:mm'),
+        subtitle:
+          (ctime?.isBefore(dayjs().startOf('year'))
+            ? ctime?.format('YYYY年MM月DD日 HH:mm')
+            : ctime?.format('MM月DD日 HH:mm')) || '-',
       });
     }
   }, [currentItem]);
@@ -153,7 +167,7 @@ const ImageView: NavigationFunctionComponent<IImageViewProps> = props => {
 
   async function saveImageToLocal() {
     try {
-      await MediaLibrary.saveToLibraryAsync(currentItem!.uri);
+      await MediaLibrary.saveToLibraryAsync(currentItem.uri as string);
       RNToasty.Show({
         title: '已保存到相册',
         position: 'top',
@@ -204,7 +218,7 @@ const ImageView: NavigationFunctionComponent<IImageViewProps> = props => {
               : ui.colors.white,
         }}
         ref={imageBrowserRef}
-        images={images}
+        images={imageSources}
         initialIndex={index}
         renderExtraElements={({ index: i, loadStatus }) => {
           return getSourceByMime(images?.[i]?.mime) === SourceType.Video &&

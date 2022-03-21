@@ -1,26 +1,10 @@
 import * as ClassifyImage from 'react-native-classify-image';
-import { Like } from 'typeorm/browser';
-import * as FS from 'react-native-fs';
 
 import { services } from '@/services';
 import { CustomSentry } from '@/utils/customSentry';
+import Process from './Process';
 
-interface ImageResult {
-  id: string;
-  uri: string;
-  labels?: FileLabel;
-}
-
-interface Listener {
-  type: 'progress' | 'error' | 'stop' | 'start';
-  listener: (event: any) => void;
-}
-
-class ClassifyImageProcess {
-  private progress = 0;
-  private status?: 'STARTED' | 'STOPPED' = 'STOPPED';
-  private listeners = new Set<Listener>();
-
+class ClassifyImageProcess extends Process {
   public async start(): PVoid {
     this.status = 'STARTED';
     this.sendEvent('start');
@@ -54,59 +38,6 @@ class ClassifyImageProcess {
     // 所有图片数据
   }
 
-  public stop(): void {
-    this.status = 'STOPPED';
-    this.progress = 0;
-    this.sendEvent('stop');
-  }
-
-  public on(
-    type: Listener['type'],
-    listener: Listener['listener'],
-  ): () => void {
-    const listenerItem = {
-      type,
-      listener,
-    };
-    this.listeners.add(listenerItem);
-
-    return () => {
-      this.listeners.delete(listenerItem);
-    };
-  }
-
-  public removeAllListeners(): void {
-    this.listeners.clear();
-  }
-
-  private sendEvent(type: Listener['type'], event?: any): void {
-    this.listeners.forEach(item => {
-      if (item.type === type) {
-        item.listener(event);
-      }
-    });
-  }
-
-  private async getAllImages() {
-    const images = await services.api.photo.list({
-      mime: Like('image/%'),
-    });
-
-    for (const [index, image] of images?.items?.entries()) {
-      if (!image.uri || !(await FS.exists(image.uri))) {
-        images?.items.splice(index, 1);
-      }
-    }
-
-    return (
-      images?.items.map(image => ({
-        id: image.id,
-        uri: image.uri,
-        labels: image.labels,
-      })) ?? []
-    );
-  }
-
   private async updateImageLabels(
     id: string,
     labels?: {
@@ -136,8 +67,7 @@ class ClassifyImageProcess {
 
 const classifyImageProcess = new ClassifyImageProcess();
 
-classifyImageProcess.on('error', error => {
-  console.log(error);
+classifyImageProcess.once('error', error => {
   CustomSentry.captureException(error);
 });
 

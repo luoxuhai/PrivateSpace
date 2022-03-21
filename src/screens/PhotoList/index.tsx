@@ -4,8 +4,6 @@ import React, {
   useEffect,
   useMemo,
   useCallback,
-  forwardRef,
-  useImperativeHandle,
 } from 'react';
 import {
   OptionsModalPresentationStyle,
@@ -16,17 +14,10 @@ import {
   useNavigationButtonPress,
   useNavigationComponentDidDisappear,
 } from 'react-native-navigation-hooks';
-import {
-  ViewStyle,
-  StyleSheet,
-  StyleProp,
-  FlatListProps,
-  View,
-} from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { observer } from 'mobx-react-lite';
-import { FlatGrid } from 'react-native-super-grid';
 import { useQuery } from 'react-query';
-import { useTranslation, getI18n } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import {
   useSharedValue,
   useAnimatedStyle,
@@ -34,19 +25,18 @@ import {
 } from 'react-native-reanimated';
 
 import { useStore } from '@/store';
-import { platformInfo } from '@/utils';
 import AddButton from './AddButton';
 import { services } from '@/services';
 import { useDeepEffect, useUpdateEffect } from '@/hooks';
-import { IListFileData } from '@/services/api/local/type.d';
 import IconCheckmarkCircleFill from '@/assets/icons/checkmark.circle.fill.svg';
 import { ToolbarContainer } from './ToolbarContainer';
 import { ContextMenu } from './ContextMenu';
 import { ImageItemLine, ImageItemBlock } from './ImageItem';
-import { useForceRender, useStat } from '@/hooks';
+import { useForceRender } from '@/hooks';
 import { DataLoadStatus } from '@/components/DataLoadStatus';
 import GridList, { GridListInstance } from '@/components/GridList';
 import { FileDetail } from '../PhotoView/FileDetail';
+import { AlbumStore } from '@/store/album';
 
 interface IImageListProps extends NavigationComponentProps {
   albumId: string;
@@ -58,7 +48,7 @@ interface IImageListProps extends NavigationComponentProps {
   };
 }
 
-const rightButtons = [
+const baseRightButtons = [
   {
     id: 'more',
     component: {
@@ -66,19 +56,12 @@ const rightButtons = [
       name: 'ImageListMoreButton',
     },
   },
-  {
-    id: 'select',
-    text: getI18n().t('common:select'),
-  },
 ];
 
-export async function queryImage(albumId, album) {
+export async function queryImage(albumId: string, album: AlbumStore) {
   const res = await services.api.photo.list({
     parent_id: albumId,
-    order_by: {
-      [album.photoViewConfig?.sort?.field]:
-        album.photoViewConfig?.sort?.order === 'desc' ? 'DESC' : 'ASC',
-    },
+    order_by: album.orderBy,
   });
 
   return {
@@ -96,7 +79,6 @@ const ImageList: NavigationFunctionComponent<IImageListProps> = props => {
   const addButtonOpacity = useSharedValue(1);
   const { visible, forceRender } = useForceRender();
   const fileDetailRef = useRef(null);
-  const gridListRef = useRef<GridListInstance>(null);
   const imagesRef = useRef<API.PhotoWithSource[] | undefined>();
 
   const addButtonStyle = useAnimatedStyle(() => {
@@ -107,26 +89,37 @@ const ImageList: NavigationFunctionComponent<IImageListProps> = props => {
     };
   }, []);
 
-  useStat('ImageList');
-
   useNavigationComponentDidDisappear(() => {
     forceRender();
   }, props.componentId);
 
+  const rightButtons = useMemo(
+    () => [
+      {
+        id: baseRightButtons[0].id,
+        component: {
+          ...baseRightButtons[0].component,
+          passProps: {
+            albumId: props.albumId,
+            async onRefetch(onCallback?: () => void) {
+              await refetchFileList();
+              onCallback?.();
+            },
+            onSelect() {
+              setIsSelectMode(true);
+            },
+          },
+        },
+      },
+    ],
+    [],
+  );
+
   useEffect(() => {
-    services.nav.screens?.N.updateProps('ImageListMoreButton', {
-      albumId: props.albumId,
-      async onScrollToTop() {
-        gridListRef.current?.scrollToOffset({
-          animated: false,
-          offset: 0,
-        });
-      },
-      async onRefetch(onCallback?: () => void) {
-        await refetchFileList();
-        onCallback?.();
-      },
-    });
+    services.nav.screens?.N.updateProps(
+      'ImageListMoreButton',
+      rightButtons[0].component.passProps,
+    );
 
     return () => {
       setIsSelectMode(false);
@@ -147,7 +140,7 @@ const ImageList: NavigationFunctionComponent<IImageListProps> = props => {
     );
   }
 
-  async function handleImagePress(item: IListFileData, index: number) {
+  async function handleImagePress(item: API.PhotoWithSource, index: number) {
     if (isSelectMode) {
       setSelectedIds(prev => {
         const newData = prev?.includes(item.id)
@@ -161,7 +154,8 @@ const ImageList: NavigationFunctionComponent<IImageListProps> = props => {
   }
 
   const {
-    isLoading,
+    isRefetching,
+    isFetching,
     data: photoData,
     refetch: refetchFileList,
   } = useQuery(
@@ -308,17 +302,21 @@ const ImageList: NavigationFunctionComponent<IImageListProps> = props => {
     'unselectAll',
   );
 
-  const isGalleryView = album.photoViewConfig?.view === 'gallery';
+  const isGalleryView = album.view === 'gallery';
+
+  useUpdateEffect(() => {
+    refetchFileList();
+  }, [isGalleryView]);
 
   const GalleryItem = useMemo(() => {
     forceRender();
-    switch (album.photoViewConfig?.view) {
+    switch (album.view) {
       case 'list':
         return ImageItemLine;
       default:
         return ImageItemBlock;
     }
-  }, [album.photoViewConfig?.view]);
+  }, [album.view]);
 
   const renderItem = useCallback(
     ({ item, index }) => {
@@ -349,15 +347,14 @@ const ImageList: NavigationFunctionComponent<IImageListProps> = props => {
             backgroundColor: ui.colors.systemBackground,
           },
         ]}
-        ref={gridListRef}
         ListEmptyComponent={
-          <DataLoadStatus loading={isLoading} text={t('imageList:noData')} />
+          <DataLoadStatus loading={isFetching} text={t('imageList:noData')} />
         }
         itemWidth={100}
         gutter={2}
         externalGutter={false}
         gridEnabled={isGalleryView}
-        data={photoData?.items ?? []}
+        data={isRefetching ? [] : photoData?.items ?? []}
         renderItem={renderItem}
         onScrollBeginDrag={() => {
           addButtonOpacity.value = 0.4;
@@ -387,9 +384,7 @@ const ImageList: NavigationFunctionComponent<IImageListProps> = props => {
         }}
       />
       <FileDetail ref={fileDetailRef} />
-      {platformInfo.os === 'ios' &&
-        parseInt(platformInfo.version, 10) >= 14 &&
-        album.moreContextVisible && <View style={styles.mask} />}
+      {album.moreContextVisible && <View style={styles.mask} />}
     </>
   );
 };
@@ -409,7 +404,7 @@ ImageList.options = props => {
           videoTotal,
         }),
       },
-      rightButtons: props.hasImage ? rightButtons : [],
+      rightButtons: props.hasImage ? baseRightButtons : [],
     },
   };
 };
@@ -471,51 +466,6 @@ const selectedMaskStyles = StyleSheet.create({
     alignItems: 'center',
   },
 });
-
-interface IGalleryListProps extends FlatListProps<any> {
-  style?: StyleProp<ViewStyle>;
-  data: any[];
-  spacing?: number;
-  itemDimension?: number;
-  renderItem: ({ item, itemStyle, index }) => JSX.Element;
-  onLayout?: () => void;
-}
-
-/**
- * 画廊视图列表
- */
-export const GalleryList = forwardRef(
-  (
-    {
-      style,
-      data,
-      spacing = 2,
-      itemDimension = 100,
-      renderItem,
-      onLayout,
-      ...rest
-    }: IGalleryListProps,
-    ref,
-  ): JSX.Element => {
-    const flatGridRef = useRef(null);
-
-    useImperativeHandle(ref, () => flatGridRef.current);
-
-    return (
-      <FlatGrid
-        ref={flatGridRef}
-        style={[style]}
-        itemDimension={itemDimension}
-        spacing={spacing}
-        between={false}
-        data={data}
-        onLayout={onLayout}
-        renderItem={renderItem}
-        {...rest}
-      />
-    );
-  },
-);
 
 const styles = StyleSheet.create({
   flatGrid: {

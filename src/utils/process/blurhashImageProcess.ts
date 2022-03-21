@@ -1,8 +1,12 @@
 import { Blurhash } from 'react-native-blurhash';
+import { unlink } from 'react-native-fs';
 
 import { services } from '@/services';
 import { CustomSentry } from '@/utils/customSentry';
 import Process from './Process';
+import { resizeImage } from '@/utils';
+import { getSourceByMime } from '../common';
+import { SourceType } from '@/services/database/entities/file.entity';
 
 class BlurhashImageProcess extends Process {
   public async start(): PVoid {
@@ -19,27 +23,39 @@ class BlurhashImageProcess extends Process {
         }
 
         try {
-          const imageUri = file.mime?.startsWith('image/')
-            ? file.uri
-            : file.poster || file.thumbnail;
+          let imageUri =
+            file.thumbnail ||
+            file.poster ||
+            getSourceByMime(file.mime) === SourceType.Image
+              ? file.uri
+              : undefined;
+
+          const compressed = await resizeImage({
+            uri: imageUri,
+            width: 64,
+          });
+          imageUri = compressed?.path;
           if (!imageUri) return;
 
-          let componentsX = 32;
-          let componentsY = 32;
+          let componentsX = 8;
+          let componentsY = 8;
 
           const width = file.extra?.width ?? file.metadata?.width ?? 0;
           const height = file.extra?.height ?? file.metadata?.height ?? 0;
 
           if (width > height) {
-            componentsY = Math.trunc(componentsX / (width / height));
+            componentsY = componentsX / (width / height);
           } else if (width < height) {
-            componentsX = Math.trunc(componentsY * (width / height));
+            componentsX = componentsY * (width / height);
           }
+
           const blurhashStr = await Blurhash.encode(
             `file://${encodeURI(imageUri)}`,
             componentsX,
             componentsY,
           );
+
+          unlink(imageUri);
 
           await this.updateFileBlurhash(file.id as string, blurhashStr);
           this.sendEvent('progress', {
@@ -48,7 +64,6 @@ class BlurhashImageProcess extends Process {
           });
           untreatedImages.splice(index, 1);
         } catch (error) {
-          console.log('--------------', error);
           this.sendEvent('error', error);
         }
       });
@@ -59,7 +74,6 @@ class BlurhashImageProcess extends Process {
   }
 
   private async updateFileBlurhash(id: string, blurhash?: string) {
-    console.log(id, blurhash);
     return await services.api.photo.update({
       where: {
         id,
@@ -86,7 +100,6 @@ let errorCount = 0;
 
 blurhashImageProcess.on('error', error => {
   errorCount++;
-  console.log(error);
   if (errorCount <= 1) {
     CustomSentry.captureException(error);
   }

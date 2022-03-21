@@ -64,7 +64,6 @@ const ImageBrowser = forwardRef<ImageBrowserInstance, ImageBrowserProps>(
         style={[styles.pageView, props.style]}
         ref={pagerViewRef}
         buffer={4}
-        maxRenderWindow={20}
         pageMargin={20}
         overdrag
         initialPage={props.initialIndex}

@@ -4,7 +4,7 @@ import { observer } from 'mobx-react-lite';
 import { useTranslation } from 'react-i18next';
 
 import { useStore } from '@/store';
-import { Language } from '@/services/locale';
+import { Language } from '@/locales';
 import CheckList from '@/components/CheckList';
 import { SafeAreaScrollView } from '@/components';
 
@@ -27,7 +27,7 @@ function LanguageSettingScreen(): JSX.Element {
         defaultValue={ui.language}
         options={languageOptions(t('common:followSystem'))}
         onChange={language => {
-          ui.setLanguage(language);
+          ui.setLanguage(language as Language);
         }}
       />
     </SafeAreaScrollView>

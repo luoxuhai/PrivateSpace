@@ -4,6 +4,7 @@ import DocumentPicker, {
 } from 'react-native-document-picker';
 import { SupportedPlatforms } from 'react-native-document-picker/src/fileTypes';
 import { PhotoFile } from 'react-native-vision-camera';
+// import ImagePicker from 'react-native-image-picker'
 
 import { PermissionManager, randomNum, extname } from '@/utils';
 import { CameraPage } from '@/screens/Camera';
@@ -70,7 +71,8 @@ export class FileImporter implements IFileImporter {
           const res = await ImagePicker.openPicker({
             multiple: true,
             writeTempFile: true,
-            maxFiles: 99,
+            maxFiles: 999,
+            compressVideo: false,
             compressVideoPreset: 'Passthrough',
             compressImageQuality: 1,
             smartAlbums: [

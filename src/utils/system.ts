@@ -6,11 +6,14 @@ import {
   PlatformIOSStatic,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
-import * as Device from 'expo-device';
-import * as Network from 'expo-network';
+import Device from 'react-native-device-info';
+import NetInfo, {
+  NetInfoStateType,
+  NetInfoWifiState,
+} from '@react-native-community/netinfo';
 import { NavigationConstants } from 'react-native-navigation';
 
-import { Language } from '@/services/locale';
+import { Language } from '@/locales';
 import { services } from '@/services';
 import { stores } from '@/store';
 
@@ -22,43 +25,53 @@ export function getLocalLanguage(): Language {
   return 'en-US';
 }
 
-interface IPlatformInfo {
+interface SystemInfo {
   os: 'ios' | 'android' | 'windows' | 'macos' | 'web';
   isPad: boolean;
   version: string;
   modelName?: string | null;
   totalMemory?: number | null;
   supportedCpuArchitectures?: string[] | null;
-  getIpAddressAsync: () => Promise<string>;
-  getNetworkStateTypeAsync: () => Promise<Network.NetworkStateType | undefined>;
+  getUsedMemory: () => Promise<number>;
+  getIpAddressAsync: () => Promise<string | null>;
+  getNetworkStateTypeAsync: () => Promise<NetInfoStateType | undefined>;
+  getFreeDiskStorage: () => Promise<number>;
 }
 
-export const platformInfo: IPlatformInfo = {
+interface ApplicationInfo {
+  name: string;
+  version: string;
+  env: 'AppStore' | 'TestFlight' | 'Other';
+}
+
+export const systemInfo: SystemInfo = {
   os: Platform.OS,
   isPad: (Platform as PlatformIOSStatic).isPad,
   version: String(Platform.Version),
-  modelName: Device.modelName,
-  totalMemory: Device.totalMemory,
-  supportedCpuArchitectures: Device.supportedCpuArchitectures,
-  getIpAddressAsync: Network.getIpAddressAsync,
-  getNetworkStateTypeAsync: () =>
-    Network.getNetworkStateAsync().then(value => value.type),
+  modelName: Device.getModel(),
+  totalMemory: Device.getTotalMemorySync(),
+  supportedCpuArchitectures: Device.supportedAbisSync(),
+  getUsedMemory: async () => Device.getUsedMemory(),
+  getFreeDiskStorage: async () => Device.getFreeDiskStorage(),
+  getIpAddressAsync: async () =>
+    ((await NetInfo.fetch()) as NetInfoWifiState)?.details?.ipAddress,
+  getNetworkStateTypeAsync: async () => (await NetInfo.fetch()).type,
+};
+
+export const applicationInfo: ApplicationInfo = {
+  name: Device.getApplicationName(),
+  version: Device.getVersion(),
+  env: Device.getInstallerPackageNameSync() as
+    | 'AppStore'
+    | 'TestFlight'
+    | 'Other',
 };
 
 export function getSystemAppearance(): ColorSchemeName {
   return Appearance.getColorScheme();
 }
 
-interface IHapticFeedback {
-  impactAsync: {
-    light: () => PVoid;
-    medium: () => PVoid;
-    heavy: () => PVoid;
-  };
-  canUse: () => boolean;
-}
-
-export class HapticFeedback implements IHapticFeedback {
+export class HapticFeedback {
   static canUse(): boolean {
     return stores.global.settingInfo.hapticFeedback;
   }

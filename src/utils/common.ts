@@ -1,4 +1,3 @@
-/* eslint-disable no-bitwise */
 import { v4 } from 'uuid';
 import {
   Alert,
@@ -9,7 +8,6 @@ import {
 } from 'react-native';
 import { getI18n } from 'react-i18next';
 import axios from 'axios';
-import * as Application from 'expo-application';
 import {
   checkMultiple,
   requestMultiple,
@@ -17,10 +15,16 @@ import {
   RESULTS,
   IOSPermission,
 } from 'react-native-permissions';
+import dayjs from 'dayjs';
+import durationPlugin from 'dayjs/plugin/duration';
+import numeral from 'numeral';
 
 import { SourceType } from '@/services/database/entities/file.entity';
 import config from '@/config';
+import { applicationInfo } from '@/utils';
 import { stores } from '@/store';
+
+dayjs.extend(durationPlugin);
 
 export function generateID(): string {
   return v4();
@@ -36,7 +40,7 @@ export async function appUpdateCheck(): PVoid {
     if (!res?.data?.results?.[0]) return;
 
     const { version: latestVersion, releaseNotes } = res.data.results[0];
-    const localVersion = Application.nativeApplicationVersion;
+    const localVersion = applicationInfo.version;
     const { appUpdateIgnore } = stores.global;
     // 存在最新版
     if (
@@ -158,7 +162,7 @@ export function randomNum(n: number): string {
 export function randomNumRange(min, max) {
   switch (arguments.length) {
     case 1:
-      return parseInt(Math.random() * min + 1, 10);
+      return parseInt(String(Math.random() * min + 1), 10);
     case 2:
       return parseInt(Math.random() * (max - min + 1) + min, 10);
     default:
@@ -166,7 +170,9 @@ export function randomNumRange(min, max) {
   }
 }
 
-export function getSourceByMime(mime: string): SourceType {
+export function getSourceByMime(mime?: string | null): SourceType {
+  if (!mime) return SourceType.Unknown;
+
   if (/^image/.test(mime)) {
     return SourceType.Image;
   } else if (/^audio/.test(mime)) {
@@ -175,8 +181,10 @@ export function getSourceByMime(mime: string): SourceType {
     return SourceType.Video;
   } else if (/^text/.test(mime)) {
     return SourceType.Text;
-  } else {
+  } else if (/^application/.test(mime)) {
     return SourceType.Application;
+  } else {
+    return SourceType.Unknown;
   }
 }
 
@@ -241,4 +249,12 @@ export function compareVersion(version1: string, version2: string): number {
     }
   }
   return 0;
+}
+
+export function formatDuration(duration: number) {
+  const formatStr =
+    (numeral(duration).divide(1000).value() ?? 0) >= 3600
+      ? 'HH:mm:ss'
+      : 'mm:ss';
+  return dayjs.duration(duration).format(formatStr);
 }

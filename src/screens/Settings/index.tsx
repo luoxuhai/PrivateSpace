@@ -12,12 +12,11 @@ import { NavigationComponentProps } from 'react-native-navigation';
 import { useTranslation } from 'react-i18next';
 import { InAppBrowser } from 'react-native-inappbrowser-reborn';
 import * as LocalAuthentication from 'expo-local-authentication';
-import * as Application from 'expo-application';
 import LinearGradient from 'react-native-linear-gradient';
 
 import { ScreenName } from '@/screens';
 import { services } from '@/services';
-import { ELanguage } from '@/services/locale';
+import { ELanguage } from '@/locales';
 import config from '@/config';
 import { useStore } from '@/store';
 import { UserRole } from '@/store/user';
@@ -31,9 +30,8 @@ import SimpleSelectionList, {
 } from '@/components/SimpleSelectionList';
 import { SafeAreaScrollView } from '@/components';
 import { appearanceModeOptions } from './Theme';
-import { platformInfo } from '@/utils';
-import { DynamicUpdate } from '@/utils/dynamicUpdate';
-import baidumobstat from '@/utils/analytics/baidumob';
+import { languageOptions } from './Language';
+import { systemInfo, applicationInfo } from '@/utils';
 
 import { getAutoLockOptions } from './AutoLock';
 import { getUrgentOptions } from './Urgent';
@@ -60,7 +58,7 @@ function SettingsPage(props: NavigationComponentProps) {
           data: [
             {
               title: '隐私空间 高级版',
-              icon: <IconVip width={26} />,
+              icon: <IconVip width={26} height={26} />,
               onPress: handleToPurchases,
             },
           ],
@@ -69,7 +67,7 @@ function SettingsPage(props: NavigationComponentProps) {
     {
       data: [
         {
-          title: '高级功能',
+          title: t('setting:advanced.navigation.title'),
           onPress() {
             handleToPage('AdvancedSetting');
           },
@@ -158,13 +156,13 @@ function SettingsPage(props: NavigationComponentProps) {
           )?.title,
           onPress: () => handleToPage('ThemeSetting'),
         },
-        // {
-        //   title: t('setting:language'),
-        //   extra: languageOptions(t('common:followSystem')).find(
-        //     item => item.value === ui.language,
-        //   )?.title,
-        //   onPress: () => handleToPage('LanguageSetting'),
-        // },
+        {
+          title: t('setting:language'),
+          extra: languageOptions(t('common:followSystem')).find(
+            item => item.value === ui.language,
+          )?.title,
+          onPress: () => handleToPage('LanguageSetting'),
+        },
         {
           title: t('setting:hapticFeedback'),
           render: () => (
@@ -187,15 +185,15 @@ function SettingsPage(props: NavigationComponentProps) {
           onPress: async () => {
             let networkType: string | undefined;
             try {
-              networkType = await platformInfo.getNetworkStateTypeAsync();
+              networkType = await systemInfo.getNetworkStateTypeAsync();
             } catch {}
 
             const url = `${config.TXC_FEEDBACK_URL}?os=${
-              platformInfo.os || '-'
-            }&osVersion=${platformInfo.version || '-'}&clientVersion=${
-              Application.nativeApplicationVersion || '-'
+              systemInfo.os || '-'
+            }&osVersion=${systemInfo.version || '-'}&clientVersion=${
+              applicationInfo.version || '-'
             }&netType=${networkType || '-'}&customInfo=${JSON.stringify({
-              modelName: platformInfo.modelName || '-',
+              modelName: systemInfo.modelName || '-',
               userId: user.current?.id || '-',
             })}`;
 
@@ -227,7 +225,7 @@ function SettingsPage(props: NavigationComponentProps) {
         },
       ],
     },
-  ];
+  ].filter(item => item);
 
   return (
     <SafeAreaScrollView
@@ -245,7 +243,6 @@ function SettingsPage(props: NavigationComponentProps) {
 
 function handleToPurchases() {
   services.nav.screens?.show('Purchase');
-  baidumobstat.onEvent('click_purchase');
 }
 
 function PurchasesCard(): JSX.Element {

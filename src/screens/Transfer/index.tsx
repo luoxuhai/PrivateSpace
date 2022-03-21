@@ -23,20 +23,14 @@ import { useStore } from '@/store';
 import { FileStatus } from '@/services/database/entities/file.entity';
 import { transformResult } from '@/screens/PhotoList/AddButton';
 import { createFiles } from '@/utils/initShare';
-import {
-  platformInfo,
-  join,
-  extname,
-  generateID,
-  randomNumRange,
-} from '@/utils';
+import { systemInfo, join, extname, generateID, randomNumRange } from '@/utils';
 import { THUMBNAIL_PATH, SOURCE_PATH, TEMP_PATH } from '@/config';
 import { IconButton } from '@/components/Icon';
 import SafeAreaScrollView from '@/components/SafeAreaScrollView';
 import { services } from '@/services';
 import WebClient from './WebClient';
+import { HapticFeedback } from '@/utils';
 import { RNToasty } from 'react-native-toasty';
-import { useStat } from '@/hooks';
 
 import IconWifi from '@/assets/icons/wifi.svg';
 import IconWifiSlash from '@/assets/icons/wifi.slash.svg';
@@ -52,13 +46,11 @@ const enum ConnectState {
 
 const TransferScreen: NavigationFunctionComponent =
   observer<NavigationComponentProps>(props => {
-    const { ui, user, global } = useStore();
+    const { ui, global } = useStore();
     const [url, setUrl] = useState<string | undefined>();
     const [connectState, setConnectState] = useState<ConnectState>(
       ConnectState.Pending,
     );
-
-    useStat('Transfer');
 
     useNavigationButtonPress(
       () => {
@@ -125,12 +117,13 @@ const TransferScreen: NavigationFunctionComponent =
     useEffect(() => {
       if (connectState === ConnectState.Failed) {
         setUrl(undefined);
+        HapticFeedback.notificationAsync.error();
       }
     }, [connectState]);
 
     async function startHttpServer() {
       await stopHttpServer();
-      const ip = await platformInfo.getIpAddressAsync();
+      const ip = await systemInfo.getIpAddressAsync();
       const port = randomNumRange(5000, 60000);
 
       await HttpServer.start(
@@ -201,7 +194,7 @@ const TransferScreen: NavigationFunctionComponent =
                         item.uri?.split('source')[1]
                       }`;
                       const thumbnailUrl = (
-                        item.poster || item.thumbnail
+                        item.thumbnail || item.poster
                       )?.split('thumbnail')[1]
                         ? `http://${ip}:${port}/api/thumbnail${
                             item.thumbnail?.split('thumbnail')[1]

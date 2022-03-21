@@ -10,12 +10,10 @@ import List, { IListItem } from '@/components/List';
 import { SafeAreaScrollView } from '@/components';
 import PasscodeLock, { EInputType } from '@/screens/PasscodeLock';
 import { EUserType } from '@/services/database/entities/user.entity';
-import { useStat } from '@/hooks';
 
 function FakePasswordSettingScreen(): JSX.Element {
   const { ui, global, user } = useStore();
   const { t } = useTranslation();
-  useStat('FakePasswordSetting');
 
   const localAuthText = global.localAuthTypes?.includes(
     LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION,
@@ -63,7 +61,7 @@ function FakePasswordSettingScreen(): JSX.Element {
       ),
     },
     {
-      title: `隐藏解锁界面${localAuthText}解锁按钮`,
+      title: t('fakePass:hideAuthBtn', { localAuthText }),
       render: () => (
         <Switch
           disabled={!global.settingInfo.fakePassword?.enabled}
@@ -103,7 +101,7 @@ function FakePasswordSettingScreen(): JSX.Element {
   }
 
   const headerText = global.settingInfo.autoLocalAuth
-    ? `开启后将关闭自动${localAuthText}识别解锁功能`
+    ? t('fakePass:header', { localAuthText })
     : null;
 
   return (

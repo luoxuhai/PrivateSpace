@@ -33,7 +33,6 @@ import { SafeAreaScrollView } from '@/components';
 import { Toolbar } from '@/components/Toolbar';
 import CustomButton from '@/components/CustomButton';
 import { LoadingOverlay } from '@/components/LoadingOverlay';
-import { useStat } from '@/hooks';
 import analytics from '@/utils/analytics/firebase';
 
 import { RNToasty } from 'react-native-toasty';
@@ -43,6 +42,7 @@ import IconMore from '@/assets/icons/ellipsis.circle.svg';
 import IconSearch from '@/assets/icons/vip.search.svg';
 import IconTrash from '@/assets/icons/vip.trash.svg';
 import IconWifi from '@/assets/icons/vip.wifi.2.svg';
+import IconiCloud from '@/assets/icons/vip.icloud.svg';
 
 const PAY_BUTTON_WIDTH = 200;
 const ICON_COLOR = '#EED198';
@@ -107,8 +107,6 @@ const PurchaseScreen: NavigationFunctionComponent =
       }),
       [projectList],
     );
-
-    useStat('Purchase');
 
     useNavigationButtonPress(handleDismiss, props.componentId, 'cancel');
     useNavigationButtonPress(
@@ -434,25 +432,20 @@ const rightsList = [
     title: 'WI-FI 无线传输',
     screenId: 'Transfer',
   },
-  {
-    image: IconTrash,
-    title: '自定义回收站保留时长',
-    screenId: 'RecycleBinSetting',
-  },
   // {
-  //   image: IconFace,
-  //   title: '人像封面',
-  //   screenId: '',
-  // },
-  // {
-  //   image: IconSaliency,
-  //   title: '焦点封面',
-  //   screenId: '',
+  //   image: IconiCloud,
+  //   title: 'iCloud备份',
+  //   screenId: 'ICloud',
   // },
   {
     image: IconSearch,
     title: '智能搜索',
     screenId: 'AdvancedSetting',
+  },
+  {
+    image: IconTrash,
+    title: '自定义回收站保留时长',
+    screenId: 'RecycleBinSetting',
   },
   {
     image: IconMore,
@@ -495,8 +488,8 @@ const Rights = ({ componentId }: { componentId: string }) => {
           <View style={styles.rightsIcon}>
             {
               <item.image
-                width={30}
-                height={30}
+                width={25}
+                height={25}
                 fill={ICON_COLOR}
                 style={styles.rightsItemImg}
               />
@@ -609,7 +602,6 @@ const styles = StyleSheet.create({
   },
   rightsItemTitle: {
     flex: 1,
-    fontWeight: '500',
     color: '#A7853E',
     fontSize: 12,
     textAlign: 'center',
@@ -682,13 +674,13 @@ function setPurchaseListener() {
             } catch {}
             handleDismiss();
 
-            const product = products?.find(
-              item => item.productId === config.inAppPurchasesProductIds[1],
-            );
-            analytics().logPurchase({
-              value: Number(product?.price.slice(1, product?.price?.length)),
-              currency: product?.priceCurrencyCode,
-            });
+            // const product = products?.find(
+            //   item => item.productId === config.inAppPurchasesProductIds[1],
+            // );
+            // analytics?.logPurchase({
+            //   value: Number(product?.price.slice(1, product?.price?.length)),
+            //   currency: product?.priceCurrencyCode,
+            // });
           }
           break;
         case InAppPurchases.IAPResponseCode.USER_CANCELED:

@@ -8,14 +8,13 @@ import * as MediaLibrary from 'expo-media-library';
 import { RNToasty } from 'react-native-toasty';
 
 import { showDeleteActionSheet } from '@/utils';
-import { IListFileData } from '@/services/api/local/type.d';
 import { useDeleteFile, useUpdateFile } from '@/hooks';
 import { useStore } from '@/store';
 import { services } from '@/services';
 import { LoadingOverlay } from '@/components/LoadingOverlay';
 
 interface IContextMenuProps {
-  item: IListFileData;
+  item: API.PhotoWithSource;
   disabled?: boolean;
   albumId?: string;
   children?: React.ReactNode;
@@ -104,9 +103,11 @@ export const ContextMenu = observer<IContextMenuProps>(props => {
               text: '移动到相册',
             },
             excludedFolder: [props.albumId],
-            async onDone({ id }) {
+            async onDone({ id }: { id: string }) {
               await updateFile({
-                id: props.item.id,
+                where: {
+                  id: props.item.id,
+                },
                 data: {
                   parent_id: id,
                 },

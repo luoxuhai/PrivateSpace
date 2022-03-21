@@ -123,7 +123,8 @@ const renderItem = (item: IListItem, hasBorder: boolean): JSX.Element => {
             {
               color: stores.ui.colors.label,
             },
-          ]}>
+          ]}
+          numberOfLines={2}>
           {item.title}
         </Text>
         <View style={styles.right}>
@@ -163,7 +164,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   listItem: {
-    height: 44,
+    minHeight: 44,
     paddingLeft: 15,
     flexDirection: 'row',
     alignItems: 'center',
@@ -175,6 +176,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingRight: 15,
+    paddingVertical: 10,
   },
   icon: {
     marginRight: 14,
@@ -182,6 +184,7 @@ const styles = StyleSheet.create({
   title: {
     marginRight: 12,
     fontSize: 17,
+    flex: 1,
   },
   image: {
     width: 36,

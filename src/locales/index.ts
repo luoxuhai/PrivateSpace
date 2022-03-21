@@ -1,5 +1,4 @@
-import 'intl-pluralrules';
-import i18next, { TFunction } from 'i18next';
+import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
 import enUS from './en-us';
@@ -16,14 +15,10 @@ export enum ELanguage {
 
 const DEFAULT_LANGUAGE = ELanguage.ZH_CN;
 
-export default class Locale {
-  constructor() {
-    i18next.use(initReactI18next).init({
-      resources: {
-        [ELanguage.EN_US]: enUS,
-        [ELanguage.ZH_CN]: zhCN,
-      },
-      lng: DEFAULT_LANGUAGE,
-    });
-  }
-}
+i18next.use(initReactI18next).init({
+  resources: {
+    [ELanguage.EN_US]: enUS,
+    [ELanguage.ZH_CN]: zhCN,
+  },
+  lng: DEFAULT_LANGUAGE,
+});

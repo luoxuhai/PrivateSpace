@@ -31,7 +31,7 @@ export const AddAlbumDialog = observer<
 >(
   (props, ref) => {
     const [visible, setVisible] = useState<boolean>(false);
-    const textInputRef = useRef<{ focus: () => void; blur: () => void }>();
+    const textInputRef = useRef<TextInput>(null);
     const inputValueRef = useRef<string>();
     const { ui, global } = useStore();
 
@@ -138,6 +138,7 @@ export const AddAlbumDialog = observer<
             keyboardAppearance={isDark ? 'dark' : 'light'}
             returnKeyType="done"
             placeholder="相册名"
+            selectionColor={ui.themes.primary}
             onChangeText={value => {
               inputValueRef.current = value.trim();
             }}

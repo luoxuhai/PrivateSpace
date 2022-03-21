@@ -29,6 +29,9 @@ export interface ImageSource {
   thumbnail?: string;
   /** See https://blurha.sh/ */
   blurhash?: string;
+  width?: number;
+  height?: number;
+  type?: 'image' | 'video';
   [key: string]: any;
 }
 

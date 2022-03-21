@@ -1,8 +1,6 @@
 import React, { Fragment } from 'react';
-import { View, Text, StyleSheet, ViewStyle, StyleProp } from 'react-native';
-import { observer } from 'mobx-react-lite';
+import { View, ViewStyle, StyleProp } from 'react-native';
 
-import { useStore } from '@/store';
 import List, { IListItem } from './List';
 import CheckList, { ICheckListItem, ICheckList } from './CheckList';
 
@@ -27,8 +25,8 @@ function SimpleSelectionList(props: ISimpleSelectionList): JSX.Element {
     <View style={props.style}>
       {props.sections
         .filter(section => section)
-        .map((selection: any) => (
-          <Fragment key={selection.title}>
+        .map((selection: any, index) => (
+          <Fragment key={`${selection.title}-${index}`}>
             {props.listType === 'check' ? (
               <CheckList
                 options={selection.data as ICheckListItem<string>[]}

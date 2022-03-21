@@ -87,7 +87,7 @@ export class GlobalStore implements IStore {
     },
     advanced: {
       smartSearch: {
-        enabled: true,
+        enabled: false,
       },
     },
   };

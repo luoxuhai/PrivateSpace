@@ -14,6 +14,13 @@ declare global {
 
     type AlbumType = Omit<FileEntity, 'mime'>;
 
+    type AlbumWithSource = Omit<FileEntity, 'mime'> & {
+      item_total: number;
+      cover?: string | null;
+      image_total: number;
+      video_total: number;
+    };
+
     type PhotoType = FileEntity;
 
     type PhotoWithSource = FileEntity & {
