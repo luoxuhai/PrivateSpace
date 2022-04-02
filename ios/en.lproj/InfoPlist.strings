@@ -1,0 +1,17 @@
+/* 
+  InfoPlist.strings
+  PrivateSpace
+
+  Created by 罗绪海 on 2022/4/2.
+  
+*/
+
+CFBundleDisplayName = "Private Space";
+NSAppleMusicUsageDescription = "To delete imported pictures and videos";
+NSCameraUsageDescription = "The app will access your camera permissions when you use the import pictures and videos from camera function, in order to import pictures and videos";
+NSFaceIDUsageDescription = "The app will access your face ID permission when you use the face unlock function, in order to unlock quickly";
+NSLocationWhenInUseUsageDescription = "We need access to your location to automatically switch display languages";
+NSMicrophoneUsageDescription = "The app will access your microphone permission when you use the record video from camera function, in order to record video sound";
+NSMotionUsageDescription = "To lock the APP when the device screen is down";
+NSPhotoLibraryAddUsageDescription = "To save pictures and videos to the album";
+NSPhotoLibraryUsageDescription = "The app will access your album permissions when you use the import pictures and videos from album function, in order to import pictures and videos";

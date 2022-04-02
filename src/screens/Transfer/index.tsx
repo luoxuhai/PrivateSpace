@@ -24,7 +24,7 @@ import { FileStatus } from '@/services/database/entities/file.entity';
 import { transformResult } from '@/screens/PhotoList/AddButton';
 import { createFiles } from '@/utils/initShare';
 import { systemInfo, join, extname, generateID, randomNumRange } from '@/utils';
-import { THUMBNAIL_PATH, SOURCE_PATH, TEMP_PATH } from '@/config';
+import { THUMBNAIL_PATH, SOURCE_PATH, TEMP_PATH, DATA_PATH } from '@/config';
 import { IconButton } from '@/components/Icon';
 import SafeAreaScrollView from '@/components/SafeAreaScrollView';
 import { services } from '@/services';
@@ -125,6 +125,7 @@ const TransferScreen: NavigationFunctionComponent =
       await stopHttpServer();
       const ip = await systemInfo.getIpAddressAsync();
       const port = randomNumRange(5000, 60000);
+      const origin = `http://${ip}:${port}`;
 
       await HttpServer.start(
         port,
@@ -150,7 +151,7 @@ const TransferScreen: NavigationFunctionComponent =
             response.send(404);
           }
           // 获取相册
-          else if (request.method === 'GET' && request.url === '/api/folders') {
+          else if (request.method === 'GET' && request.url === '/api/albums') {
             try {
               const res = await services.api.album.list({
                 status: FileStatus.Normal,
@@ -162,8 +163,11 @@ const TransferScreen: NavigationFunctionComponent =
                   code: 0,
                   data: {
                     list: res.items.map(item => {
-                      delete item.cover;
                       delete item.extra;
+                      item.cover = item.cover?.replace(
+                        DATA_PATH,
+                        `${origin}/api`,
+                      );
                       return item;
                     }),
                     total: res.total,
@@ -176,11 +180,11 @@ const TransferScreen: NavigationFunctionComponent =
             // 获取文件
           } else if (
             request.method === 'GET' &&
-            request.url.startsWith('/api/files')
+            request.url.startsWith('/api/photos')
           ) {
             try {
               const res = await services.api.photo.list({
-                parent_id: request.query.folderId as string,
+                parent_id: request.query.parent_id as string,
                 status: FileStatus.Normal,
               });
               response.send(
@@ -190,21 +194,24 @@ const TransferScreen: NavigationFunctionComponent =
                   code: 0,
                   data: {
                     list: res.items.map(item => {
-                      const sourceUrl = `http://${ip}:${port}/api/source${
+                      const sourceUrl = `${origin}/api/source${
                         item.uri?.split('source')[1]
                       }`;
                       const thumbnailUrl = (
-                        item.thumbnail || item.poster
-                      )?.split('thumbnail')[1]
-                        ? `http://${ip}:${port}/api/thumbnail${
-                            item.thumbnail?.split('thumbnail')[1]
-                          }`
-                        : sourceUrl;
+                        item.thumbnail ||
+                        item.poster ||
+                        sourceUrl
+                      )?.replace(DATA_PATH, `${origin}/api`);
+
+                      const poster =
+                        item.poster?.replace(DATA_PATH, `${origin}/api`) ||
+                        thumbnailUrl;
 
                       const _item = {
                         ...item,
                         thumbnail: thumbnailUrl,
                         source: sourceUrl,
+                        poster: poster,
                       };
 
                       delete _item.uri;
@@ -221,7 +228,7 @@ const TransferScreen: NavigationFunctionComponent =
             // 上传文件
           } else if (
             request.method === 'POST' &&
-            request.url.startsWith('/api/file/upload')
+            request.url.startsWith('/api/photos/upload')
           ) {
             const { file, query } = request;
             if (!file?.path) {
@@ -242,7 +249,7 @@ const TransferScreen: NavigationFunctionComponent =
                     mime: file?.mimeType,
                     name: file?.filename,
                   },
-                  query.folderId,
+                  query.album_id,
                 ),
               ]);
               response.send(200);
@@ -263,15 +270,21 @@ const TransferScreen: NavigationFunctionComponent =
             request.method === 'GET' &&
             request.url.startsWith('/api/source/')
           ) {
-            response.sendFile(request.url.replace('/api/source', SOURCE_PATH));
+            const uri = decodeURI(
+              request.url.replace('/api/source', SOURCE_PATH),
+            );
+            if (!(await FS.exists(uri))) {
+              response.send(404);
+              return;
+            }
+            response.sendFile(uri);
           } else {
             response.send(404);
           }
         },
       );
 
-      console.log(`http://${ip}:${port}`);
-      setUrl(`http://${ip}:${port}`);
+      setUrl(origin);
       setConnectState(ConnectState.Successful);
     }
 

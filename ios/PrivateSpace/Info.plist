@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>zh_CN</string>
+	<string>en_US</string>
 	<key>CFBundleDisplayName</key>
-	<string>隐私空间</string>
+	<string>$CFBundleDisplayName</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIconName</key>
@@ -93,21 +93,21 @@
 		</dict>
 	</dict>
 	<key>NSAppleMusicUsageDescription</key>
-	<string>为了删除已导入的图片和视频</string>
+	<string>$NSAppleMusicUsageDescription</string>
 	<key>NSCameraUsageDescription</key>
-	<string>App会在您使用从相机导入图片和视频功能时，访问您的相机权限，为了导入图片和视频</string>
+	<string>$NSCameraUsageDescription</string>
 	<key>NSFaceIDUsageDescription</key>
-	<string>App会在您使用面容解锁功能时，访问您的面容ID权限，为了快速解锁</string>
+	<string>$NSFaceIDUsageDescription</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>我们需要访问您的位置信息才能自动切换显示语言</string>
+	<string>$NSLocationWhenInUseUsageDescription</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>App会在您使用从相机录制视频功能时，访问您的麦克风权限，为了录制视频声音</string>
+	<string>$NSMicrophoneUsageDescription</string>
 	<key>NSMotionUsageDescription</key>
-	<string>为了让设备屏幕向下时锁定APP</string>
+	<string>$NSMotionUsageDescription</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>为了保存图片和视频到相册</string>
+	<string>$NSPhotoLibraryAddUsageDescription</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>App会在您使用从相册导入图片和视频功能时，访问您的相册权限，为了导入图片和视频</string>
+	<string>$NSPhotoLibraryUsageDescription</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Ionicons.ttf</string>
