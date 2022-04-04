@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, Switch } from 'react-native';
 import { observer } from 'mobx-react-lite';
+import { useTranslation } from 'react-i18next';
 
 import { useStore } from '@/store';
 import { services } from '@/services';
@@ -14,34 +15,37 @@ import { SafeAreaScrollView } from '@/components';
 
 function LanguageSettingScreen(): JSX.Element {
   const { ui, global, user } = useStore();
+  const { t } = useTranslation();
+
+  const suffix = useMemo(() => t('recycleBinSetting:day'), [t]);
 
   const keepOptions: ISimpleSelectionListItem<ICheckListItem<number>>[] = [
     {
-      title: '保留天数',
+      title: t('recycleBinSetting:durationHeader'),
       data: [
         {
           value: 3,
-          title: '3天',
+          title: '3' + suffix,
         },
         {
           value: 15,
-          title: '15天',
+          title: '15' + suffix,
         },
         {
           value: 30,
-          title: '30天',
+          title: '30' + suffix,
         },
         {
           value: 60,
-          title: '60天',
+          title: '60' + suffix,
         },
         {
           value: 90,
-          title: '90天',
+          title: '90' + suffix,
         },
         {
           value: 120,
-          title: '120天',
+          title: '120' + suffix,
         },
       ],
       value: global.settingInfo.recycleBin.keep ?? 30,
@@ -74,10 +78,10 @@ function LanguageSettingScreen(): JSX.Element {
       <SimpleSelectionList
         sections={[
           {
-            title: '关闭后，删除的文件不可恢复',
+            title: t('recycleBinSetting:enableHeader'),
             data: [
               {
-                title: '开启回收站',
+                title: t('recycleBinSetting:enableTitle'),
                 render: () => (
                   <Switch
                     value={global.settingInfo.recycleBin?.enabled}

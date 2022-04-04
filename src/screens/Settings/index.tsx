@@ -39,6 +39,7 @@ import { getUrgentOptions } from './Urgent';
 import IconVip from '@/assets/icons/vip.svg';
 import ImageVipCrown from '@/assets/images/vip/crown.svg';
 import ImageVipRight from '@/assets/images/vip/right.svg';
+import { t } from 'i18next';
 
 function SettingsPage(props: NavigationComponentProps) {
   const { ui, global, user } = useStore();
@@ -57,7 +58,7 @@ function SettingsPage(props: NavigationComponentProps) {
       ? {
           data: [
             {
-              title: '隐私空间 高级版',
+              title: t('purchase:tableView.title'),
               icon: <IconVip width={26} height={26} />,
               onPress: handleToPurchases,
             },
@@ -84,7 +85,9 @@ function SettingsPage(props: NavigationComponentProps) {
         user.current?.type === EUserType.ADMIN
           ? {
               title: t('fakePass:navigation.title'),
-              extra: global.settingInfo.fakePassword.enabled ? '已启动' : null,
+              extra: global.settingInfo.fakePassword.enabled
+                ? t('common:enabled')
+                : null,
               onPress: () => handleToPage('FakePasswordSetting'),
             }
           : undefined,
@@ -270,7 +273,7 @@ function PurchasesCard(): JSX.Element {
               color: colors.light.label,
             },
           ]}>
-          隐私空间高级版
+          {t('purchase:card.title')}
         </Text>
         <Text
           style={[
@@ -279,7 +282,7 @@ function PurchasesCard(): JSX.Element {
               color: ui.colors.secondaryLabel,
             },
           ]}>
-          解锁全部特权
+          {t('purchase:card.desc')}
         </Text>
       </View>
 
@@ -288,7 +291,7 @@ function PurchasesCard(): JSX.Element {
         textStyle={styles.purchasesCardButtonText}
         color={colors.light.label}
         onPress={handleToPurchases}>
-        立即开通
+        {t('purchase:card.button')}
       </CustomButton>
     </TouchableOpacity>
   );

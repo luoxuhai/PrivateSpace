@@ -10,6 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useTranslation, TFunction } from 'react-i18next';
 
 import { useStore } from '@/store';
+import { locale } from '@/locales';
 import { UIStore } from '@/store/ui';
 import { EAppOpenUrl } from '@/store/global';
 import SimpleSelectionList, {
@@ -97,7 +98,7 @@ const styles = StyleSheet.create({
 });
 
 export function getUrgentOptions(t: TFunction, ui: UIStore) {
-  return [
+  const baseOptions = [
     {
       value: null,
       icon: (
@@ -114,52 +115,117 @@ export function getUrgentOptions(t: TFunction, ui: UIStore) {
       icon: (
         <AppIcon
           noRadius
-          source={require('@/assets/icons/app-icon/safari.png')}
+          source={require('@/assets/icons/app-icon/Safari.png')}
         />
       ),
-      title: '浏览器',
+      title: t('thirdPartyApp:browser'),
     },
     {
       value: EAppOpenUrl.Notes,
-      icon: <AppIcon source={require('@/assets/icons/app-icon/notes.png')} />,
-      title: '备忘录',
+      icon: <AppIcon source={require('@/assets/icons/app-icon/Notes.png')} />,
+      title: t('thirdPartyApp:note'),
     },
     {
       value: EAppOpenUrl.Photos,
       icon: (
         <AppIcon
           noRadius
-          source={require('@/assets/icons/app-icon/photo.png')}
+          source={require('@/assets/icons/app-icon/Photos.png')}
         />
       ),
-      title: '相册',
+      title: t('thirdPartyApp:album'),
     },
     {
       value: EAppOpenUrl.Mailto,
-      icon: <AppIcon source={require('@/assets/icons/app-icon/email.png')} />,
-      title: '邮箱',
-    },
-    {
-      value: EAppOpenUrl.QQ,
-      icon: <AppIcon source={require('@/assets/icons/app-icon/qq.jpg')} />,
-      title: 'QQ',
-    },
-    {
-      value: EAppOpenUrl.Weixin,
-      icon: <AppIcon source={require('@/assets/icons/app-icon/weixin.jpg')} />,
-      title: '微信',
-    },
-    {
-      value: EAppOpenUrl.Douyin,
-      icon: <AppIcon source={require('@/assets/icons/app-icon/douyin.jpg')} />,
-      title: '抖音',
-    },
-    {
-      value: EAppOpenUrl.Bilibili,
-      icon: (
-        <AppIcon source={require('@/assets/icons/app-icon/bilibili.jpg')} />
-      ),
-      title: 'B站',
+      icon: <AppIcon source={require('@/assets/icons/app-icon/Mail.png')} />,
+      title: t('thirdPartyApp:email'),
     },
   ];
+
+  let options = baseOptions;
+
+  if (locale.country === 'CN') {
+    options = [
+      ...baseOptions,
+      ...[
+        {
+          value: EAppOpenUrl.QQ,
+          icon: <AppIcon source={require('@/assets/icons/app-icon/qq.jpg')} />,
+          title: t('thirdPartyApp:qq'),
+        },
+        {
+          value: EAppOpenUrl.Weixin,
+          icon: (
+            <AppIcon source={require('@/assets/icons/app-icon/WeChat.png')} />
+          ),
+          title: t('thirdPartyApp:wechat'),
+        },
+        {
+          value: EAppOpenUrl.Douyin,
+          icon: (
+            <AppIcon source={require('@/assets/icons/app-icon/TikTok.png')} />
+          ),
+          title: t('thirdPartyApp:douyin'),
+        },
+        {
+          value: EAppOpenUrl.Kwai,
+          icon: (
+            <AppIcon source={require('@/assets/icons/app-icon/Kwai.png')} />
+          ),
+          title: t('thirdPartyApp:kwai'),
+        },
+        {
+          value: EAppOpenUrl.Bilibili,
+          icon: (
+            <AppIcon source={require('@/assets/icons/app-icon/Bilibili.png')} />
+          ),
+          title: t('thirdPartyApp:bilibili'),
+        },
+      ],
+    ];
+  } else {
+    options = [
+      ...baseOptions,
+      ...[
+        {
+          value: EAppOpenUrl.Facebook,
+          icon: (
+            <AppIcon source={require('@/assets/icons/app-icon/Facebook.png')} />
+          ),
+          title: t('thirdPartyApp:facebook'),
+        },
+        {
+          value: EAppOpenUrl.Twitter,
+          icon: (
+            <AppIcon source={require('@/assets/icons/app-icon/Twitter.png')} />
+          ),
+          title: t('thirdPartyApp:twitter'),
+        },
+        {
+          value: EAppOpenUrl.TikTok,
+          icon: (
+            <AppIcon source={require('@/assets/icons/app-icon/TikTok.png')} />
+          ),
+          title: t('thirdPartyApp:tikTok'),
+        },
+        {
+          value: EAppOpenUrl.Instagram,
+          icon: (
+            <AppIcon
+              source={require('@/assets/icons/app-icon/Instagram.png')}
+            />
+          ),
+          title: t('thirdPartyApp:instagram'),
+        },
+        {
+          value: EAppOpenUrl.WeChat,
+          icon: (
+            <AppIcon source={require('@/assets/icons/app-icon/WeChat.png')} />
+          ),
+          title: t('thirdPartyApp:wechat'),
+        },
+      ],
+    ];
+  }
+  return options;
 }

@@ -58,7 +58,7 @@ const MiniAppsScreen: NavigationFunctionComponent<
       onPress: () => handlePushPage('RecycleBin'),
     },
     {
-      title: 'WI-FI 互传',
+      title: t('transfer:navigation.title'),
       icon: <IconRectangleSwap width={30} height={30} {...iconProps} />,
       color: luminance(ui.colors.systemGreen),
       onPress: () => {

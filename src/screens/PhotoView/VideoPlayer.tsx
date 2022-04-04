@@ -1,4 +1,9 @@
-import React, { useImperativeHandle, useRef, useState } from 'react';
+import React, {
+  forwardRef,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
 import { StyleSheet } from 'react-native';
 import { NavigationComponentProps } from 'react-native-navigation';
 import { useNavigationComponentDidDisappear } from 'react-native-navigation-hooks';
@@ -12,7 +17,7 @@ interface IVideoPlayerProps extends NavigationComponentProps {
 }
 
 const VideoPlayer = observer<IVideoPlayerProps>(
-  (props, ref) => {
+  forwardRef((props, ref) => {
     const videoRef = useRef<Video>(null);
     const [paused, setPaused] = useState(false);
 
@@ -40,8 +45,7 @@ const VideoPlayer = observer<IVideoPlayerProps>(
         }}
       />
     );
-  },
-  { forwardRef: true },
+  }),
 );
 
 export default VideoPlayer;

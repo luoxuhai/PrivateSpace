@@ -51,11 +51,10 @@ const AboutScreen: NavigationFunctionComponent<
         {
           title: t('about:changelog'),
           onPress: () => {
-            Linking.openURL(config.APP_URL.cn);
+            handleOpenBrowserPress({
+              url: `${config.CHANGELOG[webLanguageKey]}`,
+            });
           },
-          // handleOpenBrowserPress({
-          //   url: `${config.CHANGELOG[webLanguageKey]}`,
-          // }),
         },
         {
           title: t('setting:grade'),
@@ -142,7 +141,8 @@ const AboutScreen: NavigationFunctionComponent<
 
 const IconCover = observer(() => {
   const { ui, global } = useStore();
-  const { version: appVersion, name: applicationName } = applicationInfo;
+  const { t } = useTranslation();
+  const { version: appVersion } = applicationInfo;
 
   const { data: updateMetadata } = useQuery('update.metadata', async () => {
     return await DynamicUpdate.getUpdateMetadataAsync();
@@ -172,7 +172,7 @@ const IconCover = observer(() => {
           },
         ]}
         selectable>
-        {applicationName}
+        {t('app:name')}
       </Text>
       <Text
         style={{

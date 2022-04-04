@@ -8,9 +8,7 @@ import { services } from '@/services';
 import { UserRole } from '@/store/user';
 import SimpleSelectionList from '@/components/SimpleSelectionList';
 
-interface IAdvancedSettingProps {}
-
-const AdvancedSetting = observer<IAdvancedSettingProps>(() => {
+const AdvancedSetting = observer(() => {
   const { ui, global, user } = useStore();
   const { t } = useTranslation();
 
@@ -25,7 +23,7 @@ const AdvancedSetting = observer<IAdvancedSettingProps>(() => {
 
   const list = [
     {
-      title: t('setting:advanced.navigation.title'),
+      title: t('setting:advanced.smartSearch.header'),
       data: [
         {
           title: t('setting:advanced.smartSearch.title'),

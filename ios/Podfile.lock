@@ -444,7 +444,7 @@ PODS:
     - React-Core
   - react-native-file-utils (1.3.3):
     - React-Core
-  - react-native-get-random-values (1.7.1):
+  - react-native-get-random-values (1.7.2):
     - React-Core
   - react-native-image-editor (1.0.0):
     - React-Core
@@ -587,7 +587,7 @@ PODS:
     - React-Core
   - RNFS (2.19.0):
     - React-Core
-  - RNGestureHandler (1.10.3):
+  - RNGestureHandler (2.3.2):
     - React-Core
   - RNImageCropPicker (0.37.3):
     - React-Core
@@ -606,7 +606,7 @@ PODS:
     - React-Core
   - RNPermissions (3.2.0):
     - React-Core
-  - RNReanimated (2.3.1):
+  - RNReanimated (2.5.0):
     - DoubleConversion
     - FBLazyVector
     - FBReactNativeSpec
@@ -647,7 +647,7 @@ PODS:
     - React-Core
     - RNImageHelper
     - Toast (~> 4.0.0)
-  - RNVectorIcons (9.0.0):
+  - RNVectorIcons (9.1.0):
     - React-Core
   - RNZipArchive (6.0.6):
     - React-Core
@@ -668,7 +668,7 @@ PODS:
   - SSZipArchive (2.2.3)
   - Toast (4.0.0)
   - TOCropViewController (2.6.1)
-  - VisionCamera (2.11.2):
+  - VisionCamera (2.13.1):
     - React
     - React-callinvoker
     - React-Core
@@ -1104,7 +1104,7 @@ SPEC CHECKSUMS:
   FlipperKit: d8d346844eca5d9120c17d441a2f38596e8ed2b9
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
   GCDWebServer: 2c156a56c8226e2d5c0c3f208a3621ccffbe3ce4
-  glog: 5337263514dd6f09803962437687240c5dc39aa4
+  glog: 85ecdd10ee8d8ec362ef519a6a45ff9aa27b2e85
   GoogleAppMeasurement: ae033c3aad67e68294369373056b4d74cc8ae0d6
   GoogleDataTransport: 629c20a4d363167143f30ea78320d5a7eb8bd940
   GoogleUtilities: e0913149f6b0625b553d70dae12b49fc62914fd1
@@ -1125,7 +1125,7 @@ SPEC CHECKSUMS:
   Permission-PhotoLibrary: 7bec836dcdd04a0bfb200c314f1aae06d4476357
   Permission-PhotoLibraryAddOnly: 06fb0cdb1d35683b235ad8c464ef0ecc88859ea3
   PromisesObjC: 68159ce6952d93e17b2dfe273b8c40907db5ba58
-  RCT-Folly: 4d8508a426467c48885f1151029bc15fa5d7b3b8
+  RCT-Folly: 803a9cfd78114b2ec0f140cfa6fa2a6bafb2d685
   RCTRequired: 0aa6c1c27e1d65920df35ceea5341a5fe76bdb79
   RCTTypeSafety: d76a59d00632891e11ed7522dba3fd1a995e573a
   React: ab8c09da2e7704f4b3ebad4baa6cfdfcc852dcb5
@@ -1146,7 +1146,7 @@ SPEC CHECKSUMS:
   react-native-color-picker-ios: 2e23dbcbfd3506c7560632c58b7e130b6015fbeb
   react-native-document-picker: 429972f7ece4463aa5bcdd789622b3a674a3c5d1
   react-native-file-utils: 2ffd2e40a794ba055106e5b0e15cb36aafb9166a
-  react-native-get-random-values: 2c4ff6b44cb71291dabe9a8ae87d3877dcf387da
+  react-native-get-random-values: 30b3f74ca34e30e2e480de48e4add2706a40ac8f
   react-native-image-editor: b3c21b421c4977da664033fdf1f8f4a1844aa585
   react-native-ios-context-menu: 3accab640c866e82f386a0cbee34c8ada345e6fc
   react-native-mmkv: 2a15aadabf649c364cab7975eef52848611eea25
@@ -1183,19 +1183,19 @@ SPEC CHECKSUMS:
   RNFBRemoteConfig: 1f370dd4db5d605b64d59b4f38b2bb716f580b1c
   RNFileViewer: ce7ca3ac370e18554d35d6355cffd7c30437c592
   RNFS: fc610f78fdf8bfc89a9e5cc2f898519f4dba1002
-  RNGestureHandler: a479ebd5ed4221a810967000735517df0d2db211
+  RNGestureHandler: 6e757e487a4834e7280e98e9bac66d2d9c575e9c
   RNImageCropPicker: 44e2807bc410741f35d4c45b6586aedfe3da39d2
   RNImageHelper: efb1e1b39f0e19a40b8873c2c1c9614c0dd150ed
   RNInAppBrowser: 3ff3a3b8f458aaf25aaee879d057352862edf357
   RNLocalize: 74b82db20cc3895ccc25af992c644879bcec2815
   RNPermissions: f7ebe52db07c00901127966ca080b4ec6a6ceb0a
-  RNReanimated: 1326679461fa5d2399d54c18ca1432ba3e816b9e
+  RNReanimated: 190b6930d5d94832061278e1070bbe313e50c830
   RNSentry: f8c14c77e400a93331b38538f735c2538f8108a8
   RNShare: d76b8c9c6e6ffb38fc18f40b4338c9d867592ed3
   RNShareMenu: c69282e50ac439737a86949a55c7b023b90027c8
   RNSVG: 302bfc9905bd8122f08966dc2ce2d07b7b52b9f8
   RNToasty: 4bbf8d6a94d46263ad733a38b9f15868a95f7fe1
-  RNVectorIcons: 4143ba35feebab8fdbe6bc43d1e776b393d47ac8
+  RNVectorIcons: 7923e585eaeb139b9f4531d25a125a1500162a0b
   RNZipArchive: 9e6af1bebc9c7ddb42893bc4e70804321227c3ec
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
   SDWebImageWebPCoder: f93010f3f6c031e2f8fb3081ca4ee6966c539815
@@ -1203,7 +1203,7 @@ SPEC CHECKSUMS:
   SSZipArchive: 62d4947b08730e4cda640473b0066d209ff033c9
   Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
   TOCropViewController: edfd4f25713d56905ad1e0b9f5be3fbe0f59c863
-  VisionCamera: ec468a1c8a7b337ad3fe5ad51030139f0940d4a2
+  VisionCamera: 73658533c79f60ecba935d2128cff182f9e0cca0
   Yoga: d6b6a80659aa3e91aaba01d0012e7edcbedcbecd
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 

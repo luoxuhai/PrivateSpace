@@ -50,7 +50,7 @@ function getList(
       icon: IconShare,
     },
     {
-      title: '详情',
+      title: t('photoView:toolbar.detail'),
       key: 'info',
       icon: IconInfoCircle,
     },
@@ -65,7 +65,7 @@ function getList(
       icon: IconTrash,
     },
     {
-      title: '更多',
+      title: t('photoView:toolbar.more'),
       key: 'more',
       icon: iconProps => (
         <MorePopoverMenu
@@ -109,12 +109,14 @@ export const ToolbarContainer = observer<IToolbarContainerProps>(props => {
     switch (key) {
       case 'delete':
         showDeleteActionSheet({
-          title: `这${
-            props.item?.mime?.startsWith('image/') ? '张照片' : '个视频'
-          }将被删除`,
+          title: t('imageList:deleteActionSheet.title', {
+            content: props.item?.mime?.startsWith('image/')
+              ? t('imageList:navigation.subtitle.image', { count: '' })
+              : t('imageList:navigation.subtitle.video', { count: '' }),
+          }),
           message: global.settingInfo.recycleBin.enabled
-            ? '可到回收站中恢复'
-            : '此操作不可撤销',
+            ? t('imageList:deleteActionSheet.msg.softDelete')
+            : t('imageList:deleteActionSheet.msg.delete'),
           onConfirm: async () => {
             try {
               await mutateAsync({

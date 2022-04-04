@@ -1,4 +1,10 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, {
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+  useMemo,
+} from 'react';
 import { StyleSheet, View, SafeAreaView } from 'react-native';
 import {
   NavigationFunctionComponent,
@@ -60,17 +66,6 @@ interface IAlbumCoverProps extends NavigationComponentProps {
   album: FileEntity;
 }
 
-const pageViews = [
-  {
-    label: '相册项目',
-    key: 0,
-  },
-  {
-    label: '系统封面',
-    key: 1,
-  },
-];
-
 const AlbumCover: NavigationFunctionComponent<IAlbumCoverProps> = props => {
   const { ui } = useStore();
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -80,6 +75,20 @@ const AlbumCover: NavigationFunctionComponent<IAlbumCoverProps> = props => {
   >(props.album?.extra?.cover);
   const UIFrame = useUIFrame();
   const pagerViewRef = useRef<PagerView>(null);
+
+  const pageViews = useMemo(
+    () => [
+      {
+        label: t('albumCover:tab.item'),
+        key: 0,
+      },
+      {
+        label: t('albumCover:tab.system'),
+        key: 1,
+      },
+    ],
+    [t],
+  );
 
   useNavigationButtonPress(handleCloseModal, props.componentId, 'cancel');
 

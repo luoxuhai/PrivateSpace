@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useMemo, useRef } from 'react';
 import {
   TouchableOpacityProps,
   TouchableOpacity,
@@ -76,26 +76,29 @@ function AddButton(props: IAddButtonProps): JSX.Element {
 
   const { mutateAsync: createFiles } = useCreateFile();
 
-  const list = [
-    {
-      type: 'album',
-      icon: <IconPhotoRectangle {...ICON_PROPS} />,
-      title: '相册',
-      color: ui.colors.systemOrange,
-    },
-    {
-      type: 'document',
-      icon: <IconFolder {...ICON_PROPS} />,
-      title: '文件',
-      color: ui.colors.systemBlue,
-    },
-    {
-      type: 'camera',
-      icon: <IconCamera {...ICON_PROPS} />,
-      title: '相机',
-      color: ui.colors.systemPink,
-    },
-  ];
+  const list = useMemo(
+    () => [
+      {
+        type: 'album',
+        icon: <IconPhotoRectangle {...ICON_PROPS} />,
+        title: t('imageList:add.album'),
+        color: ui.colors.systemOrange,
+      },
+      {
+        type: 'document',
+        icon: <IconFolder {...ICON_PROPS} />,
+        title: t('imageList:add.doc'),
+        color: ui.colors.systemBlue,
+      },
+      {
+        type: 'camera',
+        icon: <IconCamera {...ICON_PROPS} />,
+        title: t('imageList:add.camera'),
+        color: ui.colors.systemPink,
+      },
+    ],
+    [t, ui.colors],
+  );
 
   async function handleSelectImportFile(type: string) {
     let result;

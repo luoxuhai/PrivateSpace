@@ -66,7 +66,7 @@ export const ContextMenu = observer<IContextMenuProps>(props => {
         },
         {
           actionKey: 'export',
-          actionTitle: '保存到相册',
+          actionTitle: t('imageList:save'),
           icon: {
             iconType: 'SYSTEM',
             iconValue: 'square.and.arrow.down',
@@ -100,7 +100,7 @@ export const ContextMenu = observer<IContextMenuProps>(props => {
         case 'move':
           services.nav.screens?.show('FolderPicker', {
             title: {
-              text: '移动到相册',
+              text: t('imageList:move'),
             },
             excludedFolder: [props.albumId],
             async onDone({ id }: { id: string }) {
@@ -120,12 +120,14 @@ export const ContextMenu = observer<IContextMenuProps>(props => {
           break;
         case 'delete':
           showDeleteActionSheet({
-            title: `这${
-              props.item.mime?.startsWith('image/') ? '张照片' : '个视频'
-            }将被删除`,
+            title: t('imageList:deleteActionSheet.title', {
+              content: props.item.mime?.startsWith('image/')
+                ? t('imageList:navigation.subtitle.image', { count: '' })
+                : t('imageList:navigation.subtitle.video', { count: '' }),
+            }),
             message: global.settingInfo.recycleBin.enabled
-              ? '可到回收站中恢复'
-              : '此操作不可撤销',
+              ? t('imageList:deleteActionSheet.msg.softDelete')
+              : t('imageList:deleteActionSheet.msg.delete'),
             onConfirm: async () => {
               await mutateAsync({
                 ids: [props.item.id],
@@ -141,7 +143,7 @@ export const ContextMenu = observer<IContextMenuProps>(props => {
             const timer = setTimeout(() => {
               LoadingOverlay.show({
                 text: {
-                  value: '保存中...',
+                  value: t('imageList:saving'),
                 },
               });
             }, 1000);
@@ -149,7 +151,7 @@ export const ContextMenu = observer<IContextMenuProps>(props => {
             await MediaLibrary.saveToLibraryAsync(props.item.uri);
             clearTimeout(timer);
             RNToasty.Show({
-              title: '已保存到相册',
+              title: t('imageList:saveStatus.success'),
               position: 'top',
             });
           } catch {}

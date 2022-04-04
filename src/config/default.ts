@@ -6,16 +6,14 @@ export default {
   CHANGELOG: {
     zh_cn:
       'https://privatespace-4gagcjdu022008e0-1258504012.tcloudbaseapp.com/zh-cn/changelog.html',
-    en_us:
-      'https://privatespace-4gagcjdu022008e0-1258504012.tcloudbaseapp.com/en-us/changelog.html',
+    en_us: 'https://private-space-web.netlify.app/en-us/changelog',
   },
 
   /** 用户协议 */
   USER_AGREEMENT: {
     zh_cn:
       'https://privatespace-4gagcjdu022008e0-1258504012.tcloudbaseapp.com/zh-cn/user-agreement.html',
-    en_us:
-      'https://privatespace-4gagcjdu022008e0-1258504012.tcloudbaseapp.com/zh-cn/user-agreement.html',
+    en_us: 'https://private-space-web.netlify.app/en-us/user-agreement',
   },
 
   /** 应用商店链接 */
@@ -30,8 +28,7 @@ export default {
   PRIVACY_POLICY_URL: {
     zh_cn:
       'https://privatespace-4gagcjdu022008e0-1258504012.tcloudbaseapp.com/zh-cn/privacy-policy.html',
-    en_us:
-      'https://privatespace-4gagcjdu022008e0-1258504012.tcloudbaseapp.com/en-us/privacy-policy.html',
+    en_us: 'https://private-space-web.netlify.app/en-us/privacy-policy',
   },
 
   defaultAlbum: [

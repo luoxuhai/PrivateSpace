@@ -252,7 +252,7 @@ export const getScreens = (): Screens<ScreenName> =>
         options: {
           topBar: {
             title: {
-              text: 'WI-FI 互传',
+              text: t('transfer:navigation.title'),
             },
           },
           bottomTabs: {
@@ -400,7 +400,7 @@ export const getScreens = (): Screens<ScreenName> =>
         options: {
           topBar: {
             title: {
-              text: '修改描述',
+              text: t('photoView:toolbar.desc'),
             },
             rightButtons: [
               {
@@ -423,22 +423,22 @@ export const getScreens = (): Screens<ScreenName> =>
         options: {
           topBar: {
             title: {
-              text: '隐私空间高级版',
+              text: t('purchase:navigation.title'),
             },
             subtitle: {
-              text: '完整的 隐私空间 功能体验',
+              text: t('purchase:navigation.subtitle'),
               fontSize: 10,
             },
             leftButtons: [
               {
                 id: 'cancel',
-                text: '关闭',
+                text: t('common:cancel'),
               },
             ],
             rightButtons: [
               {
                 id: 'restore',
-                text: '恢复购买',
+                text: t('purchase:restore'),
               },
             ],
           },

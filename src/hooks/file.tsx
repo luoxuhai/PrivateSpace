@@ -1,6 +1,7 @@
 import { useMutation, UseMutationResult } from 'react-query';
 import * as MediaLibrary from 'expo-media-library';
 import { Alert } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import { services } from '@/services';
 import {
@@ -75,6 +76,7 @@ export function useCreateAlbum(): UseMutationResult<
   { name: string }
 > {
   const { user } = useStore();
+  const { t } = useTranslation();
   const result = useMutation<void, unknown, { name: string }>(
     async ({ name }) => {
       try {
@@ -83,7 +85,10 @@ export function useCreateAlbum(): UseMutationResult<
           owner: user.current?.id,
         });
         if (hasAlbum) {
-          Alert.alert('该相册名已存在，请重新输入', '相册名称不能相同');
+          Alert.alert(
+            t('createAlbum:existAlert.title'),
+            t('createAlbum:existAlert.msg'),
+          );
         } else {
           await services.api.album.create({
             name,

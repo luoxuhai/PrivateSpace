@@ -78,6 +78,11 @@
 		<string>bilibili</string>
 		<string>weixin</string>
 		<string>mqq</string>
+		<string>kwai</string>
+		<string>snssdk1233</string>
+		<string>facebook</string>
+		<string>twitter</string>
+		<string>instagram</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>

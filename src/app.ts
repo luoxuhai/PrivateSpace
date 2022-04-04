@@ -1,4 +1,4 @@
-import { DevSettings, LogBox } from 'react-native';
+import { DevSettings, LogBox, Settings } from 'react-native';
 
 import '@/locales';
 import { hydrateStores, clearPersistedStores } from '@/store';

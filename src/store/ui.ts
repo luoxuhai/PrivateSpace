@@ -30,14 +30,14 @@ export class UIStore implements IStore {
   @observable themeName: EThemeName = EThemeName.Blue;
   @observable customThemeColor: string = this.themes.primary;
 
-  @observable language: Language = 'zh-CN';
+  @observable language: Language = 'system';
   @observable isSystemLanguage = this.language === 'system';
 
   @observable appIcon: EAppIcon = EAppIcon.Default;
 
   @computed
   get themes(): Themes {
-    return getThemes(this.colors, this.themeName);
+    return getThemes(this.colors, this.themeName, this.customThemeColor);
   }
 
   constructor() {
@@ -67,9 +67,6 @@ export class UIStore implements IStore {
       overrideColorScheme.setScheme(
         this.isSystemAppearance ? null : this.appearance,
       );
-      // UserInterfaceStyle.setStyle(
-      //   this.isSystemAppearance ? 'unspecified' : this.appearance,
-      // );
       StatusBar.setBarStyle(
         this.appearance === 'dark' ? 'light-content' : 'dark-content',
         true,

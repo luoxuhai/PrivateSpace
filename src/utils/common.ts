@@ -215,7 +215,7 @@ export function showDeleteActionSheet({
       title: title,
       message,
       options: [
-        `${getI18n().t('common:confirm')}${getI18n().t('common:delete')}`,
+        `${getI18n().t('common:confirm')}`,
         getI18n().t('common:cancel'),
       ],
       cancelButtonIndex: 1,

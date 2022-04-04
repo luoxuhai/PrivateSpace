@@ -19,48 +19,40 @@ interface PopoverMenuProps {
 
 export type { MenuConfig };
 
-export const PopoverMenu = observer<
-  PopoverMenuProps,
-  { toggleVisibility: () => void }
->(
-  (props, ref) => {
-    const [visibleOutside, setVisibleOutside] = useState(false);
-    const window = useWindowDimensions();
+export const PopoverMenu = observer<PopoverMenuProps>(props => {
+  const [visibleOutside, setVisibleOutside] = useState(false);
+  const window = useWindowDimensions();
 
-    function hideOutsideView() {
-      setVisibleOutside(false);
-    }
+  function hideOutsideView() {
+    setVisibleOutside(false);
+  }
 
-    function showOutsideView() {
-      setVisibleOutside(true);
-    }
+  function showOutsideView() {
+    setVisibleOutside(true);
+  }
 
-    const maskStyle: ViewStyle = {
-      display: visibleOutside ? 'flex' : 'none',
-      top: -window.width * 2,
-      left: -window.width * 2,
-      right: -window.width * 2,
-      bottom: -window.height * 2,
-    };
+  const maskStyle: ViewStyle = {
+    display: visibleOutside ? 'flex' : 'none',
+    top: -window.width * 2,
+    left: -window.width * 2,
+    right: -window.width * 2,
+    bottom: -window.height * 2,
+  };
 
-    return (
-      <>
-        <ContextMenuButton
-          isMenuPrimaryAction
-          menuConfig={props.menus}
-          onMenuWillShow={showOutsideView}
-          onMenuWillHide={hideOutsideView}
-          {...props}>
-          {props.children}
-        </ContextMenuButton>
-        <View style={[styles.mask, maskStyle]} />
-      </>
-    );
-  },
-  {
-    forwardRef: true,
-  },
-);
+  return (
+    <>
+      <ContextMenuButton
+        isMenuPrimaryAction
+        menuConfig={props.menus}
+        onMenuWillShow={showOutsideView}
+        onMenuWillHide={hideOutsideView}
+        {...props}>
+        {props.children}
+      </ContextMenuButton>
+      <View style={[styles.mask, maskStyle]} />
+    </>
+  );
+});
 
 const styles = StyleSheet.create({
   mask: {

@@ -190,7 +190,9 @@ const RecycleBinScreen: NavigationFunctionComponent<
           style={{
             color: ui.colors.secondaryLabel,
           }}>
-          最多保留{global.settingInfo.recycleBin.keep ?? 30}天，之后将永久删除。
+          {t('recycleBin:tip', {
+            duration: global.settingInfo.recycleBin.keep ?? 30,
+          })}
         </Text>
         {!global.settingInfo.recycleBin?.enabled && (
           <Text
@@ -200,12 +202,12 @@ const RecycleBinScreen: NavigationFunctionComponent<
                 color: ui.colors.secondaryLabel,
               },
             ]}>
-            回收站已关闭，可在右上角设置中打开。
+            {t('recycleBin:enableTip')}
           </Text>
         )}
       </View>
     ),
-    [ui.appearance, global.settingInfo.recycleBin],
+    [ui.appearance, global.settingInfo.recycleBin, t],
   );
 
   const renderItem = useCallback(
@@ -267,6 +269,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 15,
     marginBottom: 25,
+    paddingHorizontal: 10,
   },
   empty: {
     marginTop: '50%',

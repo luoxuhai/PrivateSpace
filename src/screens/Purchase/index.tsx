@@ -15,7 +15,7 @@ import {
 } from 'react-native-navigation';
 import { useNavigationButtonPress } from 'react-native-navigation-hooks';
 import { observer } from 'mobx-react-lite';
-import { useTranslation } from 'react-i18next';
+import { useTranslation, getI18n } from 'react-i18next';
 import { useQuery } from 'react-query';
 import { InAppBrowser } from 'react-native-inappbrowser-reborn';
 import chroma from 'chroma-js';
@@ -33,7 +33,6 @@ import { SafeAreaScrollView } from '@/components';
 import { Toolbar } from '@/components/Toolbar';
 import CustomButton from '@/components/CustomButton';
 import { LoadingOverlay } from '@/components/LoadingOverlay';
-import analytics from '@/utils/analytics/firebase';
 
 import { RNToasty } from 'react-native-toasty';
 import { UserRole } from '@/store/user';
@@ -53,16 +52,7 @@ const enum ToolbarListKey {
   PRIVACY_POLICY_URL,
 }
 
-const toolbarList = [
-  {
-    key: ToolbarListKey.USER_AGREEMENT,
-    title: '用户协议',
-  },
-  {
-    key: ToolbarListKey.PRIVACY_POLICY_URL,
-    title: '隐私政策',
-  },
-];
+const t = getI18n().t;
 
 const isDark = (ui: UIStore) => ui.appearance === 'dark';
 
@@ -72,8 +62,6 @@ setPurchaseListener();
 function handleDismiss() {
   services.nav.screens?.dismissModal('Purchase');
 }
-
-let products: InAppPurchases.IAPItemDetails[] | undefined;
 
 const PurchaseScreen: NavigationFunctionComponent =
   observer<NavigationComponentProps>(props => {
@@ -92,8 +80,8 @@ const PurchaseScreen: NavigationFunctionComponent =
       //   productId: config.inAppPurchasesProductIds[0],
       // },
       {
-        title: '永久会员',
-        subTitle: '一次性付费，永久解锁全部功能',
+        title: t('purchase:product.title'),
+        subTitle: t('purchase:product.subTitle'),
         productId: config.inAppPurchasesProductIds[1],
       },
     ]);
@@ -102,11 +90,23 @@ const PurchaseScreen: NavigationFunctionComponent =
       () => ({
         // [config
         //   .inAppPurchasesProductIds[0]]: `订阅-${projectList[0].price}每年`,
-        [config
-          .inAppPurchasesProductIds[1]]: `购买-${projectList[0].price}永久`,
+        [config.inAppPurchasesProductIds[1]]: t('purchase:payButton.title', {
+          price: projectList[0].price,
+        }),
       }),
       [projectList],
     );
+
+    const toolbarList = [
+      {
+        key: ToolbarListKey.USER_AGREEMENT,
+        title: t('about:agreement'),
+      },
+      {
+        key: ToolbarListKey.PRIVACY_POLICY_URL,
+        title: t('about:private'),
+      },
+    ];
 
     useNavigationButtonPress(handleDismiss, props.componentId, 'cancel');
     useNavigationButtonPress(
@@ -189,7 +189,7 @@ const PurchaseScreen: NavigationFunctionComponent =
       LoadingOverlay.show({
         text: {
           visible: true,
-          value: '正在恢复',
+          value: t('purchase:recovering'),
         },
       });
       const result = await InAppPurchases.getPurchaseHistoryAsync();
@@ -205,7 +205,10 @@ const PurchaseScreen: NavigationFunctionComponent =
         handleDismiss();
       } else {
         user.setPurchaseResults([]);
-        Alert.alert('恢复失败', '无购买记录，请购买');
+        Alert.alert(
+          t('purchase:purchaseState.restoreFail.title'),
+          t('purchase:purchaseState.restoreFail.detail'),
+        );
       }
     }
 
@@ -222,7 +225,7 @@ const PurchaseScreen: NavigationFunctionComponent =
       LoadingOverlay.show({
         text: {
           visible: true,
-          value: '购买中',
+          value: t('purchase:paying'),
         },
       });
       await InAppPurchases.purchaseItemAsync(currentProject.productId);
@@ -250,13 +253,13 @@ const PurchaseScreen: NavigationFunctionComponent =
           contentContainerStyle={{
             paddingBottom: bottomTabsHeight,
           }}>
-          <LargeTitle text="定价" />
+          <LargeTitle text={t('purchase:price')} />
           <Project
             value={currentProject}
             list={projectList}
             onChange={item => setCurrentProject(item)}
           />
-          <LargeTitle text="高级特权" />
+          <LargeTitle text={t('purchase:privilege')} />
           <Rights componentId={props.componentId} />
           <Agreement />
         </SafeAreaScrollView>
@@ -269,8 +272,8 @@ const PurchaseScreen: NavigationFunctionComponent =
               ) || isPerpetual
                 ? currentProject.productId ===
                   config.inAppPurchasesProductIds[1]
-                  ? '已购买'
-                  : '已订阅'
+                  ? t('purchase:purchased')
+                  : t('purchase:subscribed')
                 : payButtonDisplayMap[currentProject.productId]
             }
             loading={purchaseLoading}
@@ -317,7 +320,7 @@ const Agreement = observer(() => {
           账户收取费用，订阅以年为计费周期。订阅服务将会在当前周期结束时自动续订并收取费用，取消自动续订需要在当前订阅周期结束24小时
           前完成。在任何时候，您都可以在 App Store 进行订阅管理
           。 */}
-          用户确认购买并付款后将记入 Apple 账户。如果您有任何疑问，请
+          {t('purchase:declare')}
           <Pressable onPress={openEmail}>
             <Text
               style={[
@@ -327,7 +330,7 @@ const Agreement = observer(() => {
                   left: 4,
                 },
               ]}>
-              联系我们
+              {t('purchase:contact')}
             </Text>
           </Pressable>
         </Text>
@@ -426,35 +429,39 @@ const Project = observer(
   },
 );
 
-const rightsList = [
-  {
-    image: IconWifi,
-    title: 'WI-FI 无线传输',
-    screenId: 'Transfer',
-  },
-  // {
-  //   image: IconiCloud,
-  //   title: 'iCloud备份',
-  //   screenId: 'ICloud',
-  // },
-  {
-    image: IconSearch,
-    title: '智能搜索',
-    screenId: 'AdvancedSetting',
-  },
-  {
-    image: IconTrash,
-    title: '自定义回收站保留时长',
-    screenId: 'RecycleBinSetting',
-  },
-  {
-    image: IconMore,
-    title: '更多功能即将推出...',
-  },
-];
-
 const Rights = ({ componentId }: { componentId: string }) => {
   const { user } = useStore();
+  const { t } = useTranslation();
+
+  const rightsList = useMemo(
+    () => [
+      {
+        image: IconWifi,
+        title: t('purchase:rights.wifi.title'),
+        screenId: 'Transfer',
+      },
+      // {
+      //   image: IconiCloud,
+      //   title: 'iCloud备份',
+      //   screenId: 'ICloud',
+      // },
+      {
+        image: IconSearch,
+        title: t('purchase:rights.search.title'),
+        screenId: 'AdvancedSetting',
+      },
+      {
+        image: IconTrash,
+        title: t('purchase:rights.trash.title'),
+        screenId: 'RecycleBinSetting',
+      },
+      {
+        image: IconMore,
+        title: t('purchase:rights.more.title'),
+      },
+    ],
+    [t],
+  );
 
   const handlePress = useCallback(
     screenId => {
@@ -464,7 +471,7 @@ const Rights = ({ componentId }: { componentId: string }) => {
         }
       } else {
         RNToasty.Show({
-          title: '购买后可使用',
+          title: t('purchase:unpayTip'),
           position: 'top',
         });
       }
@@ -673,27 +680,28 @@ function setPurchaseListener() {
               await LoadingOverlay.hide();
             } catch {}
             handleDismiss();
-
-            // const product = products?.find(
-            //   item => item.productId === config.inAppPurchasesProductIds[1],
-            // );
-            // analytics?.logPurchase({
-            //   value: Number(product?.price.slice(1, product?.price?.length)),
-            //   currency: product?.priceCurrencyCode,
-            // });
           }
           break;
         case InAppPurchases.IAPResponseCode.USER_CANCELED:
-          Alert.alert('购买失败', '您已取消购买');
+          Alert.alert(
+            t('purchase:purchaseState.fail.title'),
+            t('purchase:purchaseState.fail.canceled'),
+          );
           break;
         case InAppPurchases.IAPResponseCode.DEFERRED:
-          Alert.alert('购买失败', '您无权购买，请求家长批准');
+          Alert.alert(
+            t('purchase:purchaseState.fail.title'),
+            t('purchase:purchaseState.fail.deferred'),
+          );
           break;
         default:
           CustomSentry.captureException(
             new Error(`购买失败,错误代码：${errorCode}`),
           );
-          Alert.alert('购买失败', `错误代码：${errorCode}`);
+          Alert.alert(
+            t('purchase:purchaseState.fail.title'),
+            `${t('purchase:purchaseState.fail.errorCode')}${errorCode}`,
+          );
       }
     },
   );

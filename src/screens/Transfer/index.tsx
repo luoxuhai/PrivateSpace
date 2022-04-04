@@ -18,6 +18,7 @@ import NetInfo, {
   NetInfoSubscription,
 } from '@react-native-community/netinfo';
 import { HttpServer } from '@darkce/react-native-webserver';
+import { useTranslation } from 'react-i18next';
 
 import { useStore } from '@/store';
 import { FileStatus } from '@/services/database/entities/file.entity';
@@ -47,6 +48,7 @@ const enum ConnectState {
 const TransferScreen: NavigationFunctionComponent =
   observer<NavigationComponentProps>(props => {
     const { ui, global } = useStore();
+    const { t } = useTranslation();
     const [url, setUrl] = useState<string | undefined>();
     const [connectState, setConnectState] = useState<ConnectState>(
       ConnectState.Pending,
@@ -82,7 +84,7 @@ const TransferScreen: NavigationFunctionComponent =
         } else {
           setConnectState(ConnectState.Failed);
           RNToasty.Show({
-            title: '请打开 WI-FI 后重试',
+            title: t('transfer:wifiTip'),
             position: 'top',
           });
         }
@@ -96,9 +98,9 @@ const TransferScreen: NavigationFunctionComponent =
         if (state.type === NetInfoStateType.wifi) {
           startHttpServer().catch(() => {
             startHttpServer().catch(() => {
-              Alert.alert('连接失败，请重试！', undefined, [
+              Alert.alert(t('transfer:connectFail'), undefined, [
                 {
-                  text: '确定',
+                  text: t('common:confirm'),
                 },
               ]);
               services.nav.screens?.pop(props.componentId);
@@ -340,7 +342,7 @@ const TransferScreen: NavigationFunctionComponent =
                   color: ui.colors.systemRed,
                 },
               ]}>
-              请检查 WI-FI 连接
+              {t('transfer:errorTip')}
             </Text>
           )}
         </View>
@@ -350,9 +352,8 @@ const TransferScreen: NavigationFunctionComponent =
             {
               color: ui.colors.secondaryLabel,
             },
-          ]}
-          numberOfLines={4}>
-          在您的电脑或其他设备的浏览器中通过输入或扫描二维码打开以下网址。
+          ]}>
+          {t('transfer:tip1')}
           <Text
             style={[
               styles.tipBold,
@@ -360,7 +361,7 @@ const TransferScreen: NavigationFunctionComponent =
                 color: ui.colors.label,
               },
             ]}>
-            必须连接到同一个WI-FI，请勿离开本页面
+            {t('transfer:tip2')}
           </Text>
         </Text>
         <View

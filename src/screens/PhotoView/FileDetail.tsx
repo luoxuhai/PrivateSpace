@@ -4,6 +4,7 @@ import React, {
   useState,
   useMemo,
   useCallback,
+  forwardRef,
 } from 'react';
 import {
   StyleSheet,
@@ -37,7 +38,7 @@ interface IFileDetailProps {
 }
 
 export const FileDetail = observer<IFileDetailProps>(
-  (props, ref) => {
+  forwardRef((props, ref) => {
     const bottomSheetRef = useRef<IBottomSheetPropsRef>();
     const { t } = useTranslation();
     const [item, setItem] = useState<FileEntity>();
@@ -193,8 +194,7 @@ export const FileDetail = observer<IFileDetailProps>(
         </BottomSheetScrollView>
       </BottomSheet>
     );
-  },
-  { forwardRef: true },
+  }),
 );
 
 const styles = StyleSheet.create({
