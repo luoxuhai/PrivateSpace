@@ -17,7 +17,7 @@ import NetInfo, {
   NetInfoStateType,
   NetInfoSubscription,
 } from '@react-native-community/netinfo';
-import { HttpServer } from '@darkce/react-native-webserver';
+import { HttpServer } from '@react-native-library/webserver';
 import { useTranslation } from 'react-i18next';
 
 import { useStore } from '@/store';

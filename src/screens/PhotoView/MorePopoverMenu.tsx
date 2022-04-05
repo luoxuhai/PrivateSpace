@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { PopoverMenu, MenuConfig } from '@/components/PopoverMenu';
 import { useUpdateFile } from '@/hooks';
 import { services } from '@/services';
-import { extname, getSourcePath } from '@/utils';
+import { extname, getSourcePath, HapticFeedback } from '@/utils';
 
 interface IContextMenuProps {
   item: API.PhotoWithSource;
@@ -132,6 +132,9 @@ export const MorePopoverMenu = observer<IContextMenuProps>(props => {
         if (event?.nativeEvent.actionKey) {
           handleMenuItemPress(event?.nativeEvent.actionKey);
         }
+      }}
+      onMenuWillShow={() => {
+        HapticFeedback.impactAsync.light();
       }}>
       <TouchableOpacity>{props.children}</TouchableOpacity>
     </PopoverMenu>

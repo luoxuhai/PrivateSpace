@@ -483,7 +483,7 @@ const Rights = ({ componentId }: { componentId: string }) => {
     <View style={styles.rightsWrapper}>
       {rightsList.map(item => (
         <TouchableOpacity
-          key={item.screenId}
+          key={item.title}
           activeOpacity={item.screenId ? 0.5 : 1}
           style={[
             styles.rightsItem,

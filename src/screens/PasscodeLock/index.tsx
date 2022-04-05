@@ -19,7 +19,7 @@ import {
 import { useStore, stores } from '@/store';
 import { EUserType } from '@/services/database/entities/user.entity';
 import { services } from '@/services';
-import { PermissionManager } from '@/utils';
+import { PermissionManager, HapticFeedback } from '@/utils';
 import { getAppIcon } from '@/utils/designSystem';
 import PasscodeKeyboard from '@/components/PasscodeKeyboard';
 import { useUpdateEffect } from '@/hooks';
@@ -233,7 +233,13 @@ const PasscodeLockOverlay: PasscodeLockOverlayComponent<IPasscodeLockProps> = (
     );
 
     return (
-      <TouchableOpacity onPress={handleLocalAuth}>{authIcon}</TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => {
+          handleLocalAuth();
+          HapticFeedback.impactAsync.medium();
+        }}>
+        {authIcon}
+      </TouchableOpacity>
     );
   }
 

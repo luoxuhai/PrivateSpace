@@ -63,6 +63,10 @@ function languageCodeFromSystemToInternal(languageCode?: string): ELanguage {
       return ELanguage.KO_KR;
     case 'ja':
       return ELanguage.JA_JP;
+    case 'ru':
+      return ELanguage.RU_RU;
+    case 'es':
+      return ELanguage.ES_ES;
     default:
       return ELanguage.EN_US;
   }
@@ -80,6 +84,10 @@ function languageCodeFromInternalToSystem(languageCode?: string) {
       return 'ko';
     case 'ja-JP':
       return 'ja';
+    case 'ru-RU':
+      return 'ru';
+    case 'es-ES':
+      return 'es';
     default:
       return 'en';
   }

@@ -1,3 +1,4 @@
+import '@/utils/exceptionHandler';
 import 'react-native-gesture-handler';
 import 'react-native-get-random-values';
 import 'intl-pluralrules';

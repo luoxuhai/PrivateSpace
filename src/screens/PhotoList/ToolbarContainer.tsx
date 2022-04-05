@@ -91,9 +91,12 @@ export const ToolbarContainer = observer<IToolbarContainerProps>(props => {
         });
         break;
       case 'share':
-        await RNShare.open({
-          urls: getSelectedFileUris(),
-        });
+        try {
+          await RNShare.open({
+            urls: getSelectedFileUris(),
+          });
+        } catch {}
+
         props.onDone?.();
         break;
       case 'move':

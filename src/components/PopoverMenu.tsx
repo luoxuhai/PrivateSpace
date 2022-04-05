@@ -15,6 +15,8 @@ interface PopoverMenuProps {
   onPressMenuItem?: (event?: OnPressMenuItemEventObject) => void;
   onMenuWillShow?: () => void;
   onMenuWillHide?: () => void;
+  onMenuDidShow?: () => void;
+  onMenuDidHide?: () => void;
 }
 
 export type { MenuConfig };

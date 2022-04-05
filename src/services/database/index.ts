@@ -41,11 +41,11 @@ class DataBase {
     const repository = this.connection?.getRepository(UserEntity);
 
     for (const value of [EUserType.ADMIN, EUserType.GHOST]) {
-      let user = await repository?.findOne({
+      let user = (await repository?.findOne({
         where: {
           type: value,
         },
-      });
+      })) as Partial<UserEntity>;
 
       if (!user) {
         const res = await repository?.insert({

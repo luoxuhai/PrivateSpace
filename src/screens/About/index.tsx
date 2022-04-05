@@ -179,7 +179,7 @@ const IconCover = observer(() => {
           color: ui.colors.secondaryLabel,
         }}>
         V{appVersion}
-        {updateMetadata?.label && ` (${updateMetadata.label.replace('v', '')})`}
+        {updateMetadata?.label && `-${updateMetadata.label.replace('v', '')}`}
       </Text>
       {(global.debug || __DEV__) && (
         <Pressable

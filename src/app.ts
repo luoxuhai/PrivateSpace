@@ -1,4 +1,4 @@
-import { DevSettings, LogBox, Settings } from 'react-native';
+import { DevSettings, LogBox } from 'react-native';
 
 import '@/locales';
 import { hydrateStores, clearPersistedStores } from '@/store';
@@ -8,6 +8,7 @@ import { CustomSentry } from '@/utils/customSentry';
 import classifyImageProcess from '@/utils/process/classifyImageProcess';
 import thumbnailProcess from '@/utils/process/thumbnailProcess';
 import blurhashImageProcess from '@/utils/process/blurhashImageProcess';
+import { DynamicUpdate } from '@/utils/dynamicUpdate';
 
 export const start = async (): PVoid => {
   const { nav } = services;
@@ -29,6 +30,8 @@ export const start = async (): PVoid => {
     blurhashImageProcess.start();
     thumbnailProcess.start();
   }, 1000 * 5);
+
+  DynamicUpdate.sync();
 
   if (__DEV__) {
     LogBox.ignoreAllLogs();

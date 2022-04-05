@@ -140,7 +140,7 @@ export const ToolbarContainer = observer<IToolbarContainerProps>(props => {
         });
         break;
       case 'share':
-        await Share.share({
+        Share.share({
           url: props.item?.uri,
         });
         break;

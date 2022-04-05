@@ -142,9 +142,6 @@ function SettingsPage(props: NavigationComponentProps) {
               }}
             />
           ),
-          onPress() {
-            handleToPage('UrgentSetting');
-          },
         },
       ].filter(item => item),
     },

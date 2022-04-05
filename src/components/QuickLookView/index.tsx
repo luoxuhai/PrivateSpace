@@ -1,9 +1,10 @@
 import React from 'react';
-import { requireNativeComponent } from 'react-native';
+import { requireNativeComponent, ViewStyle } from 'react-native';
 
 interface QuickLookViewProps {
   url?: string;
   assetFileName?: string;
+  style?: ViewStyle;
 }
 
 function QuickLookView(props: QuickLookViewProps) {
