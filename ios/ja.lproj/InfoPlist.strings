@@ -6,7 +6,7 @@
   
 */
 
-CFBundleDisplayName = "사적인 공간";
+CFBundleDisplayName = "プライベートスペース";
 NSAppleMusicUsageDescription="インポートされた写真とビデオを削除するには";
 NSCameraUsageDescription = "写真やビデオをインポートするために、カメラから写真やビデオをインポートする機能を使用すると、アプリはカメラの権限にアクセスします";
 NSFaceIDUsageDescription = "顔認証機能を使用すると、アプリは顔ID権限にアクセスして、すばやくロックを解除します";

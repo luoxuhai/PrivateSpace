@@ -1,18 +1,17 @@
 import { Alert, StatusBar } from 'react-native';
 import CodePush, { LocalPackage } from 'react-native-code-push';
 
-import { stores } from '@/store';
+import { CustomSentry } from './customSentry';
 
 export class DynamicUpdate {
   static timer?: NodeJS.Timer;
+
   /**
    * 检查并更新，不会重启应用
    */
-  static sync(): void {
-    // TODO: 先取消
-    return;
+  static sync(debug = false): void {
     StatusBar.setNetworkActivityIndicatorVisible(true);
-    if (stores.global.debug) {
+    if (debug) {
       CodePush.sync(
         {
           updateDialog: {
@@ -28,13 +27,22 @@ export class DynamicUpdate {
         status => {
           Alert.alert('CodePush.SyncStatus', transformSyncStatus(status));
         },
-      ).finally(() => {
-        StatusBar.setNetworkActivityIndicatorVisible(false);
+      ).catch(error => {
+        Alert.alert('更新失败', error.message);
+        console.error(error);
       });
     } else {
-      CodePush.sync().finally(() => {
-        StatusBar.setNetworkActivityIndicatorVisible(false);
-      });
+      CodePush.sync()
+        .catch(error => {
+          CustomSentry.captureException(error, {
+            extra: {
+              title: '检查热更新失败',
+            },
+          });
+        })
+        .finally(() => {
+          StatusBar.setNetworkActivityIndicatorVisible(false);
+        });
     }
   }
 

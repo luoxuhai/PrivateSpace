@@ -17,7 +17,7 @@ import {
 import { StyleSheet, View } from 'react-native';
 import { observer } from 'mobx-react-lite';
 import { useQuery } from 'react-query';
-import { useTranslation } from 'react-i18next';
+import { useTranslation, getI18n } from 'react-i18next';
 import {
   useSharedValue,
   useAnimatedStyle,
@@ -263,7 +263,7 @@ const ImageList: NavigationFunctionComponent<IImageListProps> = props => {
     if (isSelectAll) {
       leftButton = {
         id: 'unselectAll',
-        text: t('common:cancel') + t('common:selectAll'),
+        text: t('common:unselectAll'),
       };
       setSelectedIds(photoData?.items.map(item => item.id) ?? []);
     } else {
@@ -417,15 +417,22 @@ function getTopBarSubtitle({
   videoTotal?: number;
 }) {
   let subtitleText: string | undefined;
+  const t = getI18n().t;
 
   if (imageTotal && !videoTotal) {
-    subtitleText = `${imageTotal}张照片`;
+    subtitleText = t('imageList:navigation.subtitle.image', {
+      count: imageTotal,
+    });
   } else if (!imageTotal && videoTotal) {
-    subtitleText = `${videoTotal}个视频`;
+    subtitleText = t('imageList:navigation.subtitle.video', {
+      count: videoTotal,
+    });
   } else if (!imageTotal && !videoTotal) {
     subtitleText = undefined;
   } else {
-    subtitleText = `${imageTotal}张照片、${videoTotal}个视频`;
+    subtitleText = `${t('imageList:navigation.subtitle.image', {
+      count: imageTotal,
+    })}、${t('imageList:navigation.subtitle.video', { count: videoTotal })}`;
   }
 
   return subtitleText;

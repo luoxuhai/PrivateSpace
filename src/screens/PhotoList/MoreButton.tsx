@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback } from 'react';
 import { TouchableOpacity, StyleSheet } from 'react-native';
 import { observer } from 'mobx-react-lite';
 import { useTranslation } from 'react-i18next';
@@ -6,6 +6,7 @@ import { MenuConfig } from 'react-native-ios-context-menu';
 import { PopoverMenu } from '@/components/PopoverMenu';
 import { useStore } from '@/store';
 import IconEllipsisCircle from '@/assets/icons/ellipsis.circle.svg';
+import { HapticFeedback } from '@/utils';
 
 interface IContextMenuProps {
   item: API.PhotoWithSource;
@@ -129,8 +130,20 @@ export const MoreButton = observer<IContextMenuProps>(props => {
     ],
   };
 
-  const button = useMemo(
-    () => (
+  return (
+    <PopoverMenu
+      menus={menuConfig}
+      style={styles.contextMenuButton}
+      onMenuWillShow={() => {
+        album.setMoreContextVisible(true);
+        HapticFeedback.impactAsync.light();
+      }}
+      onMenuWillHide={() => {
+        album.setMoreContextVisible(false);
+      }}
+      onPressMenuItem={({ nativeEvent }) =>
+        handleMenuItemPress(nativeEvent.actionKey)
+      }>
       <TouchableOpacity activeOpacity={0.5}>
         <IconEllipsisCircle
           style={styles.icon}
@@ -139,24 +152,6 @@ export const MoreButton = observer<IContextMenuProps>(props => {
           fill={ui.themes.primary}
         />
       </TouchableOpacity>
-    ),
-    [ui.themes.primary],
-  );
-
-  return (
-    <PopoverMenu
-      menus={menuConfig}
-      style={styles.contextMenuButton}
-      onMenuWillShow={() => {
-        album.setMoreContextVisible(true);
-      }}
-      onMenuWillHide={() => {
-        album.setMoreContextVisible(false);
-      }}
-      onPressMenuItem={({ nativeEvent }) =>
-        handleMenuItemPress(nativeEvent.actionKey)
-      }>
-      {button}
     </PopoverMenu>
   );
 });

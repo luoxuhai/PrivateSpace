@@ -111,13 +111,15 @@ export default class Nav {
           if (!maskVisible && !lockScreenVisible && enableMask) {
             stores.global.setMaskVisible(true);
           }
-          if (!__DEV__) {
-            DynamicUpdate.sync();
-          }
+          // if (!__DEV__) {
+          //   DynamicUpdate.sync();
+          // }
+          DynamicUpdate.sync();
           break;
         case 'active':
           stores.global.setMaskVisible(false);
           clearTimeout(timer);
+          DynamicUpdate.sync();
       }
     });
   }

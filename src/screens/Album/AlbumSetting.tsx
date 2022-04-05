@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { TextInput, Image, StyleSheet, View } from 'react-native';
 import {
   NavigationFunctionComponent,
@@ -7,6 +7,7 @@ import {
 import { observer } from 'mobx-react-lite';
 import { useNavigationButtonPress } from 'react-native-navigation-hooks';
 import { useMutation, useQuery } from 'react-query';
+import { useTranslation } from 'react-i18next';
 
 import { debounce } from 'lodash';
 import { services } from '@/services';
@@ -26,7 +27,7 @@ const AlbumSettingModal: NavigationFunctionComponent<
   IAlbumSettingModalProps
 > = props => {
   const { ui, global } = useStore();
-
+  const { t } = useTranslation();
   const { refetch: refetchAlbumList, data: albumResult } = useQuery('albums', {
     enabled: false,
   });
@@ -94,14 +95,14 @@ const AlbumSettingModal: NavigationFunctionComponent<
           color={ui.colors.systemRed}
           onPress={() => {
             showDeleteActionSheet({
-              title: '删除相册',
+              title: t('albumSetting:deleteActionSheet.title'),
               onConfirm: () => {
                 handleDeleteAlbum(props.album.id as string);
               },
             });
             HapticFeedback.impactAsync.medium();
           }}>
-          删除
+          {t('common:delete')}
         </CustomButton>
       </View>
     </SafeAreaScrollView>
@@ -122,9 +123,11 @@ function OperationList({
   album,
   onChange,
 }: IOperationListProps): JSX.Element {
+  const { t } = useTranslation();
+
   const list = [
     {
-      title: '相册名称',
+      title: t('albumSetting:albumName'),
       render: () => (
         <TextInput
           style={[
@@ -135,7 +138,7 @@ function OperationList({
             },
           ]}
           defaultValue={album.name}
-          placeholder="请输入相册名称"
+          placeholder={t('albumSetting:placeholder')}
           placeholderTextColor={ui.colors.tertiaryLabel}
           maxLength={200}
           selectTextOnFocus
@@ -152,7 +155,7 @@ function OperationList({
       ),
     },
     {
-      title: '相册封面',
+      title: t('albumSetting:cover'),
       render: () => (
         <Image
           style={styles.image}

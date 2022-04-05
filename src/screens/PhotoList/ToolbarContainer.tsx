@@ -34,7 +34,7 @@ function getList(t: TFunction<'translation', undefined>, ui: UIStore) {
       icon: IconShare,
     },
     {
-      title: '保存到相册',
+      title: t('imageList:save'),
       key: 'export',
       icon: IconSave,
     },
@@ -75,10 +75,10 @@ export const ToolbarContainer = observer<IToolbarContainerProps>(props => {
     switch (key) {
       case 'delete':
         showDeleteActionSheet({
-          title: '这些图片将会被删除',
+          title: t('imageList:deleteActionSheet.all.title'),
           message: global.settingInfo.recycleBin.enabled
-            ? '可到回收站中恢复'
-            : '此操作不可撤销',
+            ? t('imageList:deleteActionSheet.msg.softDelete')
+            : t('imageList:deleteActionSheet.msg.delete'),
           onConfirm: async () => {
             try {
               await mutateAsync({
@@ -91,15 +91,18 @@ export const ToolbarContainer = observer<IToolbarContainerProps>(props => {
         });
         break;
       case 'share':
-        await RNShare.open({
-          urls: getSelectedFileUris(),
-        });
+        try {
+          await RNShare.open({
+            urls: getSelectedFileUris(),
+          });
+        } catch {}
+
         props.onDone?.();
         break;
       case 'move':
         services.nav.screens?.show('FolderPicker', {
           title: {
-            text: '移动到相册',
+            text: t('imageList:moveToAlbum'),
           },
           excludedFolder: [props.albumId],
           async onDone({ id }: { id: string }) {
@@ -121,7 +124,7 @@ export const ToolbarContainer = observer<IToolbarContainerProps>(props => {
         try {
           LoadingOverlay.show({
             text: {
-              value: '保存中...',
+              value: `${t('imageList:saving')}...`,
             },
           });
           await Promise.all(

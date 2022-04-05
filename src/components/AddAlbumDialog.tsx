@@ -3,12 +3,14 @@ import React, {
   useImperativeHandle,
   useCallback,
   useRef,
+  forwardRef,
 } from 'react';
 import Modal from 'react-native-modal';
 import { View, TextInput, Text, StyleSheet, Alert } from 'react-native';
 import { observer } from 'mobx-react-lite';
 import { VibrancyView } from '@react-native-community/blur';
 import chroma from 'chroma-js';
+import { useTranslation } from 'react-i18next';
 
 import { useStore } from '@/store';
 import config from '@/config';
@@ -29,11 +31,12 @@ export const AddAlbumDialog = observer<
   IAddAlbumDialogProps,
   IAddAlbumDialogRef
 >(
-  (props, ref) => {
+  forwardRef((props, ref) => {
     const [visible, setVisible] = useState<boolean>(false);
     const textInputRef = useRef<TextInput>(null);
     const inputValueRef = useRef<string>();
     const { ui, global } = useStore();
+    const { t } = useTranslation();
 
     useImperativeHandle(ref, () => ({
       open(): void {
@@ -61,7 +64,7 @@ export const AddAlbumDialog = observer<
                   color: ui.colors.label,
                 },
               ]}>
-              创建相册
+              {t('createAlbum:dialog.title')}
             </Text>
             <Text
               style={[
@@ -70,7 +73,7 @@ export const AddAlbumDialog = observer<
                   color: ui.colors.secondaryLabel,
                 },
               ]}>
-              请输入相册名称
+              {t('createAlbum:dialog.subtitle')}
             </Text>
           </View>
           <IconButton
@@ -100,10 +103,14 @@ export const AddAlbumDialog = observer<
         avoidKeyboard
         style={styles.modal}
         onModalWillHide={() => {
-          textInputRef.current?.blur?.();
+          setTimeout(() => {
+            textInputRef.current?.blur?.();
+          }, 20);
         }}
         onModalWillShow={() => {
-          textInputRef.current?.focus?.();
+          setTimeout(() => {
+            textInputRef.current?.focus?.();
+          }, 20);
         }}
         onBackdropPress={closeDialog}>
         <View
@@ -137,7 +144,7 @@ export const AddAlbumDialog = observer<
             maxLength={200}
             keyboardAppearance={isDark ? 'dark' : 'light'}
             returnKeyType="done"
-            placeholder="相册名"
+            placeholder={t('createAlbum:dialog.albumName')}
             selectionColor={ui.themes.primary}
             onChangeText={value => {
               inputValueRef.current = value.trim();
@@ -163,14 +170,13 @@ export const AddAlbumDialog = observer<
                   closeDialog();
                 }
               }}>
-              确认
+              {t('common:confirm')}
             </CustomButton>
           </View>
         </View>
       </Modal>
     );
-  },
-  { forwardRef: true },
+  }),
 );
 
 const styles = StyleSheet.create({

@@ -5,12 +5,25 @@ import { CustomSentry } from '@/utils/customSentry';
 import { TEMP_PATH, STATIC_PATH } from '@/config';
 import { join, generateID } from '@/utils';
 import { initDataDirectory } from '@/services';
+import { locale } from '@/locales';
 
 const HOME_DIR = 'wifi-transfer-web';
-const WEB_CLIENT_URL = `https://private-space-storage.oss-cn-beijing.aliyuncs.com/web/${HOME_DIR}.zip`;
+const WEB_CLIENT_URL = {
+  cn: `https://private-space-storage.oss-cn-beijing.aliyuncs.com/web/${HOME_DIR}.zip`,
+  us: `https://private-space-storage-us.oss-us-west-1.aliyuncs.com/web/${HOME_DIR}.zip`,
+};
 const TEMP_SAVE_PATH = join(TEMP_PATH, generateID());
 const SAVE_PATH = join(STATIC_PATH, HOME_DIR);
 const FILE_NAME = `${HOME_DIR}.zip`;
+
+function getWebsiteUrl() {
+  const { country } = locale;
+  if (country === 'CN') {
+    return WEB_CLIENT_URL.cn;
+  } else {
+    return WEB_CLIENT_URL.us;
+  }
+}
 
 export default class WebClient {
   static path: string = SAVE_PATH;
@@ -25,7 +38,7 @@ export default class WebClient {
       initDataDirectory();
 
       await downloadFile({
-        fromUrl: WEB_CLIENT_URL,
+        fromUrl: getWebsiteUrl(),
         toFile: join(TEMP_SAVE_PATH, FILE_NAME),
         cacheable: true,
       }).promise;

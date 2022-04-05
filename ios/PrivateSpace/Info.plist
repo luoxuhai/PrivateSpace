@@ -67,8 +67,6 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>CodePushDeploymentKey</key>
 	<string>$(CODEPUSH_KEY)</string>
-	<key>CodePushServerURL</key>
-	<string>$(CODEPUSH_HOST)</string>
 	<key>GOOGLE_ANALYTICS_REGISTRATION_WITH_AD_NETWORK_ENABLED</key>
 	<false/>
 	<key>LSApplicationQueriesSchemes</key>
@@ -78,6 +76,11 @@
 		<string>bilibili</string>
 		<string>weixin</string>
 		<string>mqq</string>
+		<string>kwai</string>
+		<string>snssdk1233</string>
+		<string>facebook</string>
+		<string>twitter</string>
+		<string>instagram</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>

@@ -34,6 +34,12 @@ export const enum EAppOpenUrl {
   QQ = 'mqq://',
   /** 微信 */
   Weixin = 'weixin://',
+  TikTok = 'snssdk1233://',
+  WeChat = 'wechat://',
+  Facebook = 'facebook://',
+  Twitter = 'twitter://',
+  Instagram = 'instagram://',
+  Kwai = 'kwai://',
 }
 
 interface ISetting {

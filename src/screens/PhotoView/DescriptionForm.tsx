@@ -5,9 +5,11 @@ import {
   StyleSheet,
   useWindowDimensions,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { observer } from 'mobx-react-lite';
 import { NavigationComponentProps } from 'react-native-navigation';
 import { useNavigationButtonPress } from 'react-native-navigation-hooks';
+
 import { useStore } from '@/store';
 import { services } from '@/services';
 
@@ -19,6 +21,7 @@ interface DescriptionFormProps extends NavigationComponentProps {
 
 const DescriptionForm = observer<DescriptionFormProps>(props => {
   const { ui } = useStore();
+  const { t } = useTranslation();
   const { height } = useWindowDimensions();
   const textInputValue = useRef<string>();
 
@@ -51,7 +54,7 @@ const DescriptionForm = observer<DescriptionFormProps>(props => {
       <TextInput
         multiline
         autoFocus
-        placeholder="输入描述"
+        placeholder={t('photoView:toolbar.descPlaceholder')}
         defaultValue={props.item?.description}
         placeholderTextColor={ui.colors.tertiaryLabel}
         onChangeText={text => (textInputValue.current = text)}

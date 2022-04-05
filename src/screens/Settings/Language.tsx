@@ -4,7 +4,7 @@ import { observer } from 'mobx-react-lite';
 import { useTranslation } from 'react-i18next';
 
 import { useStore } from '@/store';
-import { Language } from '@/locales';
+import { ELanguage, Language, Languages } from '@/locales';
 import CheckList from '@/components/CheckList';
 import { SafeAreaScrollView } from '@/components';
 
@@ -45,12 +45,32 @@ export const languageOptions = (
   },
   {
     title: '简体中文',
-    value: 'zh-CN',
+    value: ELanguage.ZH_CN,
+  },
+  {
+    title: '繁體中文',
+    value: ELanguage.ZH_TW,
   },
   {
     title: 'English',
-    value: 'en-US',
+    value: ELanguage.EN_US,
   },
+  // {
+  //   title: '日本語',
+  //   value: ELanguage.JA_JP,
+  // },
+  {
+    title: '한국어',
+    value: ELanguage.KO_KR,
+  },
+  // {
+  //   title: 'Русский',
+  //   value: ELanguage.RU_RU,
+  // },
+  // {
+  //   title: 'Español',
+  //   value: ELanguage.ES_ES,
+  // },
 ];
 
 const styles = StyleSheet.create({

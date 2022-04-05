@@ -18,6 +18,7 @@ import {
 
 import BlurhashView from '@/components/BlurhashView';
 import FastImageProgress from '@/components/FastImageProgress';
+import QuickLookView from '@/components/QuickLookView';
 import { useUpdateEffect } from '@/hooks';
 import { useDoubleTapToZoom, useMaxScale } from './hooks';
 import {
@@ -27,7 +28,6 @@ import {
   ImageSource,
   LoadStatus,
 } from './type.d';
-import { getSourceByMime } from '@/utils';
 
 export interface ImageViewProps
   extends Pick<ScrollViewProps, 'onScrollEndDrag' | 'onScrollBeginDrag'> {
@@ -139,7 +139,11 @@ function ImageView(props: ImageViewProps): JSX.Element {
 
   return (
     <View style={styles.container}>
-      <ScrollView
+      <QuickLookView
+        style={[styles.scrollView]}
+        url={props.source.poster || props.source.uri || props.source.thumbnail}
+      />
+      {/* <ScrollView
         style={styles.scrollView}
         ref={scrollViewRef}
         contentContainerStyle={styles.contentContainerStyle}
@@ -193,7 +197,7 @@ function ImageView(props: ImageViewProps): JSX.Element {
             renderError={renderError}
           />
         </Pressable>
-      </ScrollView>
+      </ScrollView> */}
       {props.renderExtraElements?.(loadStatus)}
     </View>
   );

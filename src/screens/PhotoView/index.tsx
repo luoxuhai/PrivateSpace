@@ -154,7 +154,7 @@ const ImageView: NavigationFunctionComponent<IImageViewProps> = props => {
     HapticFeedback.impactAsync.heavy();
     ActionSheetIOS.showActionSheetWithOptions(
       {
-        options: ['保存到相册', t('common:cancel')],
+        options: [t('imageList:save'), t('common:cancel')],
         cancelButtonIndex: 1,
       },
       buttonIndex => {
@@ -169,12 +169,12 @@ const ImageView: NavigationFunctionComponent<IImageViewProps> = props => {
     try {
       await MediaLibrary.saveToLibraryAsync(currentItem.uri as string);
       RNToasty.Show({
-        title: '已保存到相册',
+        title: t('imageList:saveStatus.success'),
         position: 'top',
       });
     } catch (error) {
       RNToasty.Show({
-        title: '保存到相册失败',
+        title: t('imageList:saveStatus.fail'),
         position: 'top',
       });
       HapticFeedback.notificationAsync.error();

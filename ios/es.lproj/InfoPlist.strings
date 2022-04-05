@@ -1,0 +1,17 @@
+/* 
+  InfoPlist.strings
+  PrivateSpace
+
+  Created by 罗绪海 on 2022/4/2.
+  
+*/
+
+CFBundleDisplayName = "Espacio privado";
+NSApleMusicUsageDescription = "Para borrar fotos y videos importados";
+NSCameraUsageDescription = "La aplicación accederá a los permisos de su cámara cuando use la función de importar imágenes y videos desde la cámara, para importar imágenes y videos";
+NSFaceIDUsageDescription = "La aplicación accederá a su permiso de identificación facial cuando use la función de desbloqueo facial, para desbloquear rápidamente";
+NSLocationWhenInUseUsageDescription = "Necesitamos acceder a su ubicación para cambiar automáticamente el idioma de visualización";
+NSMicrophoneUsageDescription = "La aplicación accederá a su permiso de micrófono cuando use la función para grabar video desde la cámara, para grabar sonido de video";
+NSMotionUsageDescription = "Para bloquear la aplicación cuando la pantalla del dispositivo está inactiva";
+NSPhotoLibraryAddUsageDescription = "Para guardar fotos y videos en el álbum";
+NSPhotoLibraryUsageDescription = "La aplicación accederá a los permisos de su álbum de fotos cuando use la función para importar imágenes y videos de álbumes de fotos, para poder importar imágenes y videos";

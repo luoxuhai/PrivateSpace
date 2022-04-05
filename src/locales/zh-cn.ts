@@ -3,6 +3,23 @@ export default {
     name: '隐私空间',
   },
 
+  thirdPartyApp: {
+    browser: '浏览器',
+    email: '邮箱',
+    note: '备忘录',
+    qq: 'QQ',
+    wechat: '微信',
+    weixin: '微信',
+    douyin: '抖音',
+    tikTok: '抖音',
+    kwai: '快手',
+    bilibili: 'B站',
+    album: '相册',
+    facebook: '脸书',
+    twitter: '推特',
+    instagram: 'Instagram',
+  },
+
   album: {
     navigation: {
       title: '相册',
@@ -34,12 +51,37 @@ export default {
   imageList: {
     navigation: {
       selectBtn: '选择',
+      subtitle: {
+        image: '{{count}}张照片',
+        video: '{{count}}个视频',
+      },
     },
     tapHereToChange: '选择其他相册',
     showInfo: '查看详情',
     loadingLabelText: '导入中...',
     noData: '无图片或视频',
-    saveToLocal: '保存到本地',
+    save: '保存到相册',
+    saving: '保存中',
+    saveStatus: {
+      success: '已保存到相册',
+      fail: '保存到相册失败',
+    },
+    add: {
+      album: '相册',
+      doc: '文件',
+      camera: '相机',
+    },
+    moveToAlbum: '移动到相册',
+    deleteActionSheet: {
+      all: {
+        title: '删除全部图片、视频',
+      },
+      title: '这{{content}}将被删除',
+      msg: {
+        softDelete: '可到回收站中恢复',
+        delete: '此操作不可撤销',
+      },
+    },
   },
 
   miniApps: {
@@ -52,12 +94,19 @@ export default {
     navigation: {
       title: '回收站',
     },
+    tip: '最多保留{{ duration }}天，之后将永久删除。',
+    enableTip: '回收站已关闭，可在右上角设置中打开。',
+    restore: '恢复到相册',
   },
 
   recycleBinSetting: {
     navigation: {
       title: '回收站设置',
     },
+    enableHeader: '关闭后，删除的文件不可恢复',
+    enableTitle: '开启回收站',
+    durationHeader: '保留天数',
+    day: '天',
   },
 
   setting: {
@@ -89,6 +138,10 @@ export default {
   albumCover: {
     navigation: {
       title: '相册封面',
+    },
+    tab: {
+      item: '相册项目',
+      system: '内置封面',
     },
   },
 
@@ -137,9 +190,11 @@ export default {
     navigation: {
       title: '相册设置',
     },
-    add: {
-      title: '创建相册',
-      msg: '请输入相册名称',
+    albumName: '相册名称',
+    placeholder: '请输入相册名称',
+    cover: '相册封面',
+    deleteActionSheet: {
+      title: '删除相册',
     },
   },
 
@@ -165,6 +220,7 @@ export default {
     close: '关闭',
     done: '完成',
     language: '语言',
+    day: '天',
     hour: '小时',
     minute: '分钟',
     second: '秒',
@@ -179,6 +235,7 @@ export default {
     reset: '重置',
     select: '选择',
     selectAll: '全选',
+    unselectAll: '取消全选',
     share: '分享',
     delete: '删除',
     deleteAll: '删除全部',
@@ -189,6 +246,10 @@ export default {
     restoreAll: '恢复全部',
     noData: '无数据',
     all: '全部',
+    enabled: '已启动',
+    disabled: '已禁用',
+    closed: '已关闭',
+    opened: '已打开',
   },
 
   permission: {
@@ -233,6 +294,97 @@ export default {
         video: '视频',
         album: '相册',
       },
+    },
+  },
+
+  purchase: {
+    navigation: {
+      title: '隐私空间高级版',
+      subtitle: '完整的 隐私空间 功能体验',
+    },
+    card: {
+      title: '隐私空间高级版',
+      desc: '解锁全部特权',
+      button: '立即开通',
+    },
+    tableView: {
+      title: '隐私空间 高级版',
+    },
+    paying: '购买中',
+    price: '定价',
+    privilege: '高级特权',
+    purchased: '已购买',
+    subscribed: '已订阅',
+    contact: '联系我们',
+    declare: '用户确认购买并付款后将记入 Apple 账户。如果您有任何疑问，请',
+    rights: {
+      wifi: {
+        title: 'WI-FI 无线传输',
+      },
+      search: {
+        title: '智能搜索',
+      },
+      trash: {
+        title: '自定义回收站保留时长',
+      },
+      more: {
+        title: '更多功能即将推出...',
+      },
+    },
+    unpayTip: '购买后可使用',
+    purchaseState: {
+      fail: {
+        title: '购买失败',
+        canceled: '您已取消购买',
+        deferred: '您无权购买，请求家长批准',
+        errorCode: '错误代码：',
+      },
+      restoreFail: {
+        title: '恢复购买失败',
+        detail: '无购买记录，请购买',
+      },
+    },
+    product: {
+      title: '永久会员',
+      subTitle: '一次性付费，永久解锁全部功能',
+    },
+    payButton: {
+      title: '购买-{{price}}永久',
+    },
+    restore: '恢复购买',
+    recovering: '恢复中',
+  },
+
+  transfer: {
+    navigation: {
+      title: 'WI-FI 互传',
+    },
+    tip1: '在您的电脑或其他设备的浏览器中通过输入或扫描二维码打开以下网址。',
+    tip2: '必须连接到同一个WI-FI，请勿离开本页面',
+    errorTip: '请检查 WI-FI 连接',
+    connectFail: '连接失败，请重试！',
+    wifiTip: '请打开 WI-FI 后重试',
+  },
+
+  createAlbum: {
+    dialog: {
+      title: '创建相册',
+      subtitle: '请输入相册名称',
+      albumName: '相册名',
+    },
+    existAlert: {
+      title: '该相册名已存在，请重新输入',
+      msg: '相册名称不能相同',
+    },
+  },
+
+  photoView: {
+    toolbar: {
+      detail: '详情',
+      more: '更多',
+      desc: '修改描述',
+      rename: '重命名',
+      descPlaceholder: '请输入描述',
     },
   },
 };

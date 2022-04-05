@@ -2,6 +2,7 @@ import * as Sentry from '@sentry/react-native';
 import { Navigation } from 'react-native-navigation';
 import { DeviceMotion } from 'expo-sensors';
 import { CaptureContext } from '@sentry/types';
+import CodePush from 'react-native-code-push';
 
 import { systemInfo } from '@/utils/system';
 import config from '@/config';
@@ -21,7 +22,7 @@ export async function initSentry(): PVoid {
     ],
   });
   const networkState = await systemInfo.getNetworkStateTypeAsync();
-  const updateMetadata = await DynamicUpdate.getUpdateMetadataAsync();
+  const updateMetadata = await CodePush.getUpdateMetadata();
   const motionAvailable = await DeviceMotion.isAvailableAsync();
   const usedMemory = await systemInfo.getUsedMemory();
 

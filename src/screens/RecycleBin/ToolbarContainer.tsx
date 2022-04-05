@@ -76,8 +76,8 @@ export const ToolbarContainer = observer<IToolbarContainerProps>(props => {
       case 'delete':
       case 'deleteAll':
         showDeleteActionSheet({
-          title: '删除全部图片、视频',
-          message: '此操作不可撤销',
+          title: t('imageList:deleteActionSheet.all.title'),
+          message: t('imageList:deleteActionSheet.msg.delete'),
           onConfirm: async () => {
             try {
               await mutateAsync({
@@ -96,7 +96,7 @@ export const ToolbarContainer = observer<IToolbarContainerProps>(props => {
       case 'restoreAll':
         services.nav.screens?.show('FolderPicker', {
           title: {
-            text: '恢复到到相册',
+            text: t('recycleBin:restore'),
           },
           async onDone({ id }: { id: string }) {
             await restoreAsync({

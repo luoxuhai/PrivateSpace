@@ -5,6 +5,7 @@ import React, {
   useEffect,
   useCallback,
   useRef,
+  forwardRef,
 } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { observer } from 'mobx-react-lite';
@@ -44,7 +45,7 @@ interface SearchPanelInstance {
 }
 
 export const SearchPanel = observer<SearchPanelProps, SearchPanelInstance>(
-  (props, ref) => {
+  forwardRef((props, ref) => {
     const [visible, setVisible] = useState(false);
     const [value, setValue] = useState<string | undefined>();
     const { ui } = useStore();
@@ -333,10 +334,7 @@ export const SearchPanel = observer<SearchPanelProps, SearchPanelInstance>(
         </Animated.View>
       </Animated.View>
     );
-  },
-  {
-    forwardRef: true,
-  },
+  }),
 );
 
 const styles = StyleSheet.create({

@@ -10,6 +10,7 @@ import { stat } from 'react-native-fs';
 
 import { clearPersistedStores } from '@/store';
 import { services } from '@/services';
+import { DynamicUpdate } from '@/utils/dynamicUpdate';
 import { THUMBNAIL_PATH, SOURCE_PATH, STATIC_PATH, TEMP_PATH } from '@/config';
 
 const dirStats: {
@@ -70,6 +71,12 @@ const DeveloperScreen: NavigationFunctionComponent<
         title="清除 mobx persist"
         onPress={() => {
           clearPersistedStores();
+        }}
+      />
+      <Button
+        title="检测更新"
+        onPress={() => {
+          DynamicUpdate.sync(true);
         }}
       />
       <View>

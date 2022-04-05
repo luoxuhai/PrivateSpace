@@ -1,4 +1,3 @@
-import uiStore from '@/store/ui';
 import chroma from 'chroma-js';
 
 import IconAppIcon from '@/assets/icons/app-icon/privatespace.svg';
@@ -183,7 +182,10 @@ export const colors: Record<'light' | 'dark', SystemColors> = {
   },
 };
 
-function configureThemes(systemColors: SystemColors): {
+function configureThemes(
+  systemColors: SystemColors,
+  primary?: string,
+): {
   [key: string]: Themes;
 } {
   return {
@@ -212,7 +214,7 @@ function configureThemes(systemColors: SystemColors): {
       primary: systemColors.systemGreen,
     },
     [EThemeName.Custom]: {
-      primary: uiStore?.customThemeColor,
+      primary: primary || systemColors.systemBlue,
     },
   };
 }
@@ -220,9 +222,10 @@ function configureThemes(systemColors: SystemColors): {
 export function getThemes(
   systemColors: SystemColors,
   name: EThemeName,
+  primary?: string,
 ): Themes {
   return (
-    configureThemes(systemColors)?.[name] ?? {
+    configureThemes(systemColors, primary)?.[name] ?? {
       primary: systemColors.systemBlue,
     }
   );

@@ -201,7 +201,7 @@ export default observer(AlbumScreen);
 
 interface IAlbumCardProps {
   componentId?: string;
-  data: API.PhotoWithSource;
+  data: API.AlbumWithSource;
   style?: ViewStyle;
   footerStyle?: ViewStyle;
   onPress?: () => void;
