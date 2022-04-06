@@ -4,6 +4,7 @@ import * as Types from './types.d';
 import FileEntity, {
   FileStatus,
   FileType,
+  FileRepository,
 } from '@/services/database/entities/file.entity';
 import PhotoService from '../photo/photo.service';
 import { generateID } from '@/utils';
@@ -20,6 +21,7 @@ class AlbumService {
         owner: stores.user.current?.id,
         ...params,
         type: FileType.Folder,
+        repository: FileRepository.Album,
       },
       order: {
         mtime: 'DESC',

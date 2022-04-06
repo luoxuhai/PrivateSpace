@@ -173,16 +173,18 @@ export function randomNumRange(min, max) {
 export function getSourceByMime(mime?: string | null): SourceType {
   if (!mime) return SourceType.Unknown;
 
-  if (/^image/.test(mime)) {
+  if (mime.startsWith('image/')) {
     return SourceType.Image;
-  } else if (/^audio/.test(mime)) {
+  } else if (mime.startsWith('audio/')) {
     return SourceType.Audio;
-  } else if (/^video/.test(mime)) {
+  } else if (mime.startsWith('video/')) {
     return SourceType.Video;
-  } else if (/^text/.test(mime)) {
+  } else if (mime.startsWith('text/')) {
     return SourceType.Text;
-  } else if (/^application/.test(mime)) {
+  } else if (mime.startsWith('application/')) {
     return SourceType.Application;
+  } else if (mime.startsWith('model/')) {
+    return SourceType.Model;
   } else {
     return SourceType.Unknown;
   }
@@ -198,6 +200,10 @@ export function getSourceNameByType(type: SourceType): string {
       return '音频';
     case SourceType.Video:
       return '视频';
+    case SourceType.Application:
+      return '应用';
+    case SourceType.Model:
+      return '模型';
     default:
       return '其他';
   }

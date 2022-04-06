@@ -3,6 +3,10 @@ export default {
     name: 'Privacy Space',
   },
 
+  faceID: {
+    msg: 'For unlocking',
+  },
+
   thirdPartyApp: {
     browser: 'Safari',
     email: 'Mail',
@@ -62,6 +66,7 @@ export default {
     noData: 'No images or videos',
     save: 'Save to local',
     saving: 'Saving',
+    imported: 'Imported',
     saveStatus: {
       success: 'Saved to album',
       fail: 'Failed to save to album',
@@ -82,6 +87,27 @@ export default {
         delete: 'This action is irreversible',
       },
     },
+  },
+
+  fileManager: {
+    navigation: {
+      title: 'Files',
+    },
+    bottomTab: {},
+    add: {
+      scan: 'Scan documents',
+      doc: 'Import file',
+      folder: 'New folder',
+    },
+    folderForm: {
+      title: 'New folder',
+      msg: 'Please enter a new folder name',
+    },
+    save: 'Save to local',
+    deleteActionSheet: {
+      title: 'These {{count}} files will be deleted',
+    },
+    noData: 'No file',
   },
 
   miniApps: {
@@ -153,6 +179,8 @@ export default {
     },
     tableViewHeader:
       'When the phone screen is facing down, it will jump to the following specified application',
+    uninstall: 'The app is not installed',
+    openFail: 'Unable to open the app',
   },
 
   autoLock: {
@@ -260,6 +288,7 @@ export default {
     disabled: 'Disabled',
     closed: 'Closed',
     opened: 'Opened',
+    rename: 'Rename',
   },
 
   permission: {
@@ -341,6 +370,9 @@ export default {
       },
       more: {
         title: 'More features coming soon...',
+      },
+      scan: {
+        title: 'Scan documents',
       },
     },
     unpayTip: 'Only available after purchase',

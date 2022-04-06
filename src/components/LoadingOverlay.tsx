@@ -147,7 +147,11 @@ LoadingOverlay.show = async (props?: ILoadingOverlayProps) => {
 };
 
 LoadingOverlay.hide = async () => {
-  await services.nav.screens?.N.dismissModal('LoadingOverlay');
-  LoadingOverlay.isOpend = false;
-  return true;
+  try {
+    await services.nav.screens?.N.dismissModal('LoadingOverlay');
+    LoadingOverlay.isOpend = false;
+    return true;
+  } catch {
+    return false;
+  }
 };

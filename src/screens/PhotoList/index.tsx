@@ -34,7 +34,7 @@ import { ContextMenu } from './ContextMenu';
 import { ImageItemLine, ImageItemBlock } from './ImageItem';
 import { useForceRender } from '@/hooks';
 import { DataLoadStatus } from '@/components/DataLoadStatus';
-import GridList, { GridListInstance } from '@/components/GridList';
+import GridList from '@/components/GridList';
 import { FileDetail } from '../PhotoView/FileDetail';
 import { AlbumStore } from '@/store/album';
 

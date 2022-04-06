@@ -56,16 +56,20 @@ function UrgentSettingScreen(): JSX.Element {
       defaultValue: global.settingInfo.urgentSwitchUrl,
       async onChange(value) {
         if (value !== null) {
-          const res = await Linking.canOpenURL(value);
-          if (!res) {
-            Alert.alert('未安装该应用');
-            return;
+          try {
+            const res = await Linking.canOpenURL(value);
+            if (!res) {
+              Alert.alert(t('urgent:uninstall'));
+              return;
+            }
+
+            global.setSettingInfo({
+              urgentSwitchUrl: value as EAppOpenUrl,
+            });
+          } catch (error) {
+            Alert.alert(t('urgent:openFail'));
           }
         }
-
-        global.setSettingInfo({
-          urgentSwitchUrl: value,
-        });
       },
     },
   ];

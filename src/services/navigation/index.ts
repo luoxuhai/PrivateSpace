@@ -31,7 +31,8 @@ export default class Nav {
       Root(
         BottomTabs([
           Stack(Component(this.screens.get('Album'))),
-          Stack(Component(this.screens.get('miniApps'))),
+          Stack(Component(this.screens.get('FileManager'))),
+          Stack(Component(this.screens.get('MiniApps'))),
           Stack(Component(this.screens.get('Settings'))),
         ]),
       ),

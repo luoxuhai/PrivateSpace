@@ -120,7 +120,7 @@ function AddButton(props: IAddButtonProps): JSX.Element {
             props.onDone?.();
             HapticFeedback.impactAsync.medium();
             RNToasty.Show({
-              title: '已导入',
+              title: t('imageList:imported'),
               position: 'top',
             });
           })
@@ -129,13 +129,18 @@ function AddButton(props: IAddButtonProps): JSX.Element {
     }
 
     if (result?.length) {
-      LoadingOverlay.show();
-      const time = Date.now();
-      await createFiles(
-        await Promise.all(
-          result.map(res => transformResult(res, props.albumId)),
-        ),
-      );
+      const timer = setTimeout(() => {
+        LoadingOverlay.show();
+      }, 1000);
+      try {
+        await createFiles(
+          await Promise.all(
+            result.map(res => transformResult(res, props.albumId)),
+          ),
+        );
+      } catch {}
+
+      clearTimeout(timer);
       LoadingOverlay.hide();
       props.onDone?.();
       classifyImageProcess.start();

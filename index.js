@@ -8,7 +8,6 @@ import { start } from './src/app';
 import analytics from '@/utils/analytics/firebase';
 
 Navigation.events().registerAppLaunchedListener(start);
-
 Navigation.events().registerComponentDidAppearListener(
   ({ componentName, componentType }) => {
     if (componentType === 'Component' && analytics?.logScreenView) {
