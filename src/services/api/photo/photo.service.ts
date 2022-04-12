@@ -6,6 +6,7 @@ import { getMimeType } from '@qeepsake/react-native-file-utils';
 import { SOURCE_PATH, THUMBNAIL_PATH } from '@/config';
 import * as Types from './types.d';
 import FileEntity, {
+  FileRepository,
   FileStatus,
   FileType,
   SourceType,
@@ -32,8 +33,8 @@ class PhotoService {
         owner: stores.user.current?.id,
         status: FileStatus.Normal,
         ...params,
-        // TODO: 后续可能出现更多类型
         type: FileType.File,
+        repository: FileRepository.Album,
       },
       order,
     })) as API.PhotoWithSource[];
@@ -127,6 +128,7 @@ class PhotoService {
         ...metadata,
       },
       metadata,
+      repository: params.repository ?? FileRepository.Album,
     });
 
     return {

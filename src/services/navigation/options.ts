@@ -6,7 +6,9 @@ import BlurMask from '@/components/BlurMask';
 import { LoadingOverlay } from '@/components/LoadingOverlay';
 import { CameraPage } from '@/screens/Camera';
 import { MoreButton } from '@/screens/PhotoList/MoreButton';
+import FileManagerMoreButton from '@/screens/FileManager/MoreButton';
 import { ImageViewTitle } from '@/screens/PhotoView/ImageViewTitle';
+import TopBarButtonVip from '@/components/TopBarButtonVip';
 
 export function getDefaultOptions(): Options {
   return {
@@ -69,11 +71,19 @@ export const components = [
     componentProvider: () => withQueryClientProvider(MoreButton),
   },
   {
+    id: 'FileManagerMoreButton',
+    componentProvider: () => withQueryClientProvider(FileManagerMoreButton),
+  },
+  {
     id: 'LoadingOverlay',
     componentProvider: () => LoadingOverlay,
   },
   {
     id: 'ImageViewTitle',
     componentProvider: () => ImageViewTitle,
+  },
+  {
+    id: 'TopBarButtonVip',
+    componentProvider: () => TopBarButtonVip,
   },
 ];

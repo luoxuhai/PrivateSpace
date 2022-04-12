@@ -6,7 +6,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-interface ImageProgressWrapperProps extends ImageProps {
+export interface ImageProgressWrapperProps extends ImageProps {
   renderIndicator: (
     progress: number,
     indeterminate: boolean,

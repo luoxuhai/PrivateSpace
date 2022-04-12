@@ -2,6 +2,7 @@ import { getRepository } from 'typeorm/browser';
 
 import * as Types from './types';
 import FileEntity, {
+  FileRepository,
   FileStatus,
   FileType,
 } from '@/services/database/entities/file.entity';
@@ -38,7 +39,7 @@ class GlobalService {
       sqlStr += ` AND type = ${type}`;
     }
 
-    sqlStr += ` AND status = ${FileStatus.Normal} AND owner = "${stores.user.current?.id}"`;
+    sqlStr += ` AND status = ${FileStatus.Normal} AND owner = "${stores.user.current?.id}" AND repository = "${FileRepository.Album}"`;
 
     const files = (await getRepository<FileEntity>(FileEntity).query(
       `SELECT * FROM file WHERE ${sqlStr} ORDER BY type DESC`,

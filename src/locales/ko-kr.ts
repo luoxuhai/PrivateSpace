@@ -3,6 +3,10 @@ export default {
     name: '사적인 공간',
   },
 
+  faceID: {
+    msg: '잠금 해제를 위해',
+  },
+
   thirdPartyApp: {
     browser: '브라우저',
     email: '이메일',
@@ -62,6 +66,7 @@ export default {
     noData: '사진이나 동영상이 없습니다.',
     save: '앨범에 저장',
     saving: '절약',
+    imported: '가져오기',
     saveStatus: {
       success: '앨범에 저장됨',
       fail: '앨범에 저장하지 못했습니다.',
@@ -82,6 +87,27 @@ export default {
         delete: '이 작업은 되돌릴 수 없습니다.',
       },
     },
+  },
+
+  fileManager: {
+    navigation: {
+      title: '문서',
+    },
+    bottomTab: {},
+    add: {
+      scan: '문서 스캔',
+      doc: '파일 가져오기',
+      folder: '새 폴더',
+    },
+    folderForm: {
+      title: '새 폴더',
+      msg: '새 폴더 이름을 입력하세요',
+    },
+    save: '로컬에 저장',
+    deleteActionSheet: {
+      title: '이 {{count}}개의 파일이 삭제됩니다',
+    },
+    noData: '파일 없음',
   },
 
   miniApps: {
@@ -151,6 +177,8 @@ export default {
     },
     tableViewHeader:
       '전화 화면이 아래로 향하면 다음 지정된 응용 프로그램으로 이동합니다.',
+    uninstall: '앱이 설치되지 않았습니다',
+    openFail: '앱을 열 수 없습니다',
   },
 
   autoLock: {
@@ -253,6 +281,7 @@ export default {
     disabled: '비활성화됨',
     closed: '닫힌',
     opens: '열림',
+    rename: '이름 바꾸기',
   },
 
   permission: {
@@ -334,6 +363,9 @@ export default {
       },
       more: {
         title: '더 많은 기능이 곧 제공될 예정입니다...',
+      },
+      scan: {
+        title: '스캔한 문서',
       },
     },
     unpayTip: '구매 후 사용 가능',

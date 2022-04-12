@@ -31,6 +31,7 @@ import VideoPlayerScreen from './PhotoView/VideoPlayer';
 import PurchaseScreen from './Purchase';
 import DeveloperScreen from './About/Developer';
 import DescriptionFormScreen from './PhotoView/DescriptionForm';
+import FileManagerScreen from './FileManager';
 
 const t = getI18n().t;
 
@@ -38,7 +39,7 @@ export type ScreenName =
   | 'Album'
   | 'Transfer'
   | 'Settings'
-  | 'miniApps'
+  | 'MiniApps'
   | 'ImageList'
   | 'AlbumSetting'
   | 'FeedBack'
@@ -60,7 +61,8 @@ export type ScreenName =
   | 'Purchase'
   | 'Developer'
   | 'DescriptionForm'
-  | 'PasscodeLock';
+  | 'PasscodeLock'
+  | 'FileManager';
 
 export const getScreens = (): Screens<ScreenName> =>
   generateRNNScreens<ScreenName>(
@@ -78,6 +80,15 @@ export const getScreens = (): Screens<ScreenName> =>
                 id: 'add',
                 icon: require('@/assets/icons/navigation/plus.circle.fill.png'),
                 text: t('album:add:title'),
+              },
+            ],
+            leftButtons: [
+              {
+                id: 'vip',
+                text: 'VIP',
+                component: {
+                  name: 'TopBarButtonVip',
+                },
               },
             ],
             searchBar: {
@@ -117,7 +128,35 @@ export const getScreens = (): Screens<ScreenName> =>
           },
         },
       },
-      miniApps: {
+
+      FileManager: {
+        component: FileManagerScreen,
+        options: {
+          topBar: {
+            title: {
+              text: t('fileManager:navigation.title'),
+            },
+            ...withLargeTitle,
+            // leftButtons: [
+            //   {
+            //     id: 'vip',
+            //     text: 'VIP',
+            //     component: {
+            //       name: 'TopBarButtonVip',
+            //     },
+            //   },
+            // ],
+          },
+          bottomTab: {
+            text: t('fileManager:navigation.title'),
+            icon: {
+              system: 'folder.fill',
+            },
+          },
+        },
+      },
+
+      MiniApps: {
         component: MiniAppsScreen,
         options: {
           topBar: {

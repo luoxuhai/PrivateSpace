@@ -3,6 +3,10 @@ export default {
     name: '隱私空間',
   },
 
+  faceID: {
+    msg: '用於解鎖',
+  },
+
   thirdPartyApp: {
     browser: '瀏覽器',
     email: '郵箱',
@@ -62,6 +66,7 @@ export default {
     noData: '無圖片或視頻',
     save: '保存到相冊',
     saving: '保存中',
+    imported: '已導入',
     saveStatus: {
       success: '已保存到相冊',
       fail: '保存到相冊失敗',
@@ -82,6 +87,27 @@ export default {
         delete: '此操作不可撤銷',
       },
     },
+  },
+
+  fileManager: {
+    navigation: {
+      title: '文件',
+    },
+    bottomTab: {},
+    add: {
+      scan: '掃描文檔',
+      doc: '導入文件',
+      folder: '新建文件夾',
+    },
+    folderForm: {
+      title: '新建文件夾',
+      msg: '請輸入新文件夾名',
+    },
+    save: '保存到本地',
+    deleteActionSheet: {
+      title: '這{{count}}個文件將被刪除',
+    },
+    noData: '無文件',
   },
 
   miniApps: {
@@ -150,6 +176,8 @@ export default {
       title: '緊急切換',
     },
     tableViewHeader: '當手機屏幕朝下時會跳轉到以下指定應用',
+    uninstall: '未安裝該應用',
+    openFail: '無法打開該應用',
   },
 
   autoLock: {
@@ -250,6 +278,7 @@ export default {
     disabled: '已禁用',
     closed: '已關閉',
     opened: '已打開',
+    rename: '重命名',
   },
 
   permission: {
@@ -329,6 +358,9 @@ export default {
       },
       more: {
         title: '更多功能即將推出...',
+      },
+      scan: {
+        title: '掃描文檔',
       },
     },
     unpayTip: '購買後可使用',

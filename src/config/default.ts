@@ -52,4 +52,5 @@ export default {
     dsn: 'https://d04bc938d0934611b16c70c75a8f20d5@o264285.ingest.sentry.io/6139676',
     tracesSampleRate: 0.5,
   },
+  baseURL: 'https://ps.fastools.cn',
 };

@@ -16,6 +16,7 @@ import { HapticFeedback, getDefaultAlbum } from '@/utils';
 import { FileImporter } from '@/screens/PhotoList/FileImporter';
 import { transformResult } from '@/screens/PhotoList/AddButton';
 import { AppLaunchType } from '@/config';
+import { t } from 'i18next';
 
 const fileImporter = new FileImporter();
 
@@ -140,7 +141,7 @@ export class QuickAction {
             });
             HapticFeedback.impactAsync.medium();
             RNToasty.Show({
-              title: '已导入',
+              title: t('imageList:imported'),
               position: 'top',
             });
             stores.album.setRefetchAlbum(stores.album.refetchAlbum + 1);

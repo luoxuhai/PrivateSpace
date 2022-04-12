@@ -17,6 +17,7 @@ export const enum SourceType {
   Audio,
   Video,
   Application,
+  Model,
 }
 
 export const enum FileType {
@@ -33,6 +34,14 @@ export const enum FileStatus {
   Deleted = 2,
 }
 
+/** 存储位置 */
+export const enum FileRepository {
+  /** 相册 */
+  Album = 1,
+  /** 文件管理 */
+  File = 2,
+}
+
 @Entity('file')
 export default class File extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
@@ -40,7 +49,7 @@ export default class File extends BaseEntity {
 
   @Index()
   @Column('varchar', { nullable: true })
-  parent_id?: string;
+  parent_id?: string | null;
 
   @Column('varchar')
   owner!: string;
@@ -63,6 +72,12 @@ export default class File extends BaseEntity {
     nullable: true,
   })
   status?: FileStatus;
+
+  @Column('int', {
+    default: FileRepository.Album,
+    nullable: true,
+  })
+  repository?: FileRepository;
 
   @Column('int', { default: 0 })
   size?: number;

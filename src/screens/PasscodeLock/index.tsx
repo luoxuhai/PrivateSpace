@@ -15,6 +15,8 @@ import {
   useDeviceOrientation,
   useAppState,
 } from '@react-native-community/hooks';
+import Animated, { FadeIn } from 'react-native-reanimated';
+import LottieView from 'lottie-react-native';
 
 import { useStore, stores } from '@/store';
 import { EUserType } from '@/services/database/entities/user.entity';
@@ -85,8 +87,6 @@ function getTitle(type: EInputType, userType: EUserType, stage: EInputStage) {
   switch (stage) {
     case EInputStage.Confirm:
       return t('passcodeLock:confirm', { type: fakePassText });
-    case EInputStage.Done:
-      return type === EInputType.Verify ? '通过' : '成功';
   }
 
   switch (type) {
@@ -199,7 +199,7 @@ const PasscodeLockOverlay: PasscodeLockOverlayComponent<IPasscodeLockProps> = (
     }
 
     const result = await LocalAuthentication.authenticateAsync({
-      promptMessage: t('navigator:privateSpace'),
+      promptMessage: t('faceID:msg'),
     });
 
     const user = await services.api.user.get({
@@ -236,7 +236,7 @@ const PasscodeLockOverlay: PasscodeLockOverlayComponent<IPasscodeLockProps> = (
       <TouchableOpacity
         onPress={() => {
           handleLocalAuth();
-          HapticFeedback.impactAsync.medium();
+          HapticFeedback.impactAsync.light();
         }}>
         {authIcon}
       </TouchableOpacity>
@@ -340,7 +340,7 @@ const PasscodeLockOverlay: PasscodeLockOverlayComponent<IPasscodeLockProps> = (
       : true);
 
   return (
-    <View style={[styles.container]}>
+    <Animated.View style={[styles.container]} entering={FadeIn.duration(150)}>
       <PasscodeKeyboard
         style={[
           orientation.landscape && {
@@ -370,7 +370,7 @@ const PasscodeLockOverlay: PasscodeLockOverlayComponent<IPasscodeLockProps> = (
         }
         extraButton={extraButtonEnabled && <LocalAuthIconButton />}
       />
-    </View>
+    </Animated.View>
   );
 };
 

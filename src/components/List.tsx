@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   listItem: {
-    minHeight: 44,
+    minHeight: 45,
     paddingLeft: 15,
     flexDirection: 'row',
     alignItems: 'center',
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingRight: 15,
-    paddingVertical: 10,
+    paddingVertical: 6,
   },
   icon: {
     marginRight: 14,

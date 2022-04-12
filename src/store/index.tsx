@@ -9,12 +9,14 @@ import uiStore from './ui';
 import userStore from './user';
 import globalStore from './global';
 import albumStore from './album';
+import fileStore from './file';
 
 export const stores = {
   ui: uiStore,
   user: userStore,
   global: globalStore,
   album: albumStore,
+  file: fileStore,
 };
 
 export const storeContext = React.createContext(stores);

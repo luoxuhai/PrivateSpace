@@ -3,6 +3,10 @@ export default {
     name: '隐私空间',
   },
 
+  faceID: {
+    msg: '用于解锁',
+  },
+
   thirdPartyApp: {
     browser: '浏览器',
     email: '邮箱',
@@ -62,6 +66,7 @@ export default {
     noData: '无图片或视频',
     save: '保存到相册',
     saving: '保存中',
+    imported: '已导入',
     saveStatus: {
       success: '已保存到相册',
       fail: '保存到相册失败',
@@ -82,6 +87,27 @@ export default {
         delete: '此操作不可撤销',
       },
     },
+  },
+
+  fileManager: {
+    navigation: {
+      title: '文件',
+    },
+    bottomTab: {},
+    add: {
+      scan: '扫描文档',
+      doc: '导入文件',
+      folder: '新建文件夹',
+    },
+    folderForm: {
+      title: '新建文件夹',
+      msg: '请输入新文件夹名',
+    },
+    save: '保存到本地',
+    deleteActionSheet: {
+      title: '这{{count}}个文件将被删除',
+    },
+    noData: '无文件',
   },
 
   miniApps: {
@@ -150,6 +176,8 @@ export default {
       title: '紧急切换',
     },
     tableViewHeader: '当手机屏幕朝下时会跳转到以下指定应用',
+    uninstall: '未安装该应用',
+    openFail: '无法打开该应用',
   },
 
   autoLock: {
@@ -250,6 +278,7 @@ export default {
     disabled: '已禁用',
     closed: '已关闭',
     opened: '已打开',
+    rename: '重命名',
   },
 
   permission: {
@@ -329,6 +358,9 @@ export default {
       },
       more: {
         title: '更多功能即将推出...',
+      },
+      scan: {
+        title: '扫描文档',
       },
     },
     unpayTip: '购买后可使用',

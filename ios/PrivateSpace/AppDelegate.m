@@ -36,16 +36,16 @@ static void InitializeFlipper(UIApplication *application) {
   InitializeFlipper(application);
 #endif
   
+#if !DEBUG
+  // Firebase https://rnfirebase.io/#3-ios-setup
+  [FIRApp configure];
+#endif
+  
   RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
 [ReactNativeNavigation bootstrapWithBridge:bridge];
   [super application:application didFinishLaunchingWithOptions:launchOptions];
 
   [OverrideColorScheme enableAlertSupport];
-
-#if !DEBUG
-  // Firebase https://rnfirebase.io/#3-ios-setup
-  [FIRApp configure];
-#endif
 
   return YES;
 }

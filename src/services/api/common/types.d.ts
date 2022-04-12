@@ -29,6 +29,14 @@ declare global {
       poster?: string;
     };
 
+    type FileType = FileEntity;
+
+    type FileWithSource = FileEntity & {
+      uri?: string;
+      thumbnail?: string;
+      poster?: string;
+    };
+
     type UserType = UserEntity;
 
     type DeleteResult = void;

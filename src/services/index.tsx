@@ -43,14 +43,14 @@ export const initServices = async (): PVoid => {
   }
 };
 
-export const initDataDirectory = async (): PVoid => {
+export const initDataDirectory = () => {
   const options = {
     NSURLIsExcludedFromBackupKey: true,
   };
-  await FS.mkdir(SOURCE_PATH, options);
-  await FS.mkdir(THUMBNAIL_PATH, options);
-  await FS.mkdir(TEMP_PATH, options);
-  await FS.mkdir(STATIC_PATH, options);
+  FS.mkdir(SOURCE_PATH, options);
+  FS.mkdir(THUMBNAIL_PATH, options);
+  FS.mkdir(TEMP_PATH, options);
+  FS.mkdir(STATIC_PATH, options);
 };
 
 export const initAlbums = async (): PVoid => {

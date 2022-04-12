@@ -98,10 +98,18 @@ export const AddAlbumDialog = observer<
     return (
       <Modal
         backdropOpacity={0.4}
-        supportedOrientations={['portrait', 'landscape']}
+        supportedOrientations={[
+          'portrait',
+          'landscape',
+          'portrait-upside-down',
+          'landscape-left',
+          'landscape-right',
+        ]}
         isVisible={visible}
         avoidKeyboard
         style={styles.modal}
+        hideModalContentWhileAnimating
+        useNativeDriver
         onModalWillHide={() => {
           setTimeout(() => {
             textInputRef.current?.blur?.();

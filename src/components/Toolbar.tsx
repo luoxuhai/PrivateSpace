@@ -16,6 +16,7 @@ import { useStore } from '@/store';
 import { useUIFrame } from '@/hooks';
 import { VibrancyView } from '@react-native-community/blur';
 import { systemInfo } from '@/utils';
+import { BOTTOM_TABS_HEIGHT } from '@/config';
 
 interface IToolbarItem {
   title: string;
@@ -67,7 +68,7 @@ export const Toolbar = observer<IToolbarProps>(
           rest.style,
           {
             borderColor: ui.colors.separator,
-            minHeight: UIFrame.bottomTabsHeight,
+            minHeight: UIFrame.bottomTabsHeight || BOTTOM_TABS_HEIGHT,
           },
           displayStyle,
           borderStyle,

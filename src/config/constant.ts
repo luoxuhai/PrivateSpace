@@ -34,3 +34,5 @@ export const enum AppLaunchType {
   Unknown = 0,
   QuickAction = 1,
 }
+
+export const BOTTOM_TABS_HEIGHT = 84;

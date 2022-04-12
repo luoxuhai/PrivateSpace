@@ -21,13 +21,14 @@ import { InAppBrowser } from 'react-native-inappbrowser-reborn';
 import chroma from 'chroma-js';
 import * as InAppPurchases from 'expo-in-app-purchases';
 import { Placeholder, PlaceholderLine, Fade } from 'rn-placeholder';
+import { SFSymbol } from 'react-native-sfsymbols';
 
 import { CustomSentry } from '@/utils/customSentry';
 import { stores, useStore } from '@/store';
 import { UIStore } from '@/store/ui';
 import { services } from '@/services';
 import { ScreenName } from '@/screens';
-import config from '@/config';
+import config, { BOTTOM_TABS_HEIGHT } from '@/config';
 import { HapticFeedback } from '@/utils';
 import { SafeAreaScrollView } from '@/components';
 import { Toolbar } from '@/components/Toolbar';
@@ -440,11 +441,18 @@ const Rights = ({ componentId }: { componentId: string }) => {
         title: t('purchase:rights.wifi.title'),
         screenId: 'Transfer',
       },
-      // {
-      //   image: IconiCloud,
-      //   title: 'iCloud备份',
-      //   screenId: 'ICloud',
-      // },
+      {
+        symbol: (
+          <SFSymbol
+            name="doc.viewfinder"
+            color={ICON_COLOR}
+            weight="medium"
+            size={25}
+          />
+        ),
+        title: t('purchase:rights.scan.title'),
+        screenId: 'FileManager',
+      },
       {
         image: IconSearch,
         title: t('purchase:rights.search.title'),
@@ -493,14 +501,16 @@ const Rights = ({ componentId }: { componentId: string }) => {
           ]}
           onPress={() => handlePress(item.screenId)}>
           <View style={styles.rightsIcon}>
-            {
+            {item.image ? (
               <item.image
                 width={25}
                 height={25}
                 fill={ICON_COLOR}
                 style={styles.rightsItemImg}
               />
-            }
+            ) : (
+              item.symbol
+            )}
           </View>
           <Text numberOfLines={2} style={styles.rightsItemTitle}>
             {item.title}
@@ -541,7 +551,7 @@ const PayButton = ({
   const { ui } = useStore();
   const { width } = useWindowDimensions();
   const bottomTabsHeight =
-    services.nav.screens?.getConstants().bottomTabsHeight ?? 44;
+    services.nav.screens?.getConstants().bottomTabsHeight || BOTTOM_TABS_HEIGHT;
 
   return (
     <CustomButton
@@ -678,6 +688,7 @@ function setPurchaseListener() {
             });
             try {
               await LoadingOverlay.hide();
+              services.api.purchase.pay();
             } catch {}
             handleDismiss();
           }

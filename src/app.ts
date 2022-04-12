@@ -11,8 +11,6 @@ import blurhashImageProcess from '@/utils/process/blurhashImageProcess';
 import { DynamicUpdate } from '@/utils/dynamicUpdate';
 
 export const start = async (): PVoid => {
-  const { nav } = services;
-
   // 创建数据存放目录
   initDataDirectory();
 
@@ -22,13 +20,13 @@ export const start = async (): PVoid => {
   await initServices();
 
   // start app
-  await nav.start();
+  await services.nav.start();
 
   setTimeout(() => {
     clearRecycleBin();
     classifyImageProcess.start();
-    blurhashImageProcess.start();
     thumbnailProcess.start();
+    // blurhashImageProcess.start();
   }, 1000 * 5);
 
   DynamicUpdate.sync();

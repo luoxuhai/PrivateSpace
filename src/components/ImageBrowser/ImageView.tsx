@@ -18,7 +18,6 @@ import {
 
 import BlurhashView from '@/components/BlurhashView';
 import FastImageProgress from '@/components/FastImageProgress';
-import QuickLookView from '@/components/QuickLookView';
 import { useUpdateEffect } from '@/hooks';
 import { useDoubleTapToZoom, useMaxScale } from './hooks';
 import {
@@ -139,11 +138,7 @@ function ImageView(props: ImageViewProps): JSX.Element {
 
   return (
     <View style={styles.container}>
-      <QuickLookView
-        style={[styles.scrollView]}
-        url={props.source.poster || props.source.uri || props.source.thumbnail}
-      />
-      {/* <ScrollView
+      <ScrollView
         style={styles.scrollView}
         ref={scrollViewRef}
         contentContainerStyle={styles.contentContainerStyle}
@@ -197,7 +192,7 @@ function ImageView(props: ImageViewProps): JSX.Element {
             renderError={renderError}
           />
         </Pressable>
-      </ScrollView> */}
+      </ScrollView>
       {props.renderExtraElements?.(loadStatus)}
     </View>
   );
