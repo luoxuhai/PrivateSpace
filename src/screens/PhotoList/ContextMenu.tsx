@@ -100,7 +100,7 @@ export const ContextMenu = observer<IContextMenuProps>(props => {
         case 'move':
           services.nav.screens?.show('FolderPicker', {
             title: {
-              text: t('imageList:move'),
+              text: t('common:move'),
             },
             excludedFolder: [props.albumId],
             async onDone({ id }: { id: string }) {

@@ -5,14 +5,22 @@ import { useQuery } from 'react-query';
 import { useTranslation } from 'react-i18next';
 import { ContextMenuView, MenuConfig } from 'react-native-ios-context-menu';
 import * as FS from 'react-native-fs';
-import { RNToasty } from 'react-native-toasty';
+import RNShare from 'react-native-share';
 
-import { showDeleteActionSheet, extname, getSourcePath } from '@/utils';
-import { useDeleteFile, useUpdateFile } from '@/hooks';
-import { useStore } from '@/store';
-import { services } from '@/services';
 import { LoadingOverlay } from '@/components/LoadingOverlay';
-import { FileType } from '@/services/database/entities/file.entity';
+import {
+  showDeleteActionSheet,
+  extname,
+  getSourcePath,
+  getSourceByMime,
+} from '@/utils';
+import { useDeleteFile, useUpdateFile, useCopyFile } from '@/hooks';
+import { services } from '@/services';
+import {
+  FileRepository,
+  FileType,
+  SourceType,
+} from '@/services/database/entities/file.entity';
 
 interface IContextMenuProps {
   item: API.FileWithSource;
@@ -21,10 +29,21 @@ interface IContextMenuProps {
   onViewDetail?: (item: API.FileWithSource) => void;
 }
 
+enum ContextMenuKeys {
+  Info = 'info',
+  Share = 'share',
+  Rename = 'rename',
+  Copy = 'copy',
+  Move = 'move',
+  MoveToAlbum = 'move-to-album',
+  SaveToLocal = 'save-to-local',
+  Delete = 'delete',
+}
+
 export const ContextMenu = observer<IContextMenuProps>(props => {
   const { t } = useTranslation();
-  const { global } = useStore();
   const { mutateAsync: updateFile } = useUpdateFile();
+  const { mutateAsync: copyFile } = useCopyFile();
   const folderId = useMemo(() => props.item.parent_id, [props.item]);
 
   const { refetch: refetchFileList } = useQuery(
@@ -35,99 +54,178 @@ export const ContextMenu = observer<IContextMenuProps>(props => {
   );
 
   const { mutateAsync } = useDeleteFile();
+  const isFolder = props.item.type === FileType.Folder;
 
   const menuConfig: MenuConfig = useMemo(
     () => ({
       menuTitle: '',
       menuItems: [
         {
-          actionKey: 'info',
-          actionTitle: t('imageList:showInfo'),
-          icon: {
-            iconType: 'SYSTEM',
-            iconValue: 'info.circle',
-          },
+          menuTitle: '',
+          menuOptions: ['displayInline'],
+          menuItems: [
+            {
+              actionKey: ContextMenuKeys.Info,
+              actionTitle: t('imageList:showInfo'),
+              icon: {
+                iconType: 'SYSTEM',
+                iconValue: 'info.circle',
+              },
+            },
+            {
+              actionKey: ContextMenuKeys.Rename,
+              actionTitle: t('common:rename'),
+              icon: {
+                iconType: 'SYSTEM',
+                iconValue: 'pencil',
+              },
+            },
+          ],
         },
         {
-          actionKey: 'share',
-          actionTitle: t('common:share'),
-          icon: {
-            iconType: 'SYSTEM',
-            iconValue: 'square.and.arrow.up',
-          },
+          menuTitle: '',
+          menuOptions: ['displayInline'],
+          menuItems: [
+            !isFolder && {
+              actionKey: ContextMenuKeys.Share,
+              actionTitle: t('common:share'),
+              icon: {
+                iconType: 'SYSTEM',
+                iconValue: 'square.and.arrow.up',
+              },
+            },
+            {
+              actionKey: 'move',
+              actionTitle: t('common:move'),
+              icon: {
+                iconType: 'SYSTEM',
+                iconValue: 'folder',
+              },
+            },
+            !isFolder && {
+              actionKey: 'copy',
+              actionTitle: t('common:copy'),
+              icon: {
+                iconType: 'SYSTEM',
+                iconValue: 'doc.on.doc',
+              },
+            },
+            [SourceType.Image, SourceType.Video].includes(
+              getSourceByMime(props.item.mime),
+            ) && {
+              actionKey: ContextMenuKeys.MoveToAlbum,
+              actionTitle: t('imageList:moveToAlbum'),
+              icon: {
+                iconType: 'SYSTEM',
+                iconValue: 'photo.on.rectangle',
+              },
+            },
+            !isFolder && {
+              actionKey: ContextMenuKeys.SaveToLocal,
+              actionTitle: t('fileManager:save'),
+              icon: {
+                iconType: 'SYSTEM',
+                iconValue: 'square.and.arrow.down',
+              },
+            },
+          ].filter(item => item),
         },
         {
-          actionKey: 'rename',
-          actionTitle: t('common:rename'),
-          icon: {
-            iconType: 'SYSTEM',
-            iconValue: 'pencil',
-          },
+          menuTitle: '',
+          menuOptions: ['displayInline'],
+          menuItems: [
+            {
+              actionKey: ContextMenuKeys.Delete,
+              actionTitle: t('common:delete'),
+              icon: {
+                iconType: 'SYSTEM',
+                iconValue: 'trash',
+              },
+              menuAttributes: ['destructive'],
+            },
+          ],
         },
-        // {
-        //   actionKey: 'move',
-        //   actionTitle: t('common:move'),
-        //   icon: {
-        //     iconType: 'SYSTEM',
-        //     iconValue: 'folder',
-        //   },
-        // },
-        {
-          actionKey: 'export',
-          actionTitle: t('fileManager:save'),
-          icon: {
-            iconType: 'SYSTEM',
-            iconValue: 'square.and.arrow.down',
-          },
-        },
-        {
-          actionKey: 'delete',
-          actionTitle: t('common:delete'),
-          icon: {
-            iconType: 'SYSTEM',
-            iconValue: 'trash',
-          },
-          menuAttributes: ['destructive'],
-        },
-      ],
+      ].filter(item => item),
     }),
-    [t],
+    [t, props.item.mime, isFolder],
   );
 
   const handleMenuItemPress = useCallback(
     async ({ nativeEvent }) => {
       switch (nativeEvent.actionKey) {
-        case 'info':
+        case ContextMenuKeys.Info:
           props.onViewDetail?.(props.item);
           break;
-        case 'export':
-        case 'share':
+        case ContextMenuKeys.Share:
           Share.share({
             url: props.item.uri,
           });
           break;
-        // case 'move':
-        //   services.nav.screens?.show('FolderPicker', {
-        //     title: {
-        //       text: t('imageList:move'),
-        //     },
-        //     excludedFolder: [folderId],
-        //     async onDone({ id }: { id: string }) {
-        //       await updateFile({
-        //         where: {
-        //           id: props.item.id,
-        //         },
-        //         data: {
-        //           parent_id: id,
-        //         },
-        //       });
-        //       refetchFileList();
-        //       services.nav.screens?.dismissModal('FolderPicker');
-        //       refetchAlbumList();
-        //     },
-        //   });
-        //   break;
-        case 'delete':
+        case 'move':
+          services.nav.screens?.show('FileDirPiker', {
+            excludedFolders: [props.item.id],
+            async onDone(id: string) {
+              try {
+                await updateFile({
+                  where: {
+                    id: props.item.id,
+                  },
+                  data: {
+                    parent_id: id,
+                  },
+                });
+              } catch (error) {}
+
+              refetchFileList();
+              services.nav.screens?.dismissModal('FileDirPiker');
+            },
+          });
+          break;
+        case 'copy':
+          services.nav.screens?.show('FileDirPiker', {
+            excludedFolders: [props.item.id],
+            type: 'copy',
+            async onDone(id: string) {
+              LoadingOverlay.show();
+              await copyFile({
+                originId: props.item.id as string,
+                parent_id: id,
+              });
+              refetchFileList();
+              try {
+                await LoadingOverlay.hide();
+              } catch {}
+              services.nav.screens?.dismissModal('FileDirPiker');
+            },
+          });
+          break;
+        case ContextMenuKeys.MoveToAlbum:
+          services.nav.screens?.show('FolderPicker', {
+            title: {
+              text: t('common:move'),
+            },
+            async onDone({ id }: { id: string }) {
+              await updateFile({
+                where: {
+                  id: props.item.id,
+                },
+                data: {
+                  parent_id: id,
+                  repository: FileRepository.Album,
+                },
+              });
+              refetchFileList();
+              services.nav.screens?.dismissModal('FolderPicker');
+            },
+          });
+          break;
+        case ContextMenuKeys.SaveToLocal:
+          RNShare.open({
+            url: props.item.uri,
+            saveToFiles: true,
+          });
+          break;
+        case ContextMenuKeys.Delete:
           showDeleteActionSheet({
             title: t('fileManager:deleteActionSheet.title', {
               count: '',
@@ -142,7 +240,7 @@ export const ContextMenu = observer<IContextMenuProps>(props => {
             },
           });
           break;
-        case 'rename':
+        case ContextMenuKeys.Rename:
           Alert.prompt(
             t('common:rename'),
             undefined,

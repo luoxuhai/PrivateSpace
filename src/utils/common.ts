@@ -18,6 +18,7 @@ import {
 import dayjs from 'dayjs';
 import durationPlugin from 'dayjs/plugin/duration';
 import numeral from 'numeral';
+import { t } from 'i18next';
 
 import { SourceType } from '@/services/database/entities/file.entity';
 import config from '@/config';
@@ -47,26 +48,28 @@ export async function appUpdateCheck(): PVoid {
       compareVersion(latestVersion, localVersion ?? '') === 1 &&
       latestVersion !== appUpdateIgnore?.version
     ) {
-      Alert.alert(`发现新版本(V${latestVersion})`, releaseNotes, [
-        {
-          text: '更新',
-          style: 'default',
-          onPress: () => {
-            Linking.openURL(
-              `itms-apps://itunes.apple.com/app/id${config.appId}`,
-            );
+      Alert.alert(
+        t('appUpdate:alert.title', { version: latestVersion }),
+        releaseNotes,
+        [
+          {
+            text: t('appUpdate:alert.ok'),
+            style: 'default',
+            onPress: () => {
+              Linking.openURL(config.APP_URL.urlSchema);
+            },
           },
-        },
-        {
-          text: '不更新',
-          style: 'cancel',
-          onPress: () => {
-            stores.global.setAppUpdateIgnore({
-              version: latestVersion,
-            });
+          {
+            text: t('appUpdate:alert.cancel'),
+            style: 'cancel',
+            onPress: () => {
+              stores.global.setAppUpdateIgnore({
+                version: latestVersion,
+              });
+            },
           },
-        },
-      ]);
+        ],
+      );
     }
   } catch (error) {
     console.error(error);

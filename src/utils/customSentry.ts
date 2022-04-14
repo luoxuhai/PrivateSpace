@@ -1,28 +1,27 @@
 import * as Sentry from '@sentry/react-native';
-import { Navigation } from 'react-native-navigation';
 import { DeviceMotion } from 'expo-sensors';
 import { CaptureContext } from '@sentry/types';
 import CodePush from 'react-native-code-push';
 
-import { systemInfo } from '@/utils/system';
+import { systemInfo, applicationInfo } from '@/utils/system';
 import config from '@/config';
-import { DynamicUpdate } from '@/utils/dynamicUpdate';
 
 export async function initSentry(): PVoid {
+  let updateMetadata;
+  try {
+    updateMetadata = await CodePush.getUpdateMetadata();
+  } catch {}
+  const dist = updateMetadata?.label ?? '0';
+
   Sentry.init({
     debug: __DEV__,
     dsn: config.sentry.dsn,
+    release: `${applicationInfo.bundleId}@${applicationInfo.version}(${applicationInfo.buildNumber})+codepush:${dist}`,
+    dist,
     tracesSampleRate: config.sentry.tracesSampleRate,
-    integrations: [
-      new Sentry.ReactNativeTracing({
-        routingInstrumentation: new Sentry.ReactNativeNavigationInstrumentation(
-          Navigation,
-        ),
-      }),
-    ],
   });
+
   const networkState = await systemInfo.getNetworkStateTypeAsync();
-  const updateMetadata = await CodePush.getUpdateMetadata();
   const motionAvailable = await DeviceMotion.isAvailableAsync();
   const usedMemory = await systemInfo.getUsedMemory();
 
@@ -34,9 +33,7 @@ export async function initSentry(): PVoid {
   });
 
   Sentry.setContext('appExtra', {
-    dynamicUpdateMeta: {
-      label: updateMetadata?.label,
-    },
+    dynamicUpdateLabel: updateMetadata?.label,
   });
 }
 

@@ -29,6 +29,7 @@ import { ImageItemBlock } from '@/screens/PhotoList/ImageItem';
 import IconCheckmarkCircle from '@/assets/icons/checkmark.circle.svg';
 import { DataLoadStatus } from '@/components/DataLoadStatus';
 import GridList from '@/components/GridList';
+import { HapticFeedback } from '@/utils';
 
 const image2 = Asset.fromModule(require('@/assets/images/cover-2.jpg')).uri;
 const image3 = Asset.fromModule(require('@/assets/images/cover-3.jpg')).uri;
@@ -185,6 +186,7 @@ const AlbumCover: NavigationFunctionComponent<IAlbumCoverProps> = props => {
           selectedIndex={selectedIndex}
           onChange={event => {
             setSelectedIndex(event.nativeEvent.selectedSegmentIndex);
+            HapticFeedback.selection();
           }}
         />
       </View>

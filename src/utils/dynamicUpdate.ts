@@ -22,7 +22,6 @@ export class DynamicUpdate {
             mandatoryUpdateMessage: '噢，版本中有一些大改动，不得不更新',
             mandatoryContinueButtonLabel: '立即更新',
           },
-          installMode: CodePush.InstallMode.IMMEDIATE,
         },
         status => {
           Alert.alert('CodePush.SyncStatus', transformSyncStatus(status));
@@ -51,6 +50,13 @@ export class DynamicUpdate {
    */
   static checkForUpdate(): void {
     CodePush.checkForUpdate();
+  }
+
+  /**
+   * 检查并更新，会重启应用
+   */
+  static restartApp(): void {
+    CodePush.restartApp();
   }
 
   /**

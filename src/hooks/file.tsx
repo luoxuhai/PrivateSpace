@@ -9,6 +9,7 @@ import {
   UpdatePhotoParams,
   RestorePhotoParams,
 } from '@/services/api/photo/types.d';
+import { CopyFileParams } from '@/services/api/file/types.d';
 import { useStore, stores } from '@/store';
 
 export function useDeleteFile(): UseMutationResult<
@@ -44,6 +45,22 @@ export function useUpdateFile(): UseMutationResult<
   const result = useMutation<void, unknown, UpdatePhotoParams>(async params => {
     try {
       await services.api.photo.update(params);
+    } catch (error) {
+      console.error('error', error);
+    }
+  });
+
+  return result;
+}
+
+export function useCopyFile(): UseMutationResult<
+  void,
+  unknown,
+  CopyFileParams
+> {
+  const result = useMutation<void, unknown, CopyFileParams>(async params => {
+    try {
+      await services.api.file.copy(params);
     } catch (error) {
       console.error('error', error);
     }

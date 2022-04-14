@@ -2,12 +2,14 @@ import React from 'react';
 import {
   NavigationFunctionComponent,
   NavigationComponentProps,
+  Navigation,
 } from 'react-native-navigation';
 import { StyleSheet, View } from 'react-native';
 import { observer } from 'mobx-react';
 import { useNavigationComponentDidAppear } from 'react-native-navigation-hooks';
 import { useTranslation } from 'react-i18next';
 import useUpdateEffect from 'use-update-effect';
+import FileViewer from 'react-native-file-viewer';
 
 import { DataLoadStatus } from '@/components/DataLoadStatus';
 import AddButton from './AddButton';
@@ -17,6 +19,7 @@ import { useQuery } from 'react-query';
 import { services } from '@/services';
 import FileDetail, { FileDetailInstance } from './FileDetail';
 import { useRef } from 'react';
+import { FileType } from '@/services/database/entities/file.entity';
 
 interface FileManagerProps extends NavigationComponentProps {
   name: string;
@@ -41,8 +44,8 @@ const FileManager: NavigationFunctionComponent<FileManagerProps> = observer(
 
     const {
       data: fileResult,
-      isLoading,
       isFetching,
+      isRefetching,
       refetch,
     } = useQuery(
       [props.folderId ?? 'root', '.files'],
@@ -60,17 +63,35 @@ const FileManager: NavigationFunctionComponent<FileManagerProps> = observer(
     return (
       <>
         <FileList
-          data={fileResult?.items ?? []}
+          data={isRefetching ? [] : fileResult?.items ?? []}
           componentId={props.componentId}
+          layoutType={fileStore.view}
           ListEmptyComponent={
             <DataLoadStatus
               loading={isFetching}
               text={t('fileManager:noData')}
             />
           }
-          onViewDetail={v => fileDetailRef.current?.open?.(v)}
+          onViewDetail={item => fileDetailRef.current?.open?.(item)}
+          onItemPress={item => {
+            if (item.type === FileType.Folder && props.componentId) {
+              Navigation.push(props.componentId, {
+                component: {
+                  name: 'FileManager',
+                  passProps: {
+                    name: item.name,
+                    folderId: item.id,
+                  },
+                },
+              });
+            } else {
+              FileViewer.open(item.uri, {
+                displayName: item.name,
+              });
+            }
+          }}
         />
-        <AddButton folderId={props.folderId} />
+        <AddButton folderId={props.folderId} componentId={props.componentId} />
         <FileDetail ref={fileDetailRef} />
         {fileStore.moreContextVisible && <View style={styles.mask} />}
       </>

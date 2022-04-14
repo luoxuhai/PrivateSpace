@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   Pressable,
-  useWindowDimensions,
   Alert,
   Linking,
   TouchableOpacity,
@@ -22,6 +21,7 @@ import chroma from 'chroma-js';
 import * as InAppPurchases from 'expo-in-app-purchases';
 import { Placeholder, PlaceholderLine, Fade } from 'rn-placeholder';
 import { SFSymbol } from 'react-native-sfsymbols';
+import { RNToasty } from 'react-native-toasty';
 
 import { CustomSentry } from '@/utils/customSentry';
 import { stores, useStore } from '@/store';
@@ -29,13 +29,11 @@ import { UIStore } from '@/store/ui';
 import { services } from '@/services';
 import { ScreenName } from '@/screens';
 import config, { BOTTOM_TABS_HEIGHT } from '@/config';
-import { HapticFeedback } from '@/utils';
+import { HapticFeedback, applicationInfo } from '@/utils';
 import { SafeAreaScrollView } from '@/components';
 import { Toolbar } from '@/components/Toolbar';
 import CustomButton from '@/components/CustomButton';
 import { LoadingOverlay } from '@/components/LoadingOverlay';
-
-import { RNToasty } from 'react-native-toasty';
 import { UserRole } from '@/store/user';
 
 import IconMore from '@/assets/icons/ellipsis.circle.svg';
@@ -43,8 +41,9 @@ import IconSearch from '@/assets/icons/vip.search.svg';
 import IconTrash from '@/assets/icons/vip.trash.svg';
 import IconWifi from '@/assets/icons/vip.wifi.2.svg';
 import IconiCloud from '@/assets/icons/vip.icloud.svg';
+import { useUIFrame } from '@/hooks';
 
-const PAY_BUTTON_WIDTH = 200;
+const PAY_BUTTON_WIDTH = 250;
 const ICON_COLOR = '#EED198';
 let inAppPurchaseConnected = false;
 
@@ -549,17 +548,19 @@ const PayButton = ({
   onPress: () => void;
 }) => {
   const { ui } = useStore();
-  const { width } = useWindowDimensions();
-  const bottomTabsHeight =
-    services.nav.screens?.getConstants().bottomTabsHeight || BOTTOM_TABS_HEIGHT;
+  const { bottomTabsHeight } = useUIFrame();
 
   return (
     <CustomButton
       style={[
         styles.payButton,
         {
-          left: width / 2 - PAY_BUTTON_WIDTH / 2,
-          bottom: bottomTabsHeight + 26,
+          transform: [
+            {
+              translateX: -PAY_BUTTON_WIDTH / 2,
+            },
+          ],
+          bottom: (bottomTabsHeight || BOTTOM_TABS_HEIGHT) + 26,
         },
       ]}
       color={ui.themes.primary}
@@ -651,6 +652,7 @@ const styles = StyleSheet.create({
   payButton: {
     position: 'absolute',
     width: PAY_BUTTON_WIDTH,
+    left: '50%',
   },
 });
 
@@ -688,7 +690,9 @@ function setPurchaseListener() {
             });
             try {
               await LoadingOverlay.hide();
-              services.api.purchase.pay();
+              if (applicationInfo.env === 'AppStore') {
+                services.api.purchase.pay();
+              }
             } catch {}
             handleDismiss();
           }

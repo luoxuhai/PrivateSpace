@@ -6,7 +6,7 @@
   
 */
 
-CFBundleDisplayName = "사적인 공간";
+CFBundleDisplayName = "PSpace";
 NSAppleMusicUsageDescription = "가져온 사진과 비디오를 삭제하려면";
 NSCameraUsageDescription = "사진 및 비디오를 가져오기 위해 카메라에서 사진 및 비디오 가져오기 기능을 사용할 때 앱이 카메라 권한에 액세스합니다.";
 NSFaceIDUsageDescription = "빠른 잠금 해제를 위해 얼굴 잠금 해제 기능을 사용할 때 앱에서 얼굴 ID 권한에 액세스합니다.";

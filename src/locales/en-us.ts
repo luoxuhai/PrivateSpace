@@ -1,6 +1,6 @@
 export default {
   app: {
-    name: 'Privacy Space',
+    name: 'PSpace',
   },
 
   faceID: {
@@ -26,14 +26,14 @@ export default {
 
   album: {
     navigation: {
-      title: 'Album',
+      title: 'Albums',
     },
     add: {
       title: 'Create Album',
       msg: 'Please Enter the Album Name',
     },
     defaultName: 'Default album',
-    noData: 'No album',
+    noData: 'No albums',
   },
 
   search: {
@@ -43,12 +43,12 @@ export default {
 
   quickAction: {
     capture: {
-      title: 'Quick shot',
-      shortTitle: 'Shoot a picture',
+      title: 'Quick Take',
+      shortTitle: 'Take',
     },
     transfer: {
-      title: 'WI-FI transfer',
-      shortTitle: 'WI-FI transfer',
+      title: 'WI-FI Transfer',
+      shortTitle: 'Transfer',
     },
   },
 
@@ -61,29 +61,29 @@ export default {
       },
     },
     tapHereToChange: 'Choose another album',
-    showInfo: 'View the details',
+    showInfo: 'Get Info',
     loadingLabelText: 'Importing...',
-    noData: 'No images or videos',
+    noData: 'No Images or Videos',
     save: 'Save to local',
     saving: 'Saving',
     imported: 'Imported',
     saveStatus: {
-      success: 'Saved to album',
-      fail: 'Failed to save to album',
+      success: 'Saved to local',
+      fail: 'Failed to save to local',
     },
     add: {
-      album: 'Album',
-      doc: 'Document',
+      album: 'Albums',
+      doc: 'Documents',
       camera: 'Camera',
     },
-    moveToAlbum: 'Move to album',
+    moveToAlbum: 'Move to Album',
     deleteActionSheet: {
       all: {
         title: 'Delete all pictures and videos',
       },
       title: 'These {{content}} will be deleted',
       msg: {
-        softDelete: 'Can be restored to the recycle bin',
+        softDelete: 'Can be recovered to the recycle bin',
         delete: 'This action is irreversible',
       },
     },
@@ -98,6 +98,9 @@ export default {
       scan: 'Scan documents',
       doc: 'Import file',
       folder: 'New folder',
+      notSupported: {
+        msg: 'The current device does not support this feature',
+      },
     },
     folderForm: {
       title: 'New folder',
@@ -107,7 +110,14 @@ export default {
     deleteActionSheet: {
       title: 'These {{count}} files will be deleted',
     },
-    noData: 'No file',
+    noData: 'No files',
+    items: 'items',
+    move: {
+      text: 'Move',
+    },
+    copy: {
+      text: 'Copy',
+    },
   },
 
   miniApps: {
@@ -118,20 +128,20 @@ export default {
 
   recycleBin: {
     navigation: {
-      title: 'Recycle bin',
+      title: 'Recycle Bin',
     },
     tip: 'It is kept for up to {{ duration }} days, after which it will be permanently deleted.',
     enableTip:
       'The recycle bin is turned off and can be turned on in the settings in the upper right corner.',
-    restore: 'Restore to album',
+    restore: 'Recover to Album',
   },
 
   recycleBinSetting: {
     navigation: {
-      title: ' Recycle bin setting',
+      title: ' Recycle Bin Setting',
     },
     enableHeader: 'Deleted files are not recoverable after closing',
-    enableTitle: 'Enable recycle bin',
+    enableTitle: 'Enable Recycle Bin',
     durationHeader: 'RETENTION DAYS',
     day: ' days',
   },
@@ -142,7 +152,7 @@ export default {
     },
     changePass: 'Change Passcode',
     autoLockAuth: 'Automatically Open {{authType}} Unlock',
-    feedback: 'Feedback',
+    feedback: 'Help & Feedback',
     language: 'Language',
     grade: 'Good Reviews',
     shareApp: 'Share APP',
@@ -150,14 +160,14 @@ export default {
     safe: 'Safe',
     help: 'Help',
     immediate: 'Immediate',
-    hapticFeedback: 'Haptic feedback',
+    hapticFeedback: 'Haptic Feedback',
     autoClearOrigin: 'Prompt to delete original file after import',
     advanced: {
       navigation: {
-        title: 'Advanced settings',
+        title: 'Advanced',
       },
       smartSearch: {
-        title: 'Enable smart search',
+        title: 'Enable Smart Search',
         header: 'SMART SEARCH',
       },
     },
@@ -165,11 +175,11 @@ export default {
 
   albumCover: {
     navigation: {
-      title: 'Album cover',
+      title: 'Album Cover',
     },
     tab: {
-      item: 'Album item',
-      system: 'System cover',
+      item: 'Album Items',
+      system: 'System Covers',
     },
   },
 
@@ -194,7 +204,7 @@ export default {
 
   appearance: {
     navigation: {
-      title: 'Setting Appearance ',
+      title: 'Appearance',
     },
     mode: 'APPEARANCE MODE',
     theme: 'COLOR THEME',
@@ -205,7 +215,7 @@ export default {
 
   langSetting: {
     navigation: {
-      title: 'Setting Language',
+      title: 'Language',
     },
   },
 
@@ -272,17 +282,17 @@ export default {
     modify: 'Modify',
     reset: 'Reset',
     select: 'Select',
-    selectAll: 'Select all',
-    unselectAll: 'Unselect all',
+    selectAll: 'Select All',
+    unselectAll: 'Unselect All',
     share: 'Share',
     delete: 'Delete',
-    deleteAll: 'Delete all',
+    deleteAll: 'Delete All',
     move: 'Move',
     copy: 'Copy',
     edit: 'Edit',
-    restore: 'Restore',
-    restoreAll: 'Restore all',
-    noData: 'No data',
+    restore: 'Recover',
+    restoreAll: 'Recover All',
+    noData: 'No Data',
     all: 'All',
     enabled: 'Enabled',
     disabled: 'Disabled',
@@ -295,8 +305,8 @@ export default {
     camera: 'Camera',
     microphone: 'Microphone',
     faceID: 'Face ID',
-    photoLibrary: 'Photo library',
-    mediaLibrary: 'Media library',
+    photoLibrary: 'Photo Library',
+    mediaLibrary: 'Media Library',
     motion: 'Motion',
     unavailable: '{{permission}} unavailable',
     blocked:
@@ -310,20 +320,22 @@ export default {
     verify: 'Enter Passcode',
     createErr: 'Failed to Create Password',
     fake: 'Fake',
-    reset: 'Reset password',
+    reset: 'Reset Password',
   },
 
   // 文件管理
   fileManage: {
     gallery: 'Gallery',
     list: 'List',
-    ctime: 'Creation time',
-    mtime: 'Modification time',
-    size: 'File size',
+    icons: 'Icons',
+    ctime: 'Created',
+    mtime: 'Modified',
+    size: 'Size',
     name: 'Name',
+    kind: 'Kind',
     info: {
-      name: 'File name',
-      type: 'Type',
+      name: 'File Name',
+      type: 'Kind',
       dime: 'Dimensions',
       duration: 'Duration',
       desc: 'Description',
@@ -340,19 +352,19 @@ export default {
   purchase: {
     navigation: {
       title: 'Premium',
-      subtitle: 'Complete Privacy Space functional experience',
+      subtitle: 'Complete PSpace functional experience',
     },
     card: {
-      title: 'Privacy Space Premium',
-      desc: 'Unlock all privileges',
+      title: 'PSpace Premium',
+      desc: 'Unlock all features',
       button: 'Buy',
     },
     tableView: {
-      title: 'Privacy Space Premium',
+      title: 'PSpace Premium',
     },
     paying: 'Purchasing',
     price: 'Pricing',
-    privilege: 'Advanced Privileges',
+    privilege: 'Features',
     purchased: 'Bought',
     subscribed: 'Subscribed',
     contact: 'contact us',
@@ -360,10 +372,10 @@ export default {
       'The Apple Account will be charged to the user after the user confirms the purchase and pays for it. If you have any questions, please',
     rights: {
       wifi: {
-        title: 'WI-FI transfer',
+        title: 'WI-FI Transfer',
       },
       search: {
-        title: 'Smart search',
+        title: 'Smart Search',
       },
       trash: {
         title: 'Customize the Recycle Bin retention time',
@@ -372,7 +384,7 @@ export default {
         title: 'More features coming soon...',
       },
       scan: {
-        title: 'Scan documents',
+        title: 'Scan Documents',
       },
     },
     unpayTip: 'Only available after purchase',
@@ -394,15 +406,15 @@ export default {
       subTitle: 'One-time payment, unlock all features permanently',
     },
     payButton: {
-      title: 'Buy - {{price}}',
+      title: '{{price}} Purchase lifetime',
     },
     restore: 'Restore',
-    recovering: 'Recovering',
+    recovering: 'Restoring',
   },
 
   transfer: {
     navigation: {
-      title: 'WI-FI transfer',
+      title: 'WI-FI Transfer',
     },
     tip1: 'Open the following URL by entering or scanning the QR code in the browser of your computer or other device.',
     tip2: 'Must be connected to the same WI-FI, do not leave this page',
@@ -413,7 +425,7 @@ export default {
 
   createAlbum: {
     dialog: {
-      title: 'Create an album',
+      title: 'Create an Album',
       subtitle: 'Please enter album name',
       albumName: 'Album name',
     },
@@ -427,9 +439,25 @@ export default {
     toolbar: {
       detail: 'Detail',
       more: 'More',
-      desc: 'Modify description',
+      desc: 'Modify Description',
       rename: 'Rename',
       descPlaceholder: 'Please enter a description',
+    },
+  },
+
+  appUpdate: {
+    alert: {
+      title: 'New Version {{version}}',
+      ok: 'Update',
+      cancel: 'Cancel',
+    },
+    card: {
+      alert: {
+        title: 'Update Tips',
+        msg: 'The installation package has been downloaded, restart the APP to update',
+        ok: 'Update',
+      },
+      title: 'New Version',
     },
   },
 };

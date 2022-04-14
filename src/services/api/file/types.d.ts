@@ -55,3 +55,8 @@ export interface RestorePhotoParams {
     parent_id?: string;
   };
 }
+
+export interface CopyFileParams extends Partial<Omit<FileEntity, 'id'>> {
+  originId: string;
+  id?: string;
+}

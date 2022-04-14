@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   input: {
-    width: '75%',
+    minWidth: '65%',
     height: 34,
     borderRadius: 4,
     paddingHorizontal: 6,

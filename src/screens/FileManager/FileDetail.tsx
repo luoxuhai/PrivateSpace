@@ -5,16 +5,9 @@ import React, {
   useCallback,
   forwardRef,
 } from 'react';
-import {
-  StyleSheet,
-  View,
-  Text,
-  ScrollView,
-  useWindowDimensions,
-} from 'react-native';
+import { StyleSheet, View, Text, ScrollView } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
-import { useDeviceOrientation } from '@react-native-community/hooks';
 import { observer } from 'mobx-react-lite';
 import Modal from 'react-native-modal';
 
@@ -31,6 +24,7 @@ import FileEntity, {
   FileType,
   SourceType,
 } from '@/services/database/entities/file.entity';
+import { SafeAreaScrollView } from '@/components';
 
 interface IFileDetailProps {
   item?: FileEntity;
@@ -45,9 +39,7 @@ const FileDetail = observer<IFileDetailProps, FileDetailInstance>(
   forwardRef((props, ref) => {
     const { t } = useTranslation();
     const [item, setItem] = useState<API.FileWithSource>();
-    const { ui, global: globalStore } = useStore();
-    const windowSize = useWindowDimensions();
-    const deviceOrientation = useDeviceOrientation();
+    const { ui } = useStore();
     const [visible, setVisible] = useState(false);
     const [dime, setDime] = useState<
       { width: number; height: number } | undefined
@@ -87,6 +79,8 @@ const FileDetail = observer<IFileDetailProps, FileDetailInstance>(
       setDime(undefined);
     }, []);
 
+    const isFolder = item?.type === FileType.Folder;
+
     const list = useMemo(
       () =>
         [
@@ -98,12 +92,11 @@ const FileDetail = observer<IFileDetailProps, FileDetailInstance>(
           {
             type: 'type',
             label: t('fileManage:info.type'),
-            value:
-              props.item?.type === FileType.Folder
-                ? '文件夹'
-                : getSourceNameByType(sourceType),
+            value: isFolder
+              ? t('common:folder')
+              : getSourceNameByType(sourceType),
           },
-          {
+          !isFolder && {
             type: 'size',
             label: t('fileManage:size'),
             value: formatFileSize(item?.size),
@@ -124,7 +117,7 @@ const FileDetail = observer<IFileDetailProps, FileDetailInstance>(
             value: dayjs(item?.ctime).format('YYYY年MM月DD日 HH:mm'),
           },
         ].filter(v => v),
-      [item, dime, duration, sourceType],
+      [item, dime, duration, sourceType, t],
     );
 
     return (
@@ -152,7 +145,7 @@ const FileDetail = observer<IFileDetailProps, FileDetailInstance>(
                   : ui.colors.systemBackground,
             },
           ]}>
-          <ScrollView>
+          <SafeAreaScrollView>
             {list?.map(
               item =>
                 item && (
@@ -178,7 +171,7 @@ const FileDetail = observer<IFileDetailProps, FileDetailInstance>(
                   </View>
                 ),
             )}
-          </ScrollView>
+          </SafeAreaScrollView>
         </View>
       </Modal>
     );

@@ -97,7 +97,7 @@ export const ListTitle = observer(
 );
 
 export interface IListItem {
-  title?: string;
+  title?: ExtraValue;
   icon?: JSX.Element;
   extra?: ExtraValue;
   onPress?: () => void;

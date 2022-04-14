@@ -9,9 +9,11 @@ import { observer } from 'mobx-react-lite';
 import { stat } from 'react-native-fs';
 
 import { clearPersistedStores } from '@/store';
+import { applicationInfo, systemInfo } from '@/utils/system';
 import { services } from '@/services';
 import { DynamicUpdate } from '@/utils/dynamicUpdate';
 import { THUMBNAIL_PATH, SOURCE_PATH, STATIC_PATH, TEMP_PATH } from '@/config';
+import useDynamicUpdateMetadata from '@/hooks/useDynamicUpdateMetadata';
 
 const dirStats: {
   path: string;
@@ -40,6 +42,8 @@ const DeveloperScreen: NavigationFunctionComponent<
   NavigationComponentProps
 > = props => {
   const [data, setData] = useState<any>([]);
+  const updateMetadata = useDynamicUpdateMetadata();
+
   useNavigationButtonPress(
     () => {
       services.nav.screens?.dismissModal('Developer');
@@ -60,7 +64,7 @@ const DeveloperScreen: NavigationFunctionComponent<
   }, []);
 
   return (
-    <ScrollView>
+    <ScrollView style={styles.container}>
       <Button
         title="清除数据库"
         onPress={() => {
@@ -93,13 +97,19 @@ const DeveloperScreen: NavigationFunctionComponent<
           );
         })}
       </View>
+      <View>
+        <Text selectable>uniqueId: {systemInfo.uniqueId}</Text>
+        <Text>{JSON.stringify(applicationInfo ?? {}, null, 2)}</Text>
+        <Text>{JSON.stringify(systemInfo ?? {}, null, 2)}</Text>
+        <Text>{JSON.stringify(updateMetadata ?? {}, null, 2)}</Text>
+      </View>
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  button: {
-    marginTop: 10,
+  container: {
+    backgroundColor: '#FFF',
   },
 });
 

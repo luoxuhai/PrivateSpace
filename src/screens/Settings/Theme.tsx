@@ -110,7 +110,7 @@ const AppIconList = observer(() => {
               key={item.name}
               activeOpacity={0.8}
               onPress={async () => {
-                HapticFeedback.impactAsync.light();
+                HapticFeedback.selection();
                 const isSupported =
                   await AppIconManager.supportsDynamicAppIcon();
 
@@ -237,7 +237,7 @@ const ThemeColorList = observer(() => {
               key={item.name}
               activeOpacity={0.8}
               onPress={() => {
-                HapticFeedback.impactAsync.light();
+                HapticFeedback.selection();
                 if (item.name === EThemeName.Custom) {
                   handleColorPicker();
                 } else {

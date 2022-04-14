@@ -1,18 +1,10 @@
 import React from 'react';
-import {
-  Switch,
-  Share,
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-} from 'react-native';
+import { Switch, Share } from 'react-native';
 import { observer } from 'mobx-react-lite';
 import { NavigationComponentProps } from 'react-native-navigation';
 import { useTranslation } from 'react-i18next';
 import { InAppBrowser } from 'react-native-inappbrowser-reborn';
 import * as LocalAuthentication from 'expo-local-authentication';
-import LinearGradient from 'react-native-linear-gradient';
 
 import { ScreenName } from '@/screens';
 import { services } from '@/services';
@@ -20,26 +12,22 @@ import { ELanguage } from '@/locales';
 import config from '@/config';
 import { useStore } from '@/store';
 import { UserRole } from '@/store/user';
-import { colors } from '@/utils/designSystem';
 import { EUserType } from '@/services/database/entities/user.entity';
 import { IListItem } from '@/components/List';
-import CustomButton from '@/components/CustomButton';
 import PasscodeLockOverlay, { EInputType } from '@/screens/PasscodeLock';
 import SimpleSelectionList, {
   ISimpleSelectionListItem,
 } from '@/components/SimpleSelectionList';
 import { SafeAreaScrollView } from '@/components';
+import PurchasesCard, { handleToPurchases } from '@/components/PurchasesCard';
 import { appearanceModeOptions } from './Theme';
 import { languageOptions } from './Language';
 import { systemInfo, applicationInfo } from '@/utils';
-
 import { getAutoLockOptions } from './AutoLock';
 import { getUrgentOptions } from './Urgent';
+import { SoftwareUpdateCard } from './SoftwareUpdate';
 
 import IconVip from '@/assets/icons/vip.svg';
-import ImageVipCrown from '@/assets/images/vip/crown.svg';
-import ImageVipRight from '@/assets/images/vip/right.svg';
-import { t } from 'i18next';
 
 function SettingsPage(props: NavigationComponentProps) {
   const { ui, global, user } = useStore();
@@ -235,108 +223,11 @@ function SettingsPage(props: NavigationComponentProps) {
             ? ui.colors.systemBackground
             : ui.colors.secondarySystemBackground,
       }}>
+      <SoftwareUpdateCard componentId={props.componentId} />
       {user.userRole === UserRole.NORMAL && <PurchasesCard />}
       <SimpleSelectionList sections={list} />
     </SafeAreaScrollView>
   );
 }
-
-function handleToPurchases() {
-  services.nav.screens?.show('Purchase');
-}
-
-function PurchasesCard(): JSX.Element {
-  const { ui } = useStore();
-  return (
-    <TouchableOpacity
-      style={styles.purchasesCard}
-      activeOpacity={0.8}
-      onPress={handleToPurchases}>
-      <LinearGradient
-        style={styles.purchasesCardBg}
-        start={{
-          x: 0,
-          y: 0.5,
-        }}
-        colors={['rgba(239, 134, 25, 0.6)', 'rgba(244, 164, 68, 0.5)']}
-      />
-      <ImageVipRight style={styles.vipRight} />
-      <ImageVipCrown style={styles.vipCrown} />
-      <View>
-        <Text
-          style={[
-            styles.purchasesCardTitle,
-            {
-              color: colors.light.label,
-            },
-          ]}>
-          {t('purchase:card.title')}
-        </Text>
-        <Text
-          style={[
-            styles.purchasesCardSubTitle,
-            {
-              color: ui.colors.secondaryLabel,
-            },
-          ]}>
-          {t('purchase:card.desc')}
-        </Text>
-      </View>
-
-      <CustomButton
-        style={styles.purchasesCardButton}
-        textStyle={styles.purchasesCardButtonText}
-        color={colors.light.label}
-        onPress={handleToPurchases}>
-        {t('purchase:card.button')}
-      </CustomButton>
-    </TouchableOpacity>
-  );
-}
-
-const styles = StyleSheet.create({
-  purchasesCard: {
-    height: 160,
-    marginTop: 30,
-    marginBottom: 20,
-    marginHorizontal: 16,
-    borderRadius: 12,
-    justifyContent: 'space-between',
-    padding: 20,
-    overflow: 'hidden',
-  },
-  purchasesCardTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-  purchasesCardSubTitle: {
-    marginTop: 8,
-  },
-  purchasesCardButton: {
-    width: 100,
-    height: 34,
-    borderRadius: 20,
-  },
-  purchasesCardButtonText: {
-    fontSize: 13,
-  },
-  purchasesCardBg: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
-  },
-  vipRight: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-  },
-  vipCrown: {
-    position: 'absolute',
-    bottom: '50%',
-    right: 30,
-  },
-});
 
 export default observer(SettingsPage);

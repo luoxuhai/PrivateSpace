@@ -1,21 +1,21 @@
 import React, { useCallback } from 'react';
 
-import { StyleSheet, FlatListProps } from 'react-native';
+import { StyleSheet, FlatListProps, FlatList } from 'react-native';
 import { Navigation } from 'react-native-navigation';
 import { useNavigationComponentDidDisappear } from 'react-native-navigation-hooks';
-import FileViewer from 'react-native-file-viewer';
 
 import { FlatGrid } from 'react-native-super-grid';
-import FileItem from './FileItem';
+import FileItem, { FileItemLine } from './FileItem';
 import { ContextMenu } from '../ContextMenu';
 import { useForceRender } from '@/hooks/index';
 import { FileType } from '@/services/database/entities/file.entity';
 
 interface FileListProps
   extends Omit<FlatListProps<API.FileWithSource>, 'renderItem'> {
-  layoutType?: 'list' | 'grid' | 'gallery';
-  componentId: string;
-  onViewDetail: (v: API.FileWithSource) => void;
+  layoutType?: FileView;
+  componentId?: string;
+  onViewDetail?: (v: API.FileWithSource) => void;
+  onItemPress?: (v: API.FileWithSource) => void;
 }
 
 const ITEM_WIDTH = 80;
@@ -29,35 +29,22 @@ function FileList(props: FileListProps) {
 
   const renderItem = useCallback(
     ({ item }) => {
+      const Item = props.layoutType === 'list' ? FileItemLine : FileItem;
       return visible ? (
         <ContextMenu item={item} onViewDetail={props.onViewDetail}>
-          <FileItem
+          <Item
             item={item}
             onPress={() => {
-              if (item.type === FileType.Folder) {
-                Navigation.push(props.componentId, {
-                  component: {
-                    name: 'FileManager',
-                    passProps: {
-                      name: item.name,
-                      folderId: item.id,
-                    },
-                  },
-                });
-              } else {
-                FileViewer.open(item.uri, {
-                  displayName: item.name,
-                });
-              }
+              props.onItemPress?.(item);
             }}
           />
         </ContextMenu>
       ) : null;
     },
-    [props.componentId, visible],
+    [props.componentId, props.layoutType, visible],
   );
 
-  return (
+  return props.layoutType === 'icons' ? (
     <FlatGrid
       style={styles.list}
       renderItem={renderItem}
@@ -65,6 +52,8 @@ function FileList(props: FileListProps) {
       spacing={20}
       {...props}
     />
+  ) : (
+    <FlatList style={styles.list} renderItem={renderItem} {...props} />
   );
 }
 

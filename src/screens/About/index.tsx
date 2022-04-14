@@ -7,7 +7,6 @@ import {
 import { observer } from 'mobx-react-lite';
 import { useTranslation } from 'react-i18next';
 import { InAppBrowser } from 'react-native-inappbrowser-reborn';
-import { useQuery } from 'react-query';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { RNToasty } from 'react-native-toasty';
 
@@ -19,7 +18,7 @@ import SimpleSelectionList from '@/components/SimpleSelectionList';
 import { SafeAreaScrollView } from '@/components';
 import { getAppIcon } from '@/utils/designSystem';
 import { applicationInfo } from '@/utils';
-import { DynamicUpdate } from '@/utils/dynamicUpdate';
+import useDynamicUpdateMetadata from '@/hooks/useDynamicUpdateMetadata';
 
 const AboutScreen: NavigationFunctionComponent<
   NavigationComponentProps
@@ -91,18 +90,20 @@ const AboutScreen: NavigationFunctionComponent<
           ? {
               title: t('about:QQgroup'),
               extra: config.qqGroup,
-              onPress: async () => {
-                if (await Linking.canOpenURL('mqq://')) {
-                  Linking.openURL(
-                    `mqq://card/show_pslcard?src_type=internal&version=1&uin=${config.qqGroup}&key=d6758f2f4dee2c7e73a455f674a888651b0c05e24904f7001cbad20f7f859f82&card_type=group&source=external`,
-                  );
-                } else {
-                  Clipboard.setString(config.qqGroup);
-                  RNToasty.Show({
-                    title: '已复制群号',
-                    position: 'top',
-                  });
-                }
+              onPress: () => {
+                Linking.canOpenURL('mqq://').then(allow => {
+                  if (allow) {
+                    Linking.openURL(
+                      `mqq://card/show_pslcard?src_type=internal&version=1&uin=${config.qqGroup}&key=d6758f2f4dee2c7e73a455f674a888651b0c05e24904f7001cbad20f7f859f82&card_type=group&source=external`,
+                    );
+                  } else {
+                    Clipboard.setString(config.qqGroup);
+                    RNToasty.Show({
+                      title: '已复制群号',
+                      position: 'top',
+                    });
+                  }
+                });
               },
             }
           : null,
@@ -143,10 +144,7 @@ const IconCover = observer(() => {
   const { ui, global } = useStore();
   const { t } = useTranslation();
   const { version: appVersion } = applicationInfo;
-
-  const { data: updateMetadata } = useQuery('update.metadata', async () => {
-    return await DynamicUpdate.getUpdateMetadataAsync();
-  });
+  const { data: dynamicUpdateMetadata } = useDynamicUpdateMetadata();
 
   const AppIcon = useMemo(() => getAppIcon(ui.appIcon), [ui.appIcon]);
 
@@ -178,8 +176,7 @@ const IconCover = observer(() => {
         style={{
           color: ui.colors.secondaryLabel,
         }}>
-        V{appVersion}
-        {updateMetadata?.label && `-${updateMetadata.label.replace('v', '')}`}
+        V{appVersion}-{dynamicUpdateMetadata?.labelWithoutPrefix ?? 0}
       </Text>
       {(global.debug || __DEV__) && (
         <Pressable

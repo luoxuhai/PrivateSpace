@@ -30,8 +30,8 @@ import { useUIFrame } from '@/hooks';
 import { GridSectionList } from '@/components/GridList';
 import { ImageItemBlock } from '@/screens/PhotoList/ImageItem';
 import { AlbumCard } from './index';
-import { Empty } from '@/components/Empty';
 import { isEmpty } from 'lodash';
+import { HapticFeedback } from '@/utils';
 
 const AnimatedSegmentedControl =
   Animated.createAnimatedComponent(SegmentedControl);
@@ -304,6 +304,7 @@ export const SearchPanel = observer<SearchPanelProps, SearchPanelInstance>(
             selectedIndex={selectedTypeIndex}
             onChange={event => {
               setSelectedTypeIndex(event.nativeEvent.selectedSegmentIndex);
+              HapticFeedback.selection();
             }}
           />
         )}

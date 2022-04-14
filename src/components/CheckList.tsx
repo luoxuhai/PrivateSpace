@@ -45,8 +45,8 @@ function CheckList(props: ICheckList): JSX.Element {
         title: item.title,
         icon: item.icon,
         onPress: () => {
-          HapticFeedback.impactAsync.light();
           setCheckedValue(item.value);
+          HapticFeedback.selection();
         },
         render:
           (props.value ?? checkedValue) === item.value

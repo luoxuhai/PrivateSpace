@@ -98,6 +98,9 @@ export default {
       scan: '掃描文檔',
       doc: '導入文件',
       folder: '新建文件夾',
+      notSupported: {
+        msg: '當前設備不支持此功能',
+      },
     },
     folderForm: {
       title: '新建文件夾',
@@ -108,6 +111,13 @@ export default {
       title: '這{{count}}個文件將被刪除',
     },
     noData: '無文件',
+    items: '項',
+    move: {
+      text: '移動到此處',
+    },
+    copy: {
+      text: '複製到此處',
+    },
   },
 
   miniApps: {
@@ -306,10 +316,12 @@ export default {
   fileManage: {
     gallery: '畫廊',
     list: '列表',
+    icons: '圖標',
     ctime: '創建時間',
     mtime: '修改時間',
     size: '大小',
     name: '名稱',
+    kind: '',
     info: {
       name: '文件名',
       type: '類型',
@@ -417,6 +429,22 @@ export default {
       desc: '修改描述',
       rename: '重命名',
       descPlaceholder: '請輸入描述',
+    },
+  },
+
+  appUpdate: {
+    alert: {
+      title: '發現新版本(V{{version}})',
+      ok: '更新',
+      cancel: '取消',
+    },
+    card: {
+      alert: {
+        title: '更新提示',
+        msg: '安裝包已下載，重啟APP以更新',
+        ok: '更新',
+      },
+      title: '新版本',
     },
   },
 };

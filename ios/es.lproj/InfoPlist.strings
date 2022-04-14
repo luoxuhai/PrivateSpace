@@ -6,7 +6,7 @@
   
 */
 
-CFBundleDisplayName = "Espacio privado";
+CFBundleDisplayName = "PSpace";
 NSApleMusicUsageDescription = "Para borrar fotos y videos importados";
 NSCameraUsageDescription = "La aplicación accederá a los permisos de su cámara cuando use la función de importar imágenes y videos desde la cámara, para importar imágenes y videos";
 NSFaceIDUsageDescription = "La aplicación accederá a su permiso de identificación facial cuando use la función de desbloqueo facial, para desbloquear rápidamente";

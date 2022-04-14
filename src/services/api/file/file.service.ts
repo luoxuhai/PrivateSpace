@@ -4,7 +4,7 @@ import { isEmpty } from 'lodash';
 import { getMimeType } from '@qeepsake/react-native-file-utils';
 
 import PhotoService from '../photo/photo.service';
-import { SOURCE_PATH } from '@/config';
+import { SOURCE_PATH, THUMBNAIL_PATH } from '@/config';
 import * as Types from './types';
 import FileEntity, {
   FileRepository,
@@ -18,6 +18,7 @@ import {
   getSourceByMime,
   getThumbnailPath,
   getSourcePath,
+  getPosterPath,
 } from '@/utils';
 import { setPhotoSource } from '../common/utils';
 import { stores } from '@/store';
@@ -37,9 +38,17 @@ class FileService {
         type: 'DESC',
         ...order,
       },
-    })) as API.PhotoWithSource[];
+    })) as API.FileWithSource[];
 
     await setPhotoSource(items);
+
+    for (const [index, item] of items.entries()) {
+      if (item.type === FileType.Folder) {
+        items[index].children_count = await this.getFolderSourceCount({
+          id: item.id as string,
+        });
+      }
+    }
 
     return items;
   }
@@ -111,6 +120,53 @@ class FileService {
     return {
       id: fileId,
     };
+  }
+
+  public async copy(params: Types.CopyFileParams) {
+    const ctime = Date.now();
+    const id = generateID();
+    const sourceId = generateID();
+    const originFile = await this.findOne({ id: params.originId });
+
+    const sourceDir = join(SOURCE_PATH, sourceId);
+    const sourcePath = join(sourceDir, originFile.name);
+    const thumbnailDir = join(THUMBNAIL_PATH, sourceId);
+    const thumbnailPath = join(thumbnailDir, 'default.jpg');
+
+    try {
+      await FS.mkdir(sourceDir);
+      await FS.copyFile(originFile.uri as string, sourcePath);
+      await FS.mkdir(thumbnailDir);
+      if (
+        getSourceByMime(originFile.mime) === SourceType.Image &&
+        originFile.thumbnail !== originFile.uri
+      ) {
+        await FS.copyFile(originFile.thumbnail as string, thumbnailPath);
+      }
+
+      if (
+        getSourceByMime(originFile.mime) === SourceType.Video &&
+        originFile.poster
+      ) {
+        const posterPath = getPosterPath(sourceId) as string;
+        await FS.copyFile(originFile.poster as string, posterPath);
+      }
+
+      await getRepository(FileEntity).insert({
+        ...originFile,
+        id,
+        parent_id: params.parent_id,
+        ctime,
+        mtime: ctime,
+        extra: {
+          ...originFile,
+          source_id: sourceId,
+        },
+      });
+    } catch (error) {
+      FS.unlink(sourcePath);
+      throw error;
+    }
   }
 
   public async createFolder(params: Types.CreateFolderParams) {
@@ -227,6 +283,22 @@ class FileService {
       })
       .whereInIds(ids)
       .execute();
+  }
+
+  /**
+   * 获取文件夹下文件数量
+   *
+   */
+  public async getFolderSourceCount(params: { id: string }) {
+    const total = await getRepository(FileEntity).count({
+      where: {
+        parent_id: params.id,
+        status: FileStatus.Normal,
+        owner: stores.user.current?.id,
+        repository: FileRepository.File,
+      },
+    });
+    return total;
   }
 }
 

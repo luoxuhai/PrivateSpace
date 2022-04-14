@@ -28,7 +28,7 @@
 		35D18914276D98C500C1C94B /* dark120x120.png in Resources */ = {isa = PBXBuildFile; fileRef = 35D18910276D98C500C1C94B /* dark120x120.png */; };
 		35D18915276D98C500C1C94B /* dark167x167.png in Resources */ = {isa = PBXBuildFile; fileRef = 35D18911276D98C500C1C94B /* dark167x167.png */; };
 		35D18917276E3DA800C1C94B /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35D18916276E3DA800C1C94B /* CloudKit.framework */; };
-		35D1892527760ABF00C1C94B /* ShareExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 35AE5CCA273EB14800892FA8 /* ShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		35D1892527760ABF00C1C94B /* ShareExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 35AE5CCA273EB14800892FA8 /* ShareExtension.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		35D1892A2776F72200C1C94B /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35D189292776F72200C1C94B /* StoreKit.framework */; };
 		6172F2D35A4C3AA820D92908 /* libPods-PrivateSpace.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6423831EA8574132BED9D8CC /* libPods-PrivateSpace.a */; };
 		62D9B9918850E996E2D11F60 /* libPods-ShareExtension.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DC59688C954E35087989D57F /* libPods-ShareExtension.a */; };
@@ -765,6 +765,7 @@
 		};
 		35D1892727760ABF00C1C94B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
+			platformFilter = ios;
 			target = 35AE5CC9273EB14800892FA8 /* ShareExtension */;
 			targetProxy = 35D1892627760ABF00C1C94B /* PBXContainerItemProxy */;
 		};
@@ -899,7 +900,7 @@
 				CODE_SIGN_ENTITLEMENTS = PrivateSpace/PrivateSpaceDebug.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = MH9G89WBAL;
 				ENABLE_BITCODE = NO;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
@@ -918,7 +919,7 @@
 					"$(PROJECT_DIR)",
 				);
 				MACH_O_TYPE = mh_execute;
-				MARKETING_VERSION = 1.5.0;
+				MARKETING_VERSION = 1.6.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -927,6 +928,8 @@
 				PRODUCT_BUNDLE_IDENTIFIER = net.darkce.privatespace;
 				PRODUCT_NAME = PrivateSpace;
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -944,7 +947,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODEPUSH_KEY = "LsOfPzALBphX8m4PTjB72z1nvBX7CURq-Pj6f";
 				CODE_SIGN_ENTITLEMENTS = PrivateSpace/PrivateSpace.entitlements;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = MH9G89WBAL;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
 				HEADER_SEARCH_PATHS = (
@@ -962,7 +965,7 @@
 					"$(PROJECT_DIR)",
 				);
 				MACH_O_TYPE = mh_execute;
-				MARKETING_VERSION = 1.5.0;
+				MARKETING_VERSION = 1.6.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -970,6 +973,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = net.darkce.privatespace;
 				PRODUCT_NAME = PrivateSpace;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_VERSION = 5.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
@@ -1014,6 +1019,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = net.darkce.privatespace.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "ShareExtension/ShareExtension-Bridging-Header.h";
@@ -1063,6 +1069,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "ShareExtension/ShareExtension-Bridging-Header.h";

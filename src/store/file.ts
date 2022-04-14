@@ -5,12 +5,10 @@ import {
   clearPersistedStore,
 } from 'mobx-persist-store';
 
-type PhotoView = 'list' | 'grid';
-
 type OrderBy = Partial<API.OrderBy<API.AlbumType>>;
 
 export class FileStore implements IStore {
-  @observable view: PhotoView = 'grid';
+  @observable view: FileView = 'icons';
   @observable orderBy: OrderBy = {
     ctime: 'DESC',
   };

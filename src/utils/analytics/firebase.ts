@@ -2,8 +2,13 @@ import analytics, {
   FirebaseAnalyticsTypes,
 } from '@react-native-firebase/analytics';
 
-import { applicationInfo } from '../system';
+import { applicationInfo, systemInfo } from '../system';
+import config from '@/config';
 
-export default applicationInfo.env === 'AppStore'
+const enabled =
+  applicationInfo.env === 'AppStore' &&
+  !config.testDevices.includes(systemInfo.uniqueId as string);
+
+export default enabled
   ? analytics()
   : (null as null | FirebaseAnalyticsTypes.Module);

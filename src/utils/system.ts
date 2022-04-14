@@ -100,6 +100,7 @@ interface SystemInfo {
   modelName?: string | null;
   totalMemory?: number | null;
   supportedCpuArchitectures?: string[] | null;
+  uniqueId?: string;
   getUsedMemory: () => Promise<number>;
   getIpAddressAsync: () => Promise<string | null>;
   getNetworkStateTypeAsync: () => Promise<NetInfoStateType | undefined>;
@@ -109,6 +110,8 @@ interface SystemInfo {
 interface ApplicationInfo {
   name: string;
   version: string;
+  bundleId: string;
+  buildNumber: string;
   env: 'AppStore' | 'TestFlight' | 'Other';
 }
 
@@ -119,6 +122,7 @@ export const systemInfo: SystemInfo = {
   modelName: Device.getModel(),
   totalMemory: Device.getTotalMemorySync(),
   supportedCpuArchitectures: Device.supportedAbisSync(),
+  uniqueId: Device.getUniqueId(),
   getUsedMemory: async () => Device.getUsedMemory(),
   getFreeDiskStorage: async () => Device.getFreeDiskStorage(),
   getIpAddressAsync: async () =>
@@ -129,6 +133,8 @@ export const systemInfo: SystemInfo = {
 export const applicationInfo: ApplicationInfo = {
   name: Device.getApplicationName(),
   version: Device.getVersion(),
+  bundleId: Device.getBundleId(),
+  buildNumber: Device.getBuildNumber(),
   env: Device.getInstallerPackageNameSync() as
     | 'AppStore'
     | 'TestFlight'
@@ -178,6 +184,10 @@ export class HapticFeedback {
         );
     },
   };
+
+  static selection() {
+    if (this.canUse()) return Haptics.selectionAsync();
+  }
 }
 
 export function getUIFrame(): NavigationConstants {

@@ -98,6 +98,9 @@ export default {
       scan: '扫描文档',
       doc: '导入文件',
       folder: '新建文件夹',
+      notSupported: {
+        msg: '当前设备不支持此功能',
+      },
     },
     folderForm: {
       title: '新建文件夹',
@@ -108,6 +111,13 @@ export default {
       title: '这{{count}}个文件将被删除',
     },
     noData: '无文件',
+    items: '项',
+    move: {
+      text: '移动到此处',
+    },
+    copy: {
+      text: '复制到此处',
+    },
   },
 
   miniApps: {
@@ -279,6 +289,7 @@ export default {
     closed: '已关闭',
     opened: '已打开',
     rename: '重命名',
+    folder: '文件夹',
   },
 
   permission: {
@@ -306,10 +317,12 @@ export default {
   fileManage: {
     gallery: '画廊',
     list: '列表',
+    icons: '图标',
     ctime: '创建时间',
     mtime: '修改时间',
     size: '大小',
     name: '名称',
+    kind: '種類',
     info: {
       name: '文件名',
       type: '类型',
@@ -381,7 +394,7 @@ export default {
       subTitle: '一次性付费，永久解锁全部功能',
     },
     payButton: {
-      title: '购买-{{price}}永久',
+      title: '{{price}} 开通永久会员',
     },
     restore: '恢复购买',
     recovering: '恢复中',
@@ -417,6 +430,22 @@ export default {
       desc: '修改描述',
       rename: '重命名',
       descPlaceholder: '请输入描述',
+    },
+  },
+
+  appUpdate: {
+    alert: {
+      title: '发现新版本(V{{version}})',
+      ok: '更新',
+      cancel: '取消',
+    },
+    card: {
+      alert: {
+        title: '更新提示',
+        msg: '安装包已下载，重启APP以更新',
+        ok: '更新',
+      },
+      title: '新版本',
     },
   },
 };

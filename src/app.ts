@@ -7,8 +7,6 @@ import { clearRecycleBin } from '@/screens/RecycleBin/clearRecycleBin';
 import { CustomSentry } from '@/utils/customSentry';
 import classifyImageProcess from '@/utils/process/classifyImageProcess';
 import thumbnailProcess from '@/utils/process/thumbnailProcess';
-import blurhashImageProcess from '@/utils/process/blurhashImageProcess';
-import { DynamicUpdate } from '@/utils/dynamicUpdate';
 
 export const start = async (): PVoid => {
   // 创建数据存放目录
@@ -28,8 +26,6 @@ export const start = async (): PVoid => {
     thumbnailProcess.start();
     // blurhashImageProcess.start();
   }, 1000 * 5);
-
-  DynamicUpdate.sync();
 
   if (__DEV__) {
     LogBox.ignoreAllLogs();

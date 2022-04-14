@@ -1,3 +1,5 @@
+import appInfo from '../../app.json';
+
 export default {
   // 腾讯兔小巢反馈链接
   TXC_FEEDBACK_URL: 'https://support.qq.com/product/334350',
@@ -18,10 +20,9 @@ export default {
 
   /** 应用商店链接 */
   APP_URL: {
-    cn: `https://apps.apple.com/cn/app/${encodeURI(
-      '隐私空间-隐藏私人图片视频',
-    )}/id1597534147`,
-    global: 'https://apps.apple.com/app/id1597534147',
+    cn: `https://apps.apple.com/cn/app/id${appInfo.appId}`,
+    global: `https://apps.apple.com/app/id${appInfo.appId}`,
+    urlSchema: `itms-apps://itunes.apple.com/app/id${appInfo.appId}`,
   },
 
   /** 隐私政策 */
@@ -37,7 +38,7 @@ export default {
     },
   ],
 
-  appId: '1597534147',
+  appId: appInfo.appId,
   developerId: '1572453992',
   enableDebugModeKey: 'a1a9ac8f80b62',
   email: 'darkce97@gmail.com',
@@ -53,4 +54,5 @@ export default {
     tracesSampleRate: 0.5,
   },
   baseURL: 'https://ps.fastools.cn',
+  testDevices: ['FC1E30CE-E5BA-44D6-9B2A-9F4C75B7325A'],
 };

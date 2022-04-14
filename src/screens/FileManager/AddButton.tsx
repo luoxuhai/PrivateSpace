@@ -28,12 +28,14 @@ import { useState } from 'react';
 import { useCallback } from 'react';
 import { useMutation, useQuery } from 'react-query';
 import { UserRole } from '@/store/user';
+import { Navigation } from 'react-native-navigation';
 
 const AnimatedTouchableOpacity =
   Animated.createAnimatedComponent(TouchableOpacity);
 
 interface AddButtonProps extends ViewProps {
   folderId: string;
+  componentId?: string;
 }
 
 enum FileImportType {
@@ -50,7 +52,7 @@ const ICON_PROPS = {
 const fileImporter = new FileImporter();
 
 const AddButton = observer<AddButtonProps>(props => {
-  const { ui, global, user } = useStore();
+  const { ui, global, user, file: fileStore } = useStore();
   const { t } = useTranslation();
   const [visible, setVisible] = useState(false);
   const { bottomTabsHeight } = useUIFrame();
@@ -58,6 +60,14 @@ const AddButton = observer<AddButtonProps>(props => {
   const { refetch } = useQuery([props.folderId ?? 'root', '.files'], {
     enabled: false,
   });
+  const createFolder = useCreateFolder(
+    props.folderId,
+    props.componentId,
+    () => {
+      refetch();
+      closeModal();
+    },
+  );
 
   const list = useMemo(
     () => [
@@ -101,21 +111,6 @@ const AddButton = observer<AddButtonProps>(props => {
     [t, ui.colors],
   );
 
-  const handleCreateFolder = useCallback(
-    async (value: string) => {
-      const res = await services.api.file.createFolder({
-        name: value?.trim(),
-        parent_id: props.folderId,
-      });
-
-      if (res) {
-        closeModal();
-        refetch();
-      }
-    },
-    [props.folderId],
-  );
-
   const { mutateAsync: handleAddFile } = useMutation<void, any[], any[]>(
     async files => {
       const timer = setTimeout(() => {
@@ -146,39 +141,28 @@ const AddButton = observer<AddButtonProps>(props => {
   async function handleSelectImportFile(type: FileImportType) {
     switch (type) {
       case FileImportType.Scan:
+        // if (!Toolkit.isDocumentCameraSupported()) {
+        //   Alert.alert(t('fileManager:add.notSupported.msg'));
+        //   return;
+        // }
         if (canOpen()) {
-          const result = await Toolkit.openDocumentCamera();
-          handleAddFile([
-            {
-              name: `scan-${randomNum(4)}-${Date.now()}.pdf`,
-              uri: result.source,
-              mime: 'application/pdf',
-              metadata: {},
-            },
-          ]);
+          try {
+            const result = await Toolkit.openDocumentCamera();
+            handleAddFile([
+              {
+                name: `scan-${randomNum(4)}-${Date.now()}.pdf`,
+                uri: result.source,
+                mime: 'application/pdf',
+                metadata: {},
+              },
+            ]);
+          } catch {
+            Alert.alert(t('fileManager:add.notSupported.msg'));
+          }
         }
         break;
       case FileImportType.Folder:
-        Alert.prompt(
-          t('fileManager:folderForm.title'),
-          t('fileManager:folderForm.msg'),
-          [
-            {
-              text: t('common:cancel'),
-              style: 'cancel',
-            },
-            {
-              text: t('common:confirm'),
-              style: 'default',
-              onPress: value => {
-                if (value?.trim()) {
-                  handleCreateFolder(value.trim());
-                }
-              },
-            },
-          ],
-          'plain-text',
-        );
+        createFolder();
         break;
       case FileImportType.Document:
         const result = await fileImporter
@@ -282,6 +266,63 @@ const AddButton = observer<AddButtonProps>(props => {
 
 export default AddButton;
 
+export function useCreateFolder(
+  folderId?: string | null,
+  componentId?: string,
+  onDone?: () => void,
+) {
+  const { t } = useTranslation();
+
+  const handleCreateFolder = useCallback(
+    async (value: string) => {
+      const name = value?.trim();
+      const res = await services.api.file.createFolder({
+        name,
+        parent_id: folderId,
+      });
+
+      if (res) {
+        if (componentId) {
+          Navigation.push(componentId, {
+            component: {
+              name: 'FileManager',
+              passProps: {
+                name,
+                folderId: res.id,
+              },
+            },
+          });
+        }
+        onDone?.();
+      }
+    },
+    [folderId],
+  );
+
+  return () => {
+    Alert.prompt(
+      t('fileManager:folderForm.title'),
+      t('fileManager:folderForm.msg'),
+      [
+        {
+          text: t('common:cancel'),
+          style: 'cancel',
+        },
+        {
+          text: t('common:confirm'),
+          style: 'default',
+          onPress: value => {
+            if (value?.trim()) {
+              handleCreateFolder(value.trim());
+            }
+          },
+        },
+      ],
+      'plain-text',
+    );
+  };
+}
+
 const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
@@ -317,7 +358,7 @@ const styles = StyleSheet.create({
   },
   item: {
     alignItems: 'center',
-    width: 100,
+    minWidth: 100,
     marginBottom: 20,
   },
   iconContainer: {

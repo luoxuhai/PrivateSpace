@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, SafeAreaView } from 'react-native';
 import { observer } from 'mobx-react-lite';
 import {
   NavigationFunctionComponent,
@@ -12,6 +12,7 @@ import {
 } from 'react-native-navigation-hooks';
 import { useQuery } from 'react-query';
 import FileViewer from 'react-native-file-viewer';
+import SegmentedControl from '@react-native-segmented-control/segmented-control';
 
 import { services } from '@/services';
 import { SelectedMask } from '@/screens/PhotoList';
@@ -25,6 +26,13 @@ import { ContextMenu } from './ContextMenu';
 import { DataLoadStatus } from '@/components/DataLoadStatus';
 import { clearRecycleBin } from './clearRecycleBin';
 import GridList from '@/components/GridList';
+import { HapticFeedback } from '@/utils';
+import FileList from '../FileManager/components/FileList';
+
+enum SourceType {
+  Album = 0,
+  File,
+}
 
 const RecycleBinScreen: NavigationFunctionComponent<
   NavigationComponentProps
@@ -34,17 +42,22 @@ const RecycleBinScreen: NavigationFunctionComponent<
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isSelectMode, setIsSelectMode] = useState(false);
   const { visible, forceRender } = useForceRender();
+  const [selectedIndex, setSelectedIndex] = useState<SourceType>(
+    SourceType.Album,
+  );
 
   const {
     isLoading,
     data: photosData,
     refetch: refetchFileList,
   } = useQuery(
-    'recycle.bin.photos',
+    ['recycle.bin.photos.', selectedIndex],
     async () => {
       let res;
       try {
-        res = await services.api.photo.list({
+        res = await services.api[
+          selectedIndex === SourceType.Album ? 'photo' : 'file'
+        ].list({
           status: FileStatus.Deleted,
           order_by: { mtime: 'DESC' },
         });
@@ -227,25 +240,50 @@ const RecycleBinScreen: NavigationFunctionComponent<
   );
 
   return (
-    <>
-      <GridList
-        style={[
-          styles.galleryList,
-          {
-            backgroundColor: ui.colors.systemBackground,
-          },
+    <SafeAreaView style={styles.safeAreaView}>
+      {/* <SegmentedControl
+        style={[styles.segment]}
+        selectedIndex={selectedIndex}
+        values={[
+          t('album:navigation.title'),
+          t('fileManager:navigation.title'),
         ]}
-        itemWidth={100}
-        gutter={2}
-        externalGutter={false}
-        gridEnabled
-        ListHeaderComponent={ListHeaderComponent}
-        ListEmptyComponent={
-          <DataLoadStatus loading={isLoading} text={t('imageList:noData')} />
-        }
-        data={photosData?.items ?? []}
-        renderItem={renderItem}
-      />
+        onChange={event => {
+          setSelectedIndex(event.nativeEvent.selectedSegmentIndex);
+          HapticFeedback.selection();
+        }}
+      /> */}
+
+      {selectedIndex === SourceType.Album ? (
+        <GridList
+          style={[
+            styles.galleryList,
+            {
+              backgroundColor: ui.colors.systemBackground,
+            },
+          ]}
+          itemWidth={100}
+          gutter={2}
+          externalGutter={false}
+          gridEnabled
+          ListHeaderComponent={ListHeaderComponent}
+          ListEmptyComponent={
+            <DataLoadStatus loading={isLoading} text={t('imageList:noData')} />
+          }
+          data={photosData?.items ?? []}
+          renderItem={renderItem}
+        />
+      ) : (
+        <FileList
+          data={photosData?.items ?? []}
+          ListEmptyComponent={
+            <DataLoadStatus
+              loading={isLoading}
+              text={t('fileManager:noData')}
+            />
+          }
+        />
+      )}
       <ToolbarContainer
         visible={isSelectMode}
         selectedIds={selectedIds}
@@ -254,16 +292,17 @@ const RecycleBinScreen: NavigationFunctionComponent<
           refetchFileList();
         }}
       />
-    </>
+    </SafeAreaView>
   );
 };
 
 export default observer(RecycleBinScreen);
 
 const styles = StyleSheet.create({
-  galleryList: {
-    paddingTop: 0,
+  safeAreaView: {
+    flex: 1,
   },
+  galleryList: {},
   headerTip: {
     justifyContent: 'center',
     alignItems: 'center',
@@ -276,5 +315,9 @@ const styles = StyleSheet.create({
   },
   enabledTip: {
     marginTop: 4,
+  },
+  segment: {
+    marginTop: 10,
+    marginHorizontal: '10%',
   },
 });

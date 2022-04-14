@@ -11,4 +11,6 @@ declare global {
   interface IStore {
     hydrate?: () => PVoid;
   }
+
+  type FileView = 'list' | 'icons' | 'gallery';
 }

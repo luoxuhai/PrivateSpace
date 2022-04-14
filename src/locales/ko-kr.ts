@@ -1,6 +1,6 @@
 export default {
   app: {
-    name: '사적인 공간',
+    name: 'PSpace',
   },
 
   faceID: {
@@ -98,6 +98,9 @@ export default {
       scan: '문서 스캔',
       doc: '파일 가져오기',
       folder: '새 폴더',
+      notSupported: {
+        msg: '현재 기기는 이 기능을 지원하지 않습니다',
+      },
     },
     folderForm: {
       title: '새 폴더',
@@ -108,6 +111,13 @@ export default {
       title: '이 {{count}}개의 파일이 삭제됩니다',
     },
     noData: '파일 없음',
+    items: '프로젝트',
+    move: {
+      text: '여기로와',
+    },
+    copy: {
+      text: '여기에 복사',
+    },
   },
 
   miniApps: {
@@ -310,10 +320,12 @@ export default {
   fileManage: {
     gallery: '갤러리',
     list: '목록',
+    icons: '상',
     ctime: '시간 생성',
     mtime: '수정 시간',
     size: '크기',
     name: '이름',
+    kind: '유형',
     info: {
       name: '파일 이름',
       type: '유형',
@@ -333,15 +345,15 @@ export default {
   purchase: {
     navigation: {
       title: '프리미엄',
-      subtitle: '완벽한 프라이버시 공간 기능 경험',
+      subtitle: '완전한 기능적 경험',
     },
     card: {
-      title: '프라이버시 스페이스 프리미엄',
+      title: 'PSpace 프리미엄',
       desc: '모든 권한 잠금 해제',
       button: '지금 열기',
     },
     tableView: {
-      title: '프라이버시 스페이스 프리미엄',
+      title: 'PSpace 프리미엄',
     },
     paying: '구매',
     price: '가격',
@@ -422,6 +434,22 @@ export default {
       desc: '설명 수정',
       rename: '이름 바꾸기',
       descPlaceholder: '설명을 입력하십시오',
+    },
+  },
+
+  appUpdate: {
+    alert: {
+      title: '새 버전 발견(V{{version}})',
+      ok: '고쳐 쓰다',
+      cancel: '취소',
+    },
+    card: {
+      alert: {
+        title: '업데이트 프롬프트',
+        msg: '설치 패키지가 다운로드되었습니다. 업데이트하려면 앱을 다시 시작하세요.',
+        ok: '고쳐 쓰다',
+      },
+      title: '새로운 버전',
     },
   },
 };

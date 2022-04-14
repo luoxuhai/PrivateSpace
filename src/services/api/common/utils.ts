@@ -75,8 +75,16 @@ export async function getPhotoThumbnailPath(
   const sourceId = photo.extra?.source_id;
   if (!sourceId) return [];
 
-  let thumbnailPath: string = getThumbnailPath({ sourceId });
+  let thumbnailPath: string | undefined = getThumbnailPath({ sourceId });
   const sourcePath = getSourcePath(sourceId, photo.name);
+
+  if (
+    getSourceByMime(photo.mime) === SourceType.Video &&
+    !(await FS.exists(thumbnailPath))
+  ) {
+    return [undefined, sourcePath];
+  }
+
   if (photo.extra?.width) {
     if (photo.extra.width < 400) {
       thumbnailPath = sourcePath;
@@ -101,7 +109,6 @@ export async function setPhotoSource(
     const [thumbnail, uri] = await getPhotoThumbnailPath(item);
     newPhoto[index].thumbnail = thumbnail;
     newPhoto[index].uri = uri;
-    // TODO 视频的 `poster` 暂时取 `thumbnail`
     if (getSourceByMime(item.mime) === SourceType.Video) {
       const sourceId = item.extra?.source_id;
       const poster = getPosterPath(sourceId)!;

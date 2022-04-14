@@ -48,42 +48,76 @@ const MoreButton = observer<IContextMenuProps>(props => {
                 : 'ASC'
               : getDefaultOrder(key),
           });
-          props.onRefetch?.();
           break;
+        case 'icons':
+        case 'list':
+          fileStore.setView(key);
       }
+
+      props.onRefetch?.();
     },
     [fileStore.view, fileStore.orderBy],
   );
 
   const menuConfig: MenuConfig = {
-    menuTitle: '排序方式',
+    menuTitle: '',
     menuItems: [
       {
-        actionKey: 'ctime',
-        actionTitle: t('fileManage:ctime'),
-        menuState: getMenuState(!!fileStore.orderBy?.ctime),
+        menuTitle: '',
+        menuOptions: ['displayInline'],
+        menuItems: [
+          {
+            actionKey: 'icons',
+            actionTitle: t('fileManage:icons'),
+            menuState: getMenuState(fileStore.view === 'icons'),
+            icon: {
+              iconType: 'SYSTEM',
+              iconValue: 'square.grid.2x2',
+            },
+          },
+          {
+            actionKey: 'list',
+            actionTitle: t('fileManage:list'),
+            menuState: getMenuState(fileStore.view === 'list'),
+            icon: {
+              iconType: 'SYSTEM',
+              iconValue: 'list.bullet',
+            },
+          },
+        ],
       },
       {
-        actionKey: 'name',
-        actionTitle: t('fileManage:name'),
-        menuState: getMenuState(!!fileStore.orderBy?.name),
+        menuTitle: '',
+        menuOptions: ['displayInline'],
+        menuItems: [
+          {
+            actionKey: 'ctime',
+            actionTitle: t('fileManage:ctime'),
+            menuState: getMenuState(!!fileStore.orderBy?.ctime),
+          },
+          {
+            actionKey: 'name',
+            actionTitle: t('fileManage:name'),
+            menuState: getMenuState(!!fileStore.orderBy?.name),
+          },
+          {
+            actionKey: 'size',
+            actionTitle: t('fileManage:size'),
+            menuState: getMenuState(!!fileStore.orderBy?.size),
+          },
+        ].map(item => ({
+          ...item,
+          icon: {
+            iconType: 'SYSTEM',
+            iconValue:
+              item.menuState === 'on' &&
+              (fileStore.orderBy?.[item.actionKey] === 'ASC'
+                ? 'chevron.up'
+                : 'chevron.down'),
+          },
+        })),
       },
-      {
-        actionKey: 'size',
-        actionTitle: t('fileManage:size'),
-        menuState: getMenuState(!!fileStore.orderBy?.size),
-      },
-    ].map(item => ({
-      ...item,
-      icon: {
-        iconType: 'SYSTEM',
-        iconValue:
-          item.menuState === 'on' &&
-          (fileStore.orderBy?.[item.actionKey] === 'ASC'
-            ? 'chevron.up'
-            : 'chevron.down'),
-      },
-    })),
+    ],
   };
 
   return (

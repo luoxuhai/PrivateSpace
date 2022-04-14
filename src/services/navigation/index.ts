@@ -3,7 +3,6 @@ import { AppState, AppStateStatus } from 'react-native';
 
 import { getScreens, ScreenName } from '@/screens';
 import { getDefaultOptions, components } from './options';
-import { DynamicUpdate } from '@/utils/dynamicUpdate';
 import { stores } from '@/store';
 import { initShare } from '@/utils/initShare';
 
@@ -112,15 +111,10 @@ export default class Nav {
           if (!maskVisible && !lockScreenVisible && enableMask) {
             stores.global.setMaskVisible(true);
           }
-          // if (!__DEV__) {
-          //   DynamicUpdate.sync();
-          // }
-          DynamicUpdate.sync();
           break;
         case 'active':
           stores.global.setMaskVisible(false);
           clearTimeout(timer);
-          DynamicUpdate.sync();
       }
     });
   }

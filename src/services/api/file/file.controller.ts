@@ -67,6 +67,10 @@ class FileController {
     }
   }
 
+  public async copy(params: Types.CopyFileParams) {
+    return await PhotoService.copy(params);
+  }
+
   public async createFolder(params: Types.CreateFolderParams) {
     if (!params.name) return;
 

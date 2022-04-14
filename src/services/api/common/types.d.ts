@@ -35,6 +35,7 @@ declare global {
       uri?: string;
       thumbnail?: string;
       poster?: string;
+      children_count?: number;
     };
 
     type UserType = UserEntity;

@@ -42,7 +42,8 @@ const ArchiveExtensionName = ['zip', 'rar', 'gzip', '7z', 'tar'];
 
 const coverProps = {
   width: '90%',
-  height: 100,
+  // height: 100,
+  maxHeight: 90,
 };
 
 const imageProps: ImageProps = {
@@ -75,7 +76,7 @@ function getCoverComponentByMime(
             uri: thumbnail,
           }}
           {...imageProps}
-          // {...props}
+          {...props}
         />
       );
     } else return <CoverImage {...props} />;
@@ -89,6 +90,7 @@ function getCoverComponentByMime(
             uri: thumbnail,
           }}
           {...imageProps}
+          {...props}
         />
       );
     } else return <CoverVideo {...props} />;
@@ -114,12 +116,13 @@ function getCoverComponentByMime(
 interface FileCoverProps {
   item: API.FileWithSource;
   coverProps?: {
-    style: StyleProp<ViewProps | ImageProps>;
+    style?: StyleProp<ViewProps | ImageProps>;
+    width?: number;
+    height?: number;
   };
 }
 
 function FileCover(props: FileCoverProps): JSX.Element {
-  const { ui } = useStore();
   const Component = getCoverComponentByMime(props.item, {
     ...coverProps,
     ...props.coverProps,

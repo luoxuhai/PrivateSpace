@@ -67,6 +67,10 @@ class PhotoController {
     }
   }
 
+  public async copy(params: Types.CopyFileParams) {
+    return await PhotoService.copy(params);
+  }
+
   public async update(
     params: Types.UpdatePhotoParams,
   ): Promise<Types.Response<undefined>> {
