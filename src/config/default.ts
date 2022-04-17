@@ -55,4 +55,5 @@ export default {
   },
   baseURL: 'https://ps.fastools.cn',
   testDevices: ['FC1E30CE-E5BA-44D6-9B2A-9F4C75B7325A'],
+  groupIdentifier: 'group.net.darkce.privatespace',
 };

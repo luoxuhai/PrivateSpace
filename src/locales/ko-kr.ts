@@ -151,6 +151,7 @@ export default {
     },
     changePass: '비밀번호 변경',
     autoLockAuth: '{{authType}}잠금 해제 자동 켜기',
+    localAuth: '잠금 해제하려면 {{authType}} 활성화',
     feedback: '피드백',
     language: '언어',
     grade: '좋은 평가를 내리다',
@@ -451,5 +452,15 @@ export default {
       },
       title: '새로운 버전',
     },
+  },
+
+  shareExtension: {
+    close: '닫기',
+    add: '추가',
+    add상태: {
+      success: '기본 앨범에 추가됨',
+      fail: '추가 실패! ',
+    },
+    tip: '기본 앨범에 사진 또는 동영상 {{count}}장 추가',
   },
 };

@@ -4,7 +4,7 @@ import { AppState, AppStateStatus } from 'react-native';
 import { getScreens, ScreenName } from '@/screens';
 import { getDefaultOptions, components } from './options';
 import { stores } from '@/store';
-import { initShare } from '@/utils/initShare';
+import { initShareData } from '@/utils/initShare';
 
 export default class Nav {
   screens?: Screens<ScreenName>;
@@ -16,13 +16,9 @@ export default class Nav {
   }
 
   async start(): PVoid {
-    // if (__DEV__) {
-    //   await this.startMainScreen();
-    // } else {
     await this.startLockScreen();
-    // }
+    initShareData();
     this.addAppStateListener();
-    initShare();
   }
 
   async startMainScreen(): Promise<string | undefined> {
@@ -115,6 +111,7 @@ export default class Nav {
         case 'active':
           stores.global.setMaskVisible(false);
           clearTimeout(timer);
+          initShareData();
       }
     });
   }

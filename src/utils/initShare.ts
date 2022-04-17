@@ -1,56 +1,44 @@
-import ShareMenu, { ShareData } from 'react-native-share-menu';
+import FS from 'react-native-fs';
+import { getMimeType } from '@qeepsake/react-native-file-utils';
 
 import { transformResult } from '@/screens/PhotoList/AddButton';
 import { services } from '@/services';
 import { stores } from '@/store';
-import { LoadingOverlay } from '@/components/LoadingOverlay';
-import { RNToasty } from 'react-native-toasty';
-import { randomNum, extname, getDefaultAlbum } from '@/utils';
-import classifyImageProcess from '@/utils/process/classifyImageProcess';
+import { getDefaultAlbum } from '@/utils';
+import config from '@/config';
+import { CustomSentry } from './customSentry';
 
-export function initShare(): void {
-  ShareMenu.getInitialShare(handleShare);
-  ShareMenu.addNewShareListener(handleShare);
-}
+export async function initShareData() {
+  if (!stores.user.current?.id) return;
+  const albumId = (await getDefaultAlbum(stores.user.current.id))?.id;
+  if (!albumId) return;
 
-const handleShare = async (shareData?: ShareData) => {
-  if (!shareData?.data) {
-    return;
-  }
+  const sharedPath = await FS.pathForGroup(config.groupIdentifier);
+  const sourcePath = `${sharedPath}/Library/data/source`;
+  const files = await FS.readDir(sourcePath);
 
-  LoadingOverlay.show({
-    text: {
-      value: '保存中...',
-    },
+  files.forEach(async file => {
+    try {
+      const normalizedFile = await transformResult(
+        {
+          uri: file.path,
+          name: file.name,
+          size: file.size,
+          mime: await getMimeType(`file://${file.path}`),
+        },
+        albumId,
+      );
+      await services.api.photo.create(normalizedFile);
+      FS.unlink(file.path);
+    } catch (error) {
+      CustomSentry.captureException(error, {
+        extra: {
+          title: '创建分享的文件失败',
+        },
+      });
+    }
   });
-  try {
-    await createFiles(
-      await Promise.all(
-        shareData.data?.map(async item =>
-          transformResult(
-            {
-              uri: item.data,
-              mime: item.mimeType,
-              name: `IMG_${randomNum(10)}${extname(item.data)}`,
-            },
-            (
-              await getDefaultAlbum(stores.user.current!.id)
-            )?.id as string,
-          ),
-        ) ?? [],
-      ),
-    );
-    stores.album.setRefetchAlbum(stores.album.refetchAlbum + 1);
-  } catch {
-    RNToasty.Show({
-      title: '保存失败',
-      position: 'top',
-    });
-  }
-
-  LoadingOverlay.hide();
-  classifyImageProcess.start();
-};
+}
 
 export const createFiles = async files => {
   try {

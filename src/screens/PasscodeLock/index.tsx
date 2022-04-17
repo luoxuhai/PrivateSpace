@@ -16,7 +16,6 @@ import {
   useAppState,
 } from '@react-native-community/hooks';
 import Animated, { FadeIn } from 'react-native-reanimated';
-import LottieView from 'lottie-react-native';
 
 import { useStore, stores } from '@/store';
 import { EUserType } from '@/services/database/entities/user.entity';
@@ -133,6 +132,7 @@ const PasscodeLockOverlay: PasscodeLockOverlayComponent<IPasscodeLockProps> = (
       setTimeout(() => {
         if (
           userStore.current?.password &&
+          (globalStore.settingInfo.localAuth ?? true) &&
           globalStore.settingInfo.autoLocalAuth &&
           userStore.current?.type !== EUserType.GHOST
         ) {
@@ -335,6 +335,7 @@ const PasscodeLockOverlay: PasscodeLockOverlayComponent<IPasscodeLockProps> = (
 
   const extraButtonEnabled =
     inputType === EInputType.Verify &&
+    (globalStore.settingInfo.localAuth ?? true) &&
     (userStore.current?.type === EUserType.GHOST
       ? !globalStore.settingInfo.fakePassword?.hideLocalAuth
       : true);

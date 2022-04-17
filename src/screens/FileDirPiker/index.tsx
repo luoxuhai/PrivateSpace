@@ -62,14 +62,25 @@ const FileDirPiker: NavigationFunctionComponent<FileDirPikerProps> = observer(
       },
       { enabled: true },
     );
-    const createFolder = useCreateFolder(
-      props.folderId,
-      props.componentId,
-      () => {
-        refetch();
-        refetchFiles();
-      },
-    );
+
+    const createFolder = useCreateFolder(props.folderId, v => {
+      if (props.componentId) {
+        Navigation.push(props.componentId, {
+          component: {
+            name: 'FileDirPiker',
+            passProps: {
+              name: v.name,
+              folderId: v.id,
+              excludedFolders: props.excludedFolders,
+              onDone: props.onDone,
+              type: props.type,
+            },
+          },
+        });
+      }
+      refetch();
+      refetchFiles();
+    });
 
     return (
       <View
@@ -93,6 +104,7 @@ const FileDirPiker: NavigationFunctionComponent<FileDirPikerProps> = observer(
                   folderId: item.id,
                   excludedFolders: props.excludedFolders,
                   onDone: props.onDone,
+                  type: props.type,
                 },
               },
             });

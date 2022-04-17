@@ -22,7 +22,6 @@ import CoverTXT from '@/assets/images/file/文件类型-标准图-记事本.svg'
 import CoverZip from '@/assets/images/file/文件类型-标准图-压缩文件.svg';
 import CoverWeb from '@/assets/images/file/文件类型-标准图-链接.svg';
 import { FileType } from '@/services/database/entities/file.entity';
-import { useStore } from '@/store';
 import uiStore from '@/store/ui';
 
 const PPTExtensionName = ['ppt', 'pptx', 'pot', 'potx', 'pps', 'ppsx'];

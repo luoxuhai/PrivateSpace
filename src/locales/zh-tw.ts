@@ -151,6 +151,7 @@ export default {
     },
     changePass: '修改密碼',
     autoLockAuth: '自動開啟{{authType}}解鎖',
+    localAuth: '開啟{{authType}}解鎖',
     feedback: '反饋建議',
     language: '語言',
     grade: '給個好評',
@@ -446,5 +447,15 @@ export default {
       },
       title: '新版本',
     },
+  },
+
+  shareExtension: {
+    close: '關閉',
+    add: '添加',
+    addStatus: {
+      success: '已添加至默認相冊',
+      fail: '添加失敗！ ',
+    },
+    tip: '添加{{count}}個圖片或視頻到默認相冊',
   },
 };

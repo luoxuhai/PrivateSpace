@@ -289,8 +289,8 @@ export function CameraPage(props: Props): React.ReactElement {
 
       <TouchableOpacity
         style={[styles.closeButton, styles.button]}
-        onPress={async () => {
-          await CameraPage.close();
+        onPress={() => {
+          CameraPage.close();
           props.onCancel?.();
         }}
         activeOpacity={0.4}>
@@ -391,8 +391,8 @@ CameraPage.open = async ({
   });
 };
 
-CameraPage.close = async () => {
-  await services.nav.screens?.N.dismissModal('Camera');
+CameraPage.close = () => {
+  return services.nav.screens?.N.dismissModal('Camera');
 };
 
 const styles = StyleSheet.create({

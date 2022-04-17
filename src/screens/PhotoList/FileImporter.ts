@@ -4,7 +4,6 @@ import DocumentPicker, {
 } from 'react-native-document-picker';
 import { SupportedPlatforms } from 'react-native-document-picker/src/fileTypes';
 import { PhotoFile } from 'react-native-vision-camera';
-// import ImagePicker from 'react-native-image-picker'
 
 import { PermissionManager, randomNum, extname } from '@/utils';
 import { CameraPage } from '@/screens/Camera';
@@ -31,7 +30,7 @@ interface IMethod {
   open: (
     onCallback?: (error?: string, result?: IResult[]) => void,
   ) => Promise<IResult[] | void>;
-  close?: () => PVoid;
+  close?: () => Promise<string> | undefined;
 }
 
 interface IOptions {
@@ -157,8 +156,8 @@ export class FileImporter implements IFileImporter {
           onCancel,
         });
       },
-      close: async () => {
-        await CameraPage.close();
+      close: () => {
+        return CameraPage.close();
       },
     };
   }

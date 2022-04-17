@@ -9,6 +9,11 @@ import {
 } from 'react-native';
 import { observer } from 'mobx-react-lite';
 import { isUndefined } from 'lodash';
+import Animated, {
+  FadeIn,
+  FadeOut,
+  SequencedTransition,
+} from 'react-native-reanimated';
 
 import IconChevronRight from '@/assets/icons/chevron.right.svg';
 import { useStore, stores } from '@/store';
@@ -20,6 +25,9 @@ export interface IListProps {
 }
 
 type ExtraValue = JSX.Element | string;
+
+const AnimatedTouchableHighlight =
+  Animated.createAnimatedComponent(TouchableHighlight);
 
 const renderIconRight = () => (
   <IconChevronRight fill={stores.ui.colors.opaqueSeparator} height={12} />
@@ -35,12 +43,15 @@ function List(props: IListProps): JSX.Element {
         {props.data?.map(
           (item, index) =>
             item.renderItem?.() ?? (
-              <TouchableHighlight
+              <AnimatedTouchableHighlight
                 key={item.title}
+                layout={SequencedTransition.reverse()}
+                entering={FadeIn}
+                exiting={FadeOut.duration(150)}
                 underlayColor={colors.systemGray5}
                 onPress={item.onPress}>
                 {renderItem(item, index !== props.data!.length - 1)}
-              </TouchableHighlight>
+              </AnimatedTouchableHighlight>
             ),
         )}
       </ListContainer>

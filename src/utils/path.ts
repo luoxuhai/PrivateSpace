@@ -8,7 +8,7 @@ function _normalize(path: string): string {
       components.push(component);
     }
   }
-  let normalized = (
+  const normalized = (
     (path.startsWith('/') ? '/' : '') + components.join('/')
   ).replace(/\/\/+/g, '/');
   return normalized || '.';
@@ -119,6 +119,14 @@ function _relative(base: string, path: string) {
   return Array(base.length).fill('..').concat(path).join('/');
 }
 
+export function filename(path: string) {
+  const pos1 = path.lastIndexOf('/');
+  const pos2 = path.lastIndexOf('\\');
+  const pos = Math.max(pos1, pos2);
+  if (pos < 0) return path;
+  else return path.substring(pos + 1);
+}
+
 export const normalize = _normalize;
 export const basename = (path: string, ext: string) =>
   _basename(_normalize(path), ext);
@@ -137,6 +145,7 @@ export default {
   basename,
   dirname,
   extname,
+  filename,
   parse,
   format,
   join,

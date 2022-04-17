@@ -6,7 +6,7 @@ import {
 } from 'react-native-navigation';
 import { StyleSheet, View } from 'react-native';
 import { observer } from 'mobx-react';
-import { useNavigationComponentDidAppear } from 'react-native-navigation-hooks';
+import { useNavigationComponentDidDisappear } from 'react-native-navigation-hooks';
 import { useTranslation } from 'react-i18next';
 import useUpdateEffect from 'use-update-effect';
 import FileViewer from 'react-native-file-viewer';
@@ -32,10 +32,8 @@ const FileManager: NavigationFunctionComponent<FileManagerProps> = observer(
     const { t } = useTranslation();
     const fileDetailRef = useRef<FileDetailInstance>(null);
 
-    useNavigationComponentDidAppear(() => {
-      if (fileResult?.total) {
-        refetch();
-      }
+    useNavigationComponentDidDisappear(() => {
+      refetch();
     }, props.componentId);
 
     useUpdateEffect(() => {
@@ -67,10 +65,12 @@ const FileManager: NavigationFunctionComponent<FileManagerProps> = observer(
           componentId={props.componentId}
           layoutType={fileStore.view}
           ListEmptyComponent={
-            <DataLoadStatus
-              loading={isFetching}
-              text={t('fileManager:noData')}
-            />
+            fileResult?.total ? null : (
+              <DataLoadStatus
+                loading={isFetching}
+                text={t('fileManager:noData')}
+              />
+            )
           }
           onViewDetail={item => fileDetailRef.current?.open?.(item)}
           onItemPress={item => {

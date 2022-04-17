@@ -151,6 +151,7 @@ export default {
     },
     changePass: '修改密码',
     autoLockAuth: '自动开启{{authType}}解锁',
+    localAuth: '开启{{authType}}解锁',
     feedback: '反馈建议',
     language: '语言',
     grade: '给个好评',
@@ -447,5 +448,15 @@ export default {
       },
       title: '新版本',
     },
+  },
+
+  shareExtension: {
+    close: '关闭',
+    add: '添加',
+    addStatus: {
+      success: '已添加至默认相册',
+      fail: '添加失败！',
+    },
+    tip: '添加{{count}}个图片或视频到默认相册',
   },
 };

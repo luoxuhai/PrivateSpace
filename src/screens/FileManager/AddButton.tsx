@@ -60,14 +60,21 @@ const AddButton = observer<AddButtonProps>(props => {
   const { refetch } = useQuery([props.folderId ?? 'root', '.files'], {
     enabled: false,
   });
-  const createFolder = useCreateFolder(
-    props.folderId,
-    props.componentId,
-    () => {
-      refetch();
-      closeModal();
-    },
-  );
+  const createFolder = useCreateFolder(props.folderId, v => {
+    refetch();
+    closeModal();
+    if (props.componentId) {
+      Navigation.push(props.componentId, {
+        component: {
+          name: 'FileManager',
+          passProps: {
+            name: v.name,
+            folderId: v.id,
+          },
+        },
+      });
+    }
+  });
 
   const list = useMemo(
     () => [
@@ -268,8 +275,7 @@ export default AddButton;
 
 export function useCreateFolder(
   folderId?: string | null,
-  componentId?: string,
-  onDone?: () => void,
+  onDone?: (v: any) => void,
 ) {
   const { t } = useTranslation();
 
@@ -282,18 +288,10 @@ export function useCreateFolder(
       });
 
       if (res) {
-        if (componentId) {
-          Navigation.push(componentId, {
-            component: {
-              name: 'FileManager',
-              passProps: {
-                name,
-                folderId: res.id,
-              },
-            },
-          });
-        }
-        onDone?.();
+        onDone?.({
+          ...res,
+          name,
+        });
       }
     },
     [folderId],

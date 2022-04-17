@@ -151,7 +151,8 @@ export default {
       title: 'Settings',
     },
     changePass: 'Change Passcode',
-    autoLockAuth: 'Automatically Open {{authType}} Unlock',
+    autoLockAuth: 'Automatically Enable {{authType}} Unlock',
+    localAuth: 'Enable {{authType}} to Unlock',
     feedback: 'Help & Feedback',
     language: 'Language',
     grade: 'Good Reviews',
@@ -459,5 +460,15 @@ export default {
       },
       title: 'New Version',
     },
+  },
+
+  shareExtension: {
+    close: 'Close',
+    add: 'Add',
+    addStatus: {
+      success: 'Added to the default album',
+      fail: 'Add failed! ',
+    },
+    tip: 'Add {{count}} images or videos to the default album',
   },
 };

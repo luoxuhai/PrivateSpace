@@ -1,5 +1,10 @@
 import React, { Fragment } from 'react';
 import { View, ViewStyle, StyleProp } from 'react-native';
+import Animated, {
+  FadeIn,
+  FadeOut,
+  SequencedTransition,
+} from 'react-native-reanimated';
 
 import List, { IListItem } from './List';
 import CheckList, { ICheckListItem, ICheckList } from './CheckList';
@@ -26,7 +31,9 @@ function SimpleSelectionList(props: ISimpleSelectionList): JSX.Element {
       {props.sections
         .filter(section => section)
         .map((selection: any, index) => (
-          <Fragment key={`${selection.title}-${index}`}>
+          <Animated.View
+            key={`${selection.title}-${index}`}
+            layout={SequencedTransition.reverse()}>
             {props.listType === 'check' ? (
               <CheckList
                 options={selection.data as ICheckListItem<string>[]}
@@ -38,7 +45,7 @@ function SimpleSelectionList(props: ISimpleSelectionList): JSX.Element {
             ) : (
               <List data={selection.data} header={selection.title} />
             )}
-          </Fragment>
+          </Animated.View>
         ))}
     </View>
   );

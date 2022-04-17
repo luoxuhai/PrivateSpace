@@ -80,6 +80,8 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = PrivateSpace/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = PrivateSpace/main.m; sourceTree = "<group>"; };
 		1D0AE47A65C8663E3B452821 /* Pods-PrivateSpace-PrivateSpaceTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PrivateSpace-PrivateSpaceTests.release.xcconfig"; path = "Target Support Files/Pods-PrivateSpace-PrivateSpaceTests/Pods-PrivateSpace-PrivateSpaceTests.release.xcconfig"; sourceTree = "<group>"; };
+		354BEE47280C14860018255B /* UniformTypeIdentifiers.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UniformTypeIdentifiers.framework; path = System/Library/Frameworks/UniformTypeIdentifiers.framework; sourceTree = SDKROOT; };
+		354BEE59280C1E250018255B /* ShareExtensionRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ShareExtensionRelease.entitlements; sourceTree = "<group>"; };
 		355ED7BE27366133005ABB3E /* Bridging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bridging.swift; sourceTree = "<group>"; };
 		3560591727898C3F00B6DCA4 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		3560591927898C5600B6DCA4 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
@@ -111,12 +113,6 @@
 		35C7E28527F877AB00D4A694 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/MainInterface.strings"; sourceTree = "<group>"; };
 		35C7E28627F877AB00D4A694 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		35C7E28727F877AB00D4A694 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
-		35C7E29227FBF29F00D4A694 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/MainInterface.strings; sourceTree = "<group>"; };
-		35C7E29327FBF2A000D4A694 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
-		35C7E29427FBF2A000D4A694 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		35C7E29527FBF2F000D4A694 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/MainInterface.strings; sourceTree = "<group>"; };
-		35C7E29627FBF2F100D4A694 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
-		35C7E29727FBF2F100D4A694 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		35C7E6A727FC985400D4A694 /* QuickLook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickLook.framework; path = System/Library/Frameworks/QuickLook.framework; sourceTree = SDKROOT; };
 		35CDA1B727335ECB0039FF08 /* Ionicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Ionicons.ttf; path = "../node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
 		35D1890E276D98C500C1C94B /* dark128x128.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dark128x128.png; sourceTree = "<group>"; };
@@ -223,6 +219,7 @@
 				6423831EA8574132BED9D8CC /* libPods-PrivateSpace.a */,
 				ABFE59519B596E51CEFDCCC0 /* libPods-PrivateSpace-PrivateSpaceTests.a */,
 				DC59688C954E35087989D57F /* libPods-ShareExtension.a */,
+				354BEE47280C14860018255B /* UniformTypeIdentifiers.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -230,6 +227,7 @@
 		35AE5CCB273EB14800892FA8 /* ShareExtension */ = {
 			isa = PBXGroup;
 			children = (
+				354BEE59280C1E250018255B /* ShareExtensionRelease.entitlements */,
 				35AE5CE1273F5B8700892FA8 /* ShareViewController.swift */,
 				35AE5CDF273F5A9B00892FA8 /* ReactShareViewController.swift */,
 				35AE5CDD273EC86D00892FA8 /* ShareExtension.entitlements */,
@@ -454,8 +452,6 @@
 				ja,
 				ko,
 				"zh-Hant",
-				ru,
-				es,
 			);
 			mainGroup = 83CBB9F61A601CBA00E9B192;
 			productRefGroup = 83CBBA001A601CBA00E9B192 /* Products */;
@@ -780,8 +776,6 @@
 				35C7E27027F8756900D4A694 /* ja */,
 				35C7E28027F876BA00D4A694 /* ko */,
 				35C7E28527F877AB00D4A694 /* zh-Hant */,
-				35C7E29227FBF29F00D4A694 /* ru */,
-				35C7E29527FBF2F000D4A694 /* es */,
 			);
 			name = MainInterface.storyboard;
 			sourceTree = "<group>";
@@ -794,8 +788,6 @@
 				35C7E28127F876BA00D4A694 /* ko */,
 				35C7E28327F876C400D4A694 /* ja */,
 				35C7E28627F877AB00D4A694 /* zh-Hant */,
-				35C7E29327FBF2A000D4A694 /* ru */,
-				35C7E29627FBF2F100D4A694 /* es */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -808,8 +800,6 @@
 				35C7E28227F876BA00D4A694 /* ko */,
 				35C7E28427F876C700D4A694 /* ja */,
 				35C7E28727F877AB00D4A694 /* zh-Hant */,
-				35C7E29427FBF2A000D4A694 /* ru */,
-				35C7E29727FBF2F100D4A694 /* es */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -919,7 +909,7 @@
 					"$(PROJECT_DIR)",
 				);
 				MACH_O_TYPE = mh_execute;
-				MARKETING_VERSION = 1.6.0;
+				MARKETING_VERSION = 1.7.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -965,7 +955,7 @@
 					"$(PROJECT_DIR)",
 				);
 				MACH_O_TYPE = mh_execute;
-				MARKETING_VERSION = 1.6.0;
+				MARKETING_VERSION = 1.7.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1041,7 +1031,7 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_ENTITLEMENTS = ShareExtension/ShareExtension.entitlements;
+				CODE_SIGN_ENTITLEMENTS = ShareExtension/ShareExtensionRelease.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;

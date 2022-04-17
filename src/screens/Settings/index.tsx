@@ -1,5 +1,5 @@
 import React from 'react';
-import { Switch, Share } from 'react-native';
+import { Switch, Share, Linking } from 'react-native';
 import { observer } from 'mobx-react-lite';
 import { NavigationComponentProps } from 'react-native-navigation';
 import { useTranslation } from 'react-i18next';
@@ -32,6 +32,7 @@ import IconVip from '@/assets/icons/vip.svg';
 function SettingsPage(props: NavigationComponentProps) {
   const { ui, global, user } = useStore();
   const { t, i18n } = useTranslation();
+  const localAuth = global.settingInfo.localAuth ?? true;
 
   function handleToPage(name: ScreenName) {
     services.nav.screens?.push(props.componentId, name);
@@ -87,6 +88,29 @@ function SettingsPage(props: NavigationComponentProps) {
           onPress: () => handleToPage('AutoLockSetting'),
         },
         user.current?.type === EUserType.ADMIN && global.localAuthTypes?.length
+          ? {
+              title: t('setting:localAuth', {
+                authType: global.localAuthTypes?.includes(
+                  LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION,
+                )
+                  ? t('common:faceID')
+                  : t('common:touchID'),
+              }),
+              render: () => (
+                <Switch
+                  value={localAuth}
+                  onValueChange={value => {
+                    global.setSettingInfo({
+                      localAuth: value,
+                    });
+                  }}
+                />
+              ),
+            }
+          : undefined,
+        user.current?.type === EUserType.ADMIN &&
+        localAuth &&
+        global.localAuthTypes?.length
           ? {
               title: t('setting:autoLockAuth', {
                 authType: global.localAuthTypes?.includes(
@@ -171,27 +195,35 @@ function SettingsPage(props: NavigationComponentProps) {
         {
           title: t('setting:feedback'),
           onPress: async () => {
-            let networkType: string | undefined;
-            try {
-              networkType = await systemInfo.getNetworkStateTypeAsync();
-            } catch {}
+            if (
+              [ELanguage.ZH_CN, ELanguage.ZH_TW].includes(
+                i18n.language as ELanguage,
+              )
+            ) {
+              let networkType: string | undefined;
+              try {
+                networkType = await systemInfo.getNetworkStateTypeAsync();
+              } catch {}
 
-            const url = `${config.TXC_FEEDBACK_URL}?os=${
-              systemInfo.os || '-'
-            }&osVersion=${systemInfo.version || '-'}&clientVersion=${
-              applicationInfo.version || '-'
-            }&netType=${networkType || '-'}&customInfo=${JSON.stringify({
-              modelName: systemInfo.modelName || '-',
-              userId: user.current?.id || '-',
-            })}`;
+              const url = `${config.TXC_FEEDBACK_URL}?os=${
+                systemInfo.os || '-'
+              }&osVersion=${systemInfo.version || '-'}&clientVersion=${
+                applicationInfo.version || '-'
+              }&netType=${networkType || '-'}&customInfo=${JSON.stringify({
+                modelName: systemInfo.modelName || '-',
+                userId: user.current?.id || '-',
+              })}`;
 
-            InAppBrowser.open(encodeURI(url), {
-              dismissButtonStyle: 'close',
-              preferredControlTintColor: ui.themes.primary,
-              modalEnabled: false,
-              animated: true,
-              enableBarCollapsing: true,
-            });
+              InAppBrowser.open(encodeURI(url), {
+                dismissButtonStyle: 'close',
+                preferredControlTintColor: ui.themes.primary,
+                modalEnabled: false,
+                animated: true,
+                enableBarCollapsing: true,
+              });
+            } else {
+              Linking.openURL(`mailto:${config.email}`);
+            }
           },
         },
         {

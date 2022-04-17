@@ -348,7 +348,9 @@ const ImageList: NavigationFunctionComponent<IImageListProps> = props => {
           },
         ]}
         ListEmptyComponent={
-          <DataLoadStatus loading={isFetching} text={t('imageList:noData')} />
+          photoData?.total ? null : (
+            <DataLoadStatus loading={isFetching} text={t('imageList:noData')} />
+          )
         }
         itemWidth={100}
         gutter={2}

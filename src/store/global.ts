@@ -43,6 +43,7 @@ export const enum EAppOpenUrl {
 }
 
 interface ISetting {
+  localAuth: boolean;
   autoLocalAuth: boolean;
   // 秒
   autoLockDuration: number;
@@ -78,6 +79,7 @@ interface IAppUpdateIgnore {
 export class GlobalStore implements IStore {
   @observable localAuthTypes?: LocalAuthentication.AuthenticationType[];
   @observable settingInfo: ISetting = {
+    localAuth: true,
     autoLocalAuth: false,
     autoLockDuration: 0,
     hapticFeedback: true,
