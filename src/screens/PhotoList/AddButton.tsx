@@ -131,7 +131,7 @@ function AddButton(props: IAddButtonProps): JSX.Element {
     if (result?.length) {
       const timer = setTimeout(() => {
         LoadingOverlay.show();
-      }, 1000);
+      }, 200);
       try {
         await createFiles(
           await Promise.all(

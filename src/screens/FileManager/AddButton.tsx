@@ -52,7 +52,7 @@ const ICON_PROPS = {
 const fileImporter = new FileImporter();
 
 const AddButton = observer<AddButtonProps>(props => {
-  const { ui, global, user, file: fileStore } = useStore();
+  const { ui, global, user } = useStore();
   const { t } = useTranslation();
   const [visible, setVisible] = useState(false);
   const { bottomTabsHeight } = useUIFrame();
@@ -122,7 +122,7 @@ const AddButton = observer<AddButtonProps>(props => {
     async files => {
       const timer = setTimeout(() => {
         LoadingOverlay.show();
-      }, 1000);
+      }, 500);
       try {
         for (const file of files) {
           await services.api.file.create(

@@ -50,7 +50,7 @@ const GridList = memo(
     const flatListRef = useRef<GridListInstance>(null);
 
     const windowSize = useMemo(
-      () => ((systemInfo.totalMemory ?? 0) >= 1024 * 1024 * 1024 * 3 ? 3 : 2),
+      () => ((systemInfo.totalMemory ?? 0) >= 1024 * 1024 * 1024 * 3 ? 4 : 3),
       [],
     );
 
@@ -59,6 +59,7 @@ const GridList = memo(
         style={[styles.container, style]}
         ref={flatListRef}
         windowSize={windowSize}
+        initialNumToRender={restProps.gridEnabled ? 10 : 15}
         {...restProps}
         spacing={gutter}
         itemDimension={itemWidth}

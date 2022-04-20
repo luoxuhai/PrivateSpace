@@ -22,18 +22,13 @@ export function getLocalLanguage(isBest = true): Language {
 
 /**
  * 设置 App 语言
- * @param language
+ * @param languageTag
  */
-export function setAppLanguage(language: Language) {
+export function setAppLanguage(languageTag: string) {
   const languages = Settings.get('AppleLanguages') as string[];
-  const systemLanguage = languageCodeFromInternalToSystem(language);
-  const languageTag = languages.find(l => l.startsWith(systemLanguage));
   if (languageTag) {
     Settings.set({
-      AppleLanguages: [
-        languageTag,
-        ...languages.filter(l => l !== languageTag),
-      ],
+      AppleLanguages: [...new Set([languageTag, ...languages])],
     });
   }
 }

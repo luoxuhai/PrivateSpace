@@ -33,6 +33,7 @@ import DeveloperScreen from './About/Developer';
 import DescriptionFormScreen from './PhotoView/DescriptionForm';
 import FileManagerScreen from './FileManager';
 import FileDirPikerScreen from './FileDirPiker';
+// import FileViewScreen from './FileView';
 
 const t = getI18n().t;
 
@@ -64,6 +65,7 @@ export type ScreenName =
   | 'DescriptionForm'
   | 'PasscodeLock'
   | 'FileDirPiker'
+  | 'FileView'
   | 'FileManager';
 
 export const getScreens = (): Screens<ScreenName> =>
@@ -161,6 +163,15 @@ export const getScreens = (): Screens<ScreenName> =>
           },
         },
       },
+
+      // FileView: {
+      //   component: FileViewScreen,
+      //   options: {
+      //     bottomTabs: {
+      //       visible: false,
+      //     },
+      //   },
+      // },
 
       MiniApps: {
         component: MiniAppsScreen,
