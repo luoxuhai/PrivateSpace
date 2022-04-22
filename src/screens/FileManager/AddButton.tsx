@@ -148,13 +148,14 @@ const AddButton = observer<AddButtonProps>(props => {
   async function handleSelectImportFile(type: FileImportType) {
     switch (type) {
       case FileImportType.Scan:
-        // if (!Toolkit.isDocumentCameraSupported()) {
-        //   Alert.alert(t('fileManager:add.notSupported.msg'));
-        //   return;
-        // }
+        if (!(await Toolkit.DocumentCamera.isSupported())) {
+          Alert.alert(t('fileManager:add.notSupported.msg'));
+          return;
+        }
+
         if (canOpen()) {
           try {
-            const result = await Toolkit.openDocumentCamera();
+            const result = await Toolkit.DocumentCamera.open();
             handleAddFile([
               {
                 name: `scan-${randomNum(4)}-${Date.now()}.pdf`,

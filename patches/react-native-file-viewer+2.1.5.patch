@@ -1,0 +1,16 @@
+diff --git a/node_modules/react-native-file-viewer/ios/RNFileViewerManager.m b/node_modules/react-native-file-viewer/ios/RNFileViewerManager.m
+index 8149cac..35eb1a8 100644
+--- a/node_modules/react-native-file-viewer/ios/RNFileViewerManager.m
++++ b/node_modules/react-native-file-viewer/ios/RNFileViewerManager.m
+@@ -102,6 +102,11 @@ - (void)previewControllerDidDismiss:(CustomQLViewController *)controller {
+     [self sendEventWithName:DISMISS_EVENT body: @{@"id": controller.invocation}];
+ }
+ 
++- (QLPreviewItemEditingMode)previewController:(QLPreviewController *)controller
++                    editingModeForPreviewItem:(id<QLPreviewItem>)previewItem  API_AVAILABLE(ios(13.0)){
++    return QLPreviewItemEditingModeUpdateContents;
++}
++
+ RCT_EXPORT_MODULE()
+ 
+ - (NSArray<NSString *> *)supportedEvents {

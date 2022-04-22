@@ -12,7 +12,7 @@ import Animated from 'react-native-reanimated';
 import DocumentPicker from 'react-native-document-picker';
 import { SFSymbol } from 'react-native-sfsymbols';
 import { useTranslation } from 'react-i18next';
-import { QuickLookView } from 'react-native-app-toolkit';
+import { QuickLook } from 'react-native-app-toolkit';
 import Modal from 'react-native-modal';
 
 interface FileViewProps {
@@ -22,7 +22,7 @@ interface FileViewProps {
 const FileView = observer<FileViewProps>(props => {
   return (
     <>
-      <QuickLookView
+      <QuickLook.View
         style={{
           flex: 1,
           backgroundColor: '#F00',

@@ -106,7 +106,7 @@ export async function generateThumbnail(
       const stime = 1000;
 
       try {
-        const result = await Toolkit.getVideoThumbnail(
+        const result = await Toolkit.VideoThumbnail.getThumbnail(
           path.startsWith('file://') ? path : `file://${path}`,
           {
             time: stime,

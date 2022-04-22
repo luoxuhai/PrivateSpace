@@ -102,6 +102,9 @@ export const getScreens = (): Screens<ScreenName> =>
               placeholder: t('search:placeholder'),
               cancelText: t('search:cancel'),
               tintColor: stores.ui.themes.primary,
+              scopeButtonTitles: ['全部', '图片', '视频', '相册'],
+              showsScopeBar: true,
+              selectedScopeButtonIndex: 1,
             },
           },
           bottomTab: {

@@ -1,11 +1,12 @@
 import React, { useMemo, useRef } from 'react';
-import { Share } from 'react-native';
+import { Alert, Share } from 'react-native';
 import { observer } from 'mobx-react-lite';
 import { useTranslation, TFunction } from 'react-i18next';
 import { useQuery, useMutation } from 'react-query';
 import RNFS from 'react-native-fs';
 import PhotoEditor from 'react-native-image-editor';
 import { cloneDeep } from 'lodash';
+import { VideoEditor } from 'react-native-app-toolkit';
 
 import {
   showDeleteActionSheet,
@@ -21,18 +22,17 @@ import IconInfoCircle from '@/assets/icons/info.circle.svg';
 import IconPencil from '@/assets/icons/square.and.pencil.svg';
 import { useDeleteFile } from '@/hooks';
 import { useStore } from '@/store';
-import FileEntity, {
-  SourceType,
-} from '@/services/database/entities/file.entity';
+import { SourceType } from '@/services/database/entities/file.entity';
 import { services } from '@/services';
 import { FileDetail } from './FileDetail';
 import { MorePopoverMenu } from './MorePopoverMenu';
 import classifyImageProcess from '@/utils/process/classifyImageProcess';
 import { CreatePhotoParams } from '@/services/api/photo/types.d';
+import { transformResult } from '../PhotoList/AddButton';
 
 interface IToolbarContainerProps {
   visible: boolean;
-  item?: FileEntity;
+  item?: API.PhotoWithSource;
   images: any[];
   onDone?: (type: 'edit' | 'delete') => void;
   onChange?: (value: any[], index?: number) => void;
@@ -92,9 +92,12 @@ export const ToolbarContainer = observer<IToolbarContainerProps>(props => {
     CreatePhotoParams
   >(async file => {
     try {
+      const parentId = props.item!.parent_id!;
+
       return await services.api.photo.create({
+        ...(await transformResult(file, parentId)),
         ...file,
-        parent_id: props.item?.parent_id,
+        parent_id: parentId,
       });
     } catch (error) {
       console.error('error', error);
@@ -146,20 +149,35 @@ export const ToolbarContainer = observer<IToolbarContainerProps>(props => {
         break;
       case 'edit':
         try {
-          const path = await PhotoEditor.open({
-            path: `file://${props.item!.uri}`,
-            stickers: Array.from({ length: 26 }, (_, index) =>
-              encodeURI(
-                `https://private-space-storage.oss-cn-beijing.aliyuncs.com/image/stickers/watermark (${
-                  index + 1
-                }).png`,
+          let path;
+          const uri = props.item?.uri;
+          if (getSourceByMime(props.item?.mime) === SourceType.Video) {
+            if (!(await VideoEditor.canEdit(uri))) {
+              Alert.alert('提示', '无法编辑次视频');
+              return;
+            }
+            const result = await VideoEditor.open(uri, {
+              presentationStyle: 'overFullScreen',
+              maxDuration: 600,
+              quality: 'high',
+            });
+            path = result.uri;
+          } else {
+            path = await PhotoEditor.open({
+              path: `file://${uri}`,
+              stickers: Array.from({ length: 26 }, (_, index) =>
+                encodeURI(
+                  `https://private-space-storage.oss-cn-beijing.aliyuncs.com/image/stickers/watermark (${
+                    index + 1
+                  }).png`,
+                ),
               ),
-            ),
-          });
+            });
+          }
 
           const fileInfo = await RNFS.stat(path as string);
           const res = await createImages({
-            name: `IMG_${randomNum(6)}${extname(props.item!.name)}`,
+            name: `IMG_${randomNum(6)}${extname(props.item?.name)}`,
             uri: path.replace(/^file:\/\//, ''),
             size: fileInfo.size,
             mime: props.item?.mime,
@@ -212,7 +230,7 @@ export const ToolbarContainer = observer<IToolbarContainerProps>(props => {
       <Toolbar
         visible={props.visible}
         disabled={!props.item}
-        list={list.filter(item => (isVideo ? item.key !== 'edit' : true))}
+        list={list}
         onPress={handleToolbarPress}
       />
       <FileDetail ref={fileDetailRef} />
