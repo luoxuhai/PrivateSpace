@@ -4,6 +4,7 @@ import { VibrancyView } from '@react-native-community/blur';
 import {
   NavigationComponentProps,
   NavigationFunctionComponent,
+  OptionsModalPresentationStyle,
 } from 'react-native-navigation';
 import { observer } from 'mobx-react-lite';
 
@@ -24,6 +25,7 @@ const BlurMask: NavigationFunctionComponent<NavigationComponentProps> = () => {
 };
 
 BlurMask.options = () => ({
+  modalPresentationStyle: OptionsModalPresentationStyle.overFullScreen,
   overlay: {
     interceptTouchOutside: false,
   },

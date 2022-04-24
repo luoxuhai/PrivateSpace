@@ -20,6 +20,7 @@ import {
   getSourcePath,
   getImageSize,
   getPosterPath,
+  filePathWithScheme,
 } from '@/utils';
 import { setPhotoSource } from '../common/utils';
 import { stores } from '@/store';
@@ -81,7 +82,8 @@ class PhotoService {
     const { width, height, duration } = metadata;
     const imgSize = width ? { width, height } : await getImageSize(params.uri);
     const size = params.size ?? Number((await FS.stat(params.uri)).size);
-    const mime = params.mime || (await getMimeType(`file://${params.uri}`));
+    const mime =
+      params.mime || (await getMimeType(filePathWithScheme(params.uri)));
 
     metadata = {
       duration: duration,

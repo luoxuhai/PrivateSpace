@@ -60,5 +60,6 @@ const styles = StyleSheet.create({
   mask: {
     opacity: 0,
     ...StyleSheet.absoluteFillObject,
+    backgroundColor: '#F00',
   },
 });

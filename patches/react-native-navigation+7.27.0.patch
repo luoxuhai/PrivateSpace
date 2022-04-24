@@ -1,0 +1,145 @@
+diff --git a/node_modules/react-native-navigation/lib/ios/RNNCommandsHandler.m b/node_modules/react-native-navigation/lib/ios/RNNCommandsHandler.m
+index 61b135f..5ed397f 100644
+--- a/node_modules/react-native-navigation/lib/ios/RNNCommandsHandler.m
++++ b/node_modules/react-native-navigation/lib/ios/RNNCommandsHandler.m
+@@ -371,6 +371,15 @@ - (void)showModal:(NSDictionary *)layout
+     [_layoutManager addPendingViewController:newVc];
+ 
+     __weak UIViewController *weakNewVC = newVc;
++    
++    if (@available(iOS 15.0, *)) {
++        if (withDefault.modal.detents.get) {
++            UISheetPresentationController *sheet = [weakNewVC sheetPresentationController];
++            sheet.detents = @[UISheetPresentationControllerDetentIdentifierMedium, UISheetPresentationControllerDetentIdentifierLarge];
++            sheet.prefersGrabberVisible = YES;
++        }
++    }
++    
+     BOOL animated = [withDefault.animations.showModal.enter.enable withDefault:YES];
+     BOOL waitForRender = [withDefault.animations.showModal.enter shouldWaitForRender];
+     newVc.waitForRender = waitForRender;
+@@ -379,6 +388,7 @@ - (void)showModal:(NSDictionary *)layout
+     newVc.modalTransitionStyle = [RNNConvert
+         UIModalTransitionStyle:[withDefault.modalTransitionStyle withDefault:@"coverVertical"]];
+ 
++    
+     if (animated && !waitForRender)
+         [[AnimationObserver sharedObserver] beginAnimation];
+     [newVc setReactViewReadyCallback:^{
+diff --git a/node_modules/react-native-navigation/lib/ios/RNNModalOptions.h b/node_modules/react-native-navigation/lib/ios/RNNModalOptions.h
+index 940c330..15fb83f 100644
+--- a/node_modules/react-native-navigation/lib/ios/RNNModalOptions.h
++++ b/node_modules/react-native-navigation/lib/ios/RNNModalOptions.h
+@@ -3,5 +3,6 @@
+ @interface RNNModalOptions : RNNOptions
+ 
+ @property(nonatomic, strong) Bool *swipeToDismiss;
++@property(nonatomic, strong) Bool *detents;
+ 
+ @end
+diff --git a/node_modules/react-native-navigation/lib/ios/RNNModalOptions.m b/node_modules/react-native-navigation/lib/ios/RNNModalOptions.m
+index cc795cc..8b725dd 100644
+--- a/node_modules/react-native-navigation/lib/ios/RNNModalOptions.m
++++ b/node_modules/react-native-navigation/lib/ios/RNNModalOptions.m
+@@ -5,12 +5,15 @@ @implementation RNNModalOptions
+ - (instancetype)initWithDict:(NSDictionary *)dict {
+     self = [super initWithDict:dict];
+     self.swipeToDismiss = [BoolParser parse:dict key:@"swipeToDismiss"];
++    self.detents = [BoolParser parse:dict key:@"detents"];
+     return self;
+ }
+ 
+ - (void)mergeOptions:(RNNModalOptions *)options {
+     if (options.swipeToDismiss.hasValue)
+         self.swipeToDismiss = options.swipeToDismiss;
++    if (options.detents.hasValue)
++        self.detents = options.detents;
+ }
+ 
+ @end
+diff --git a/node_modules/react-native-navigation/lib/ios/RNNNavigationOptions.m b/node_modules/react-native-navigation/lib/ios/RNNNavigationOptions.m
+index c7c4488..d4ec0bd 100644
+--- a/node_modules/react-native-navigation/lib/ios/RNNNavigationOptions.m
++++ b/node_modules/react-native-navigation/lib/ios/RNNNavigationOptions.m
+@@ -81,7 +81,6 @@ - (RNNNavigationOptions *)mergeOptions:(RNNNavigationOptions *)options {
+         result.modalPresentationStyle = options.modalPresentationStyle;
+     if (options.modalTransitionStyle.hasValue)
+         result.modalTransitionStyle = options.modalTransitionStyle;
+-
+     return result;
+ }
+ 
+diff --git a/node_modules/react-native-navigation/lib/ios/UIViewController+RNNOptions.m b/node_modules/react-native-navigation/lib/ios/UIViewController+RNNOptions.m
+index 157d814..49b1096 100644
+--- a/node_modules/react-native-navigation/lib/ios/UIViewController+RNNOptions.m
++++ b/node_modules/react-native-navigation/lib/ios/UIViewController+RNNOptions.m
+@@ -32,40 +32,38 @@ - (void)setSearchBarWithOptions:(NSString *)placeholder
+                                tintColor:(nullable UIColor *)tintColor
+                               cancelText:(NSString *)cancelText {
+     if (!self.navigationItem.searchController) {
+-        UISearchController *search =
+-            [[UISearchController alloc] initWithSearchResultsController:nil];
+-        search.dimsBackgroundDuringPresentation = obscuresBackgroundDuringPresentation;
+-        if ([self conformsToProtocol:@protocol(UISearchResultsUpdating)]) {
+-            [search setSearchResultsUpdater:((UIViewController<UISearchResultsUpdating> *)self)];
+-        }
+-        search.searchBar.delegate = (id<UISearchBarDelegate>)self;
+-        if (placeholder) {
+-            search.searchBar.placeholder = placeholder;
+-        }
+-        if (cancelText) {
+-            [search.searchBar setValue:cancelText forKey:@"cancelButtonText"];
+-        }
+-        search.hidesNavigationBarDuringPresentation = hideTopBarOnFocus;
+-        search.searchBar.searchBarStyle = UISearchBarStyleProminent;
+-        search.searchBar.tintColor = tintColor;
+-        if (@available(iOS 13.0, *)) {
+-            search.searchBar.searchTextField.backgroundColor = backgroundColor;
+-        }
++        self.navigationItem.searchController = [[UISearchController alloc] initWithSearchResultsController:nil];
++    }
++    self.navigationItem.searchController.dimsBackgroundDuringPresentation = obscuresBackgroundDuringPresentation;
++    if ([self conformsToProtocol:@protocol(UISearchResultsUpdating)]) {
++        [self.navigationItem.searchController setSearchResultsUpdater:((UIViewController<UISearchResultsUpdating> *)self)];
++    }
++    self.navigationItem.searchController.searchBar.delegate = (id<UISearchBarDelegate>)self;
++    if (placeholder) {
++        self.navigationItem.searchController.searchBar.placeholder = placeholder;
++    }
++    if (cancelText) {
++        [self.navigationItem.searchController.searchBar setValue:cancelText forKey:@"cancelButtonText"];
++    }
++    self.navigationItem.searchController.hidesNavigationBarDuringPresentation = hideTopBarOnFocus;
++    self.navigationItem.searchController.searchBar.searchBarStyle = UISearchBarStyleProminent;
++    self.navigationItem.searchController.searchBar.tintColor = tintColor;
++    if (@available(iOS 13.0, *)) {
++        self.navigationItem.searchController.searchBar.searchTextField.backgroundColor = backgroundColor;
++    }
+ 
+-        if (focus) {
+-            dispatch_async(dispatch_get_main_queue(), ^{
+-              self.navigationItem.searchController.active = true;
+-              [self.navigationItem.searchController.searchBar becomeFirstResponder];
+-            });
+-        }
++    if (focus) {
++        dispatch_async(dispatch_get_main_queue(), ^{
++          self.navigationItem.searchController.active = true;
++          [self.navigationItem.searchController.searchBar becomeFirstResponder];
++        });
++    }
+ 
+-        self.navigationItem.searchController = search;
+-        [self.navigationItem setHidesSearchBarWhenScrolling:hideOnScroll];
++    [self.navigationItem setHidesSearchBarWhenScrolling:hideOnScroll];
+ 
+-        // Fixes #3450, otherwise, UIKit will infer the presentation context to
+-        // be the root most view controller
+-        self.definesPresentationContext = YES;
+-    }
++    // Fixes #3450, otherwise, UIKit will infer the presentation context to
++    // be the root most view controller
++    self.definesPresentationContext = YES;
+ }
+ 
+ - (void)setSearchBarHiddenWhenScrolling:(BOOL)searchBarHidden {

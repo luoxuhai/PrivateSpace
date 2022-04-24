@@ -33,7 +33,7 @@ import DeveloperScreen from './About/Developer';
 import DescriptionFormScreen from './PhotoView/DescriptionForm';
 import FileManagerScreen from './FileManager';
 import FileDirPikerScreen from './FileDirPiker';
-// import FileViewScreen from './FileView';
+import FileViewScreen from './FileView';
 
 const t = getI18n().t;
 
@@ -102,9 +102,9 @@ export const getScreens = (): Screens<ScreenName> =>
               placeholder: t('search:placeholder'),
               cancelText: t('search:cancel'),
               tintColor: stores.ui.themes.primary,
-              scopeButtonTitles: ['全部', '图片', '视频', '相册'],
-              showsScopeBar: true,
-              selectedScopeButtonIndex: 1,
+              // scopeButtonTitles: ['全部', '图片', '视频', '相册'],
+              // showsScopeBar: true,
+              // selectedScopeButtonIndex: 1,
             },
           },
           bottomTab: {
@@ -167,14 +167,14 @@ export const getScreens = (): Screens<ScreenName> =>
         },
       },
 
-      // FileView: {
-      //   component: FileViewScreen,
-      //   options: {
-      //     bottomTabs: {
-      //       visible: false,
-      //     },
-      //   },
-      // },
+      FileView: {
+        component: FileViewScreen,
+        options: {
+          bottomTabs: {
+            visible: false,
+          },
+        },
+      },
 
       MiniApps: {
         component: MiniAppsScreen,

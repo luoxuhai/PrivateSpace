@@ -12,6 +12,28 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		15D7FB4FAB40B7E5D0DF999E /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1E2C5B80BD4825275885624 /* ExpoModulesProvider.swift */; };
+		352B065128182458003FD900 /* RNVersaPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 352B065028182458003FD900 /* RNVersaPlayer.m */; };
+		352B065328182466003FD900 /* RNVersaPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352B065228182466003FD900 /* RNVersaPlayer.swift */; };
+		352B067028182539003FD900 /* VersaPlayerPlaybackError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352B065828182539003FD900 /* VersaPlayerPlaybackError.swift */; };
+		352B067128182539003FD900 /* VersaPlayerRenderingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352B065A28182539003FD900 /* VersaPlayerRenderingView.swift */; };
+		352B067228182539003FD900 /* VersaPlayerDecryptionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352B065C28182539003FD900 /* VersaPlayerDecryptionDelegate.swift */; };
+		352B067328182539003FD900 /* VersaPlayerPlaybackDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352B065D28182539003FD900 /* VersaPlayerPlaybackDelegate.swift */; };
+		352B067428182539003FD900 /* VersaPlayerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352B065E28182539003FD900 /* VersaPlayerExtension.swift */; };
+		352B067528182539003FD900 /* VersaPlayerMediaTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352B066028182539003FD900 /* VersaPlayerMediaTrack.swift */; };
+		352B067628182539003FD900 /* VersaPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352B066128182539003FD900 /* VersaPlayer.swift */; };
+		352B067728182539003FD900 /* VersaPlayerCaptionStyling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352B066228182539003FD900 /* VersaPlayerCaptionStyling.swift */; };
+		352B067828182539003FD900 /* VersaPlayerItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352B066328182539003FD900 /* VersaPlayerItem.swift */; };
+		352B067928182539003FD900 /* VersaPlayerControlsBehaviour.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352B066628182539003FD900 /* VersaPlayerControlsBehaviour.swift */; };
+		352B067A28182539003FD900 /* VersaPlayerGestureRecieverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352B066728182539003FD900 /* VersaPlayerGestureRecieverView.swift */; };
+		352B067B28182539003FD900 /* VersaPlayerGestureRecieverViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352B066828182539003FD900 /* VersaPlayerGestureRecieverViewDelegate.swift */; };
+		352B067C28182539003FD900 /* VersaTimeLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352B066A28182539003FD900 /* VersaTimeLabel.swift */; };
+		352B067D28182539003FD900 /* VersaStatefulButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352B066B28182539003FD900 /* VersaStatefulButton.swift */; };
+		352B067E28182539003FD900 /* VersaSeekbarSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352B066C28182539003FD900 /* VersaSeekbarSlider.swift */; };
+		352B067F28182539003FD900 /* VersaPlayerControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352B066D28182539003FD900 /* VersaPlayerControls.swift */; };
+		352B068028182539003FD900 /* VersaPlayerControlsCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352B066E28182539003FD900 /* VersaPlayerControlsCoordinator.swift */; };
+		352B068128182539003FD900 /* VersaPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352B066F28182539003FD900 /* VersaPlayerView.swift */; };
+		352B068C281827CC003FD900 /* VersaPlayerAirPlayExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352B0687281827CC003FD900 /* VersaPlayerAirPlayExtension.swift */; };
+		352B068D281827CC003FD900 /* VersaPlayerAirplayManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352B0688281827CC003FD900 /* VersaPlayerAirplayManager.swift */; };
 		355ED7BF27366133005ABB3E /* Bridging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 355ED7BE27366133005ABB3E /* Bridging.swift */; };
 		3580A9EE27E40F1200713C9B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3580A9ED27E40F1200713C9B /* GoogleService-Info.plist */; };
 		3580A9F127E9521900713C9B /* orange152x152.png in Resources */ = {isa = PBXBuildFile; fileRef = 3580A9F027E9521900713C9B /* orange152x152.png */; };
@@ -80,6 +102,29 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = PrivateSpace/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = PrivateSpace/main.m; sourceTree = "<group>"; };
 		1D0AE47A65C8663E3B452821 /* Pods-PrivateSpace-PrivateSpaceTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PrivateSpace-PrivateSpaceTests.release.xcconfig"; path = "Target Support Files/Pods-PrivateSpace-PrivateSpaceTests/Pods-PrivateSpace-PrivateSpaceTests.release.xcconfig"; sourceTree = "<group>"; };
+		352B065028182458003FD900 /* RNVersaPlayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNVersaPlayer.m; sourceTree = "<group>"; };
+		352B065228182466003FD900 /* RNVersaPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNVersaPlayer.swift; sourceTree = "<group>"; };
+		352B0654281824CB003FD900 /* RNVersaPlayer-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RNVersaPlayer-Bridging-Header.h"; sourceTree = "<group>"; };
+		352B065828182539003FD900 /* VersaPlayerPlaybackError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VersaPlayerPlaybackError.swift; sourceTree = "<group>"; };
+		352B065A28182539003FD900 /* VersaPlayerRenderingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VersaPlayerRenderingView.swift; sourceTree = "<group>"; };
+		352B065C28182539003FD900 /* VersaPlayerDecryptionDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VersaPlayerDecryptionDelegate.swift; sourceTree = "<group>"; };
+		352B065D28182539003FD900 /* VersaPlayerPlaybackDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VersaPlayerPlaybackDelegate.swift; sourceTree = "<group>"; };
+		352B065E28182539003FD900 /* VersaPlayerExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VersaPlayerExtension.swift; sourceTree = "<group>"; };
+		352B066028182539003FD900 /* VersaPlayerMediaTrack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VersaPlayerMediaTrack.swift; sourceTree = "<group>"; };
+		352B066128182539003FD900 /* VersaPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VersaPlayer.swift; sourceTree = "<group>"; };
+		352B066228182539003FD900 /* VersaPlayerCaptionStyling.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VersaPlayerCaptionStyling.swift; sourceTree = "<group>"; };
+		352B066328182539003FD900 /* VersaPlayerItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VersaPlayerItem.swift; sourceTree = "<group>"; };
+		352B066628182539003FD900 /* VersaPlayerControlsBehaviour.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VersaPlayerControlsBehaviour.swift; sourceTree = "<group>"; };
+		352B066728182539003FD900 /* VersaPlayerGestureRecieverView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VersaPlayerGestureRecieverView.swift; sourceTree = "<group>"; };
+		352B066828182539003FD900 /* VersaPlayerGestureRecieverViewDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VersaPlayerGestureRecieverViewDelegate.swift; sourceTree = "<group>"; };
+		352B066A28182539003FD900 /* VersaTimeLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VersaTimeLabel.swift; sourceTree = "<group>"; };
+		352B066B28182539003FD900 /* VersaStatefulButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VersaStatefulButton.swift; sourceTree = "<group>"; };
+		352B066C28182539003FD900 /* VersaSeekbarSlider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VersaSeekbarSlider.swift; sourceTree = "<group>"; };
+		352B066D28182539003FD900 /* VersaPlayerControls.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VersaPlayerControls.swift; sourceTree = "<group>"; };
+		352B066E28182539003FD900 /* VersaPlayerControlsCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VersaPlayerControlsCoordinator.swift; sourceTree = "<group>"; };
+		352B066F28182539003FD900 /* VersaPlayerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VersaPlayerView.swift; sourceTree = "<group>"; };
+		352B0687281827CC003FD900 /* VersaPlayerAirPlayExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VersaPlayerAirPlayExtension.swift; sourceTree = "<group>"; };
+		352B0688281827CC003FD900 /* VersaPlayerAirplayManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VersaPlayerAirplayManager.swift; sourceTree = "<group>"; };
 		354BEE47280C14860018255B /* UniformTypeIdentifiers.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UniformTypeIdentifiers.framework; path = System/Library/Frameworks/UniformTypeIdentifiers.framework; sourceTree = SDKROOT; };
 		354BEE59280C1E250018255B /* ShareExtensionRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ShareExtensionRelease.entitlements; sourceTree = "<group>"; };
 		355ED7BE27366133005ABB3E /* Bridging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bridging.swift; sourceTree = "<group>"; };
@@ -187,6 +232,7 @@
 		13B07FAE1A68108700A75B9A /* PrivateSpace */ = {
 			isa = PBXGroup;
 			children = (
+				352B064F28182428003FD900 /* RNVersaPlayer */,
 				35C7E29827FC59C000D4A694 /* Images */,
 				3580A9ED27E40F1200713C9B /* GoogleService-Info.plist */,
 				35EF0EC5275B535800ED7E4F /* PrivateSpaceDebug.entitlements */,
@@ -222,6 +268,140 @@
 				354BEE47280C14860018255B /* UniformTypeIdentifiers.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		352B064F28182428003FD900 /* RNVersaPlayer */ = {
+			isa = PBXGroup;
+			children = (
+				352B0682281827CC003FD900 /* VersaPlayerAirplayExtension */,
+				352B065528182539003FD900 /* VersaPlayer */,
+				352B065028182458003FD900 /* RNVersaPlayer.m */,
+				352B065228182466003FD900 /* RNVersaPlayer.swift */,
+				352B0654281824CB003FD900 /* RNVersaPlayer-Bridging-Header.h */,
+			);
+			path = RNVersaPlayer;
+			sourceTree = "<group>";
+		};
+		352B065528182539003FD900 /* VersaPlayer */ = {
+			isa = PBXGroup;
+			children = (
+				352B065628182539003FD900 /* Core */,
+				352B066428182539003FD900 /* VersaPlayerControls */,
+				352B066F28182539003FD900 /* VersaPlayerView.swift */,
+			);
+			path = VersaPlayer;
+			sourceTree = "<group>";
+		};
+		352B065628182539003FD900 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				352B065728182539003FD900 /* Enums */,
+				352B065928182539003FD900 /* Rendering */,
+				352B065B28182539003FD900 /* Protocols */,
+				352B065F28182539003FD900 /* Player */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		352B065728182539003FD900 /* Enums */ = {
+			isa = PBXGroup;
+			children = (
+				352B065828182539003FD900 /* VersaPlayerPlaybackError.swift */,
+			);
+			path = Enums;
+			sourceTree = "<group>";
+		};
+		352B065928182539003FD900 /* Rendering */ = {
+			isa = PBXGroup;
+			children = (
+				352B065A28182539003FD900 /* VersaPlayerRenderingView.swift */,
+			);
+			path = Rendering;
+			sourceTree = "<group>";
+		};
+		352B065B28182539003FD900 /* Protocols */ = {
+			isa = PBXGroup;
+			children = (
+				352B065C28182539003FD900 /* VersaPlayerDecryptionDelegate.swift */,
+				352B065D28182539003FD900 /* VersaPlayerPlaybackDelegate.swift */,
+				352B065E28182539003FD900 /* VersaPlayerExtension.swift */,
+			);
+			path = Protocols;
+			sourceTree = "<group>";
+		};
+		352B065F28182539003FD900 /* Player */ = {
+			isa = PBXGroup;
+			children = (
+				352B066028182539003FD900 /* VersaPlayerMediaTrack.swift */,
+				352B066128182539003FD900 /* VersaPlayer.swift */,
+				352B066228182539003FD900 /* VersaPlayerCaptionStyling.swift */,
+				352B066328182539003FD900 /* VersaPlayerItem.swift */,
+			);
+			path = Player;
+			sourceTree = "<group>";
+		};
+		352B066428182539003FD900 /* VersaPlayerControls */ = {
+			isa = PBXGroup;
+			children = (
+				352B066528182539003FD900 /* Core */,
+				352B066928182539003FD900 /* Controls */,
+				352B066D28182539003FD900 /* VersaPlayerControls.swift */,
+				352B066E28182539003FD900 /* VersaPlayerControlsCoordinator.swift */,
+			);
+			path = VersaPlayerControls;
+			sourceTree = "<group>";
+		};
+		352B066528182539003FD900 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				352B066628182539003FD900 /* VersaPlayerControlsBehaviour.swift */,
+				352B066728182539003FD900 /* VersaPlayerGestureRecieverView.swift */,
+				352B066828182539003FD900 /* VersaPlayerGestureRecieverViewDelegate.swift */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		352B066928182539003FD900 /* Controls */ = {
+			isa = PBXGroup;
+			children = (
+				352B066A28182539003FD900 /* VersaTimeLabel.swift */,
+				352B066B28182539003FD900 /* VersaStatefulButton.swift */,
+				352B066C28182539003FD900 /* VersaSeekbarSlider.swift */,
+			);
+			path = Controls;
+			sourceTree = "<group>";
+		};
+		352B0682281827CC003FD900 /* VersaPlayerAirplayExtension */ = {
+			isa = PBXGroup;
+			children = (
+				352B0683281827CC003FD900 /* Classes */,
+			);
+			path = VersaPlayerAirplayExtension;
+			sourceTree = "<group>";
+		};
+		352B0683281827CC003FD900 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				352B0685281827CC003FD900 /* VersaPlayerAirPlay */,
+			);
+			path = Classes;
+			sourceTree = "<group>";
+		};
+		352B0685281827CC003FD900 /* VersaPlayerAirPlay */ = {
+			isa = PBXGroup;
+			children = (
+				352B0686281827CC003FD900 /* Extensions */,
+				352B0688281827CC003FD900 /* VersaPlayerAirplayManager.swift */,
+			);
+			path = VersaPlayerAirPlay;
+			sourceTree = "<group>";
+		};
+		352B0686281827CC003FD900 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				352B0687281827CC003FD900 /* VersaPlayerAirPlayExtension.swift */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 		35AE5CCB273EB14800892FA8 /* ShareExtension */ = {
@@ -735,10 +915,32 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				352B068028182539003FD900 /* VersaPlayerControlsCoordinator.swift in Sources */,
+				352B067F28182539003FD900 /* VersaPlayerControls.swift in Sources */,
+				352B067428182539003FD900 /* VersaPlayerExtension.swift in Sources */,
+				352B067C28182539003FD900 /* VersaTimeLabel.swift in Sources */,
+				352B067628182539003FD900 /* VersaPlayer.swift in Sources */,
+				352B068C281827CC003FD900 /* VersaPlayerAirPlayExtension.swift in Sources */,
+				352B067328182539003FD900 /* VersaPlayerPlaybackDelegate.swift in Sources */,
+				352B067A28182539003FD900 /* VersaPlayerGestureRecieverView.swift in Sources */,
+				352B067E28182539003FD900 /* VersaSeekbarSlider.swift in Sources */,
+				352B067128182539003FD900 /* VersaPlayerRenderingView.swift in Sources */,
+				352B067928182539003FD900 /* VersaPlayerControlsBehaviour.swift in Sources */,
+				352B067728182539003FD900 /* VersaPlayerCaptionStyling.swift in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
+				352B067228182539003FD900 /* VersaPlayerDecryptionDelegate.swift in Sources */,
+				352B067B28182539003FD900 /* VersaPlayerGestureRecieverViewDelegate.swift in Sources */,
+				352B065328182466003FD900 /* RNVersaPlayer.swift in Sources */,
+				352B065128182458003FD900 /* RNVersaPlayer.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
+				352B068128182539003FD900 /* VersaPlayerView.swift in Sources */,
+				352B068D281827CC003FD900 /* VersaPlayerAirplayManager.swift in Sources */,
 				FC27BEBFECF5ED2AA23F5F77 /* ExpoModulesProvider.swift in Sources */,
+				352B067528182539003FD900 /* VersaPlayerMediaTrack.swift in Sources */,
+				352B067028182539003FD900 /* VersaPlayerPlaybackError.swift in Sources */,
+				352B067D28182539003FD900 /* VersaStatefulButton.swift in Sources */,
 				355ED7BF27366133005ABB3E /* Bridging.swift in Sources */,
+				352B067828182539003FD900 /* VersaPlayerItem.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -909,7 +1111,7 @@
 					"$(PROJECT_DIR)",
 				);
 				MACH_O_TYPE = mh_execute;
-				MARKETING_VERSION = 1.8.0;
+				MARKETING_VERSION = 1.9.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -955,7 +1157,7 @@
 					"$(PROJECT_DIR)",
 				);
 				MACH_O_TYPE = mh_execute;
-				MARKETING_VERSION = 1.8.0;
+				MARKETING_VERSION = 1.9.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1003,7 +1205,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 2.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = net.darkce.privatespace.ShareExtension;
@@ -1053,7 +1255,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 2.0;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = net.darkce.privatespace.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";

@@ -127,7 +127,7 @@ const AlbumScreen: NavigationFunctionComponent<
         ListEmptyComponent={
           <DataLoadStatus loading={isLoading} text={t('album:noData')} />
         }
-        windowSize={3}
+        windowSize={5}
         itemDimension={150}
         spacing={20}
         data={albumData?.items ?? []}

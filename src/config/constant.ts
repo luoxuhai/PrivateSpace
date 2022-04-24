@@ -36,3 +36,5 @@ export const enum AppLaunchType {
 }
 
 export const BOTTOM_TABS_HEIGHT = 84;
+
+export const MIN_SCREEN_WIDTH = 360;

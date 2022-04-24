@@ -28,7 +28,7 @@ interface FileManagerProps extends NavigationComponentProps {
 
 const FileManager: NavigationFunctionComponent<FileManagerProps> = observer(
   props => {
-    const { file: fileStore } = useStore();
+    const { file: fileStore, global } = useStore();
     const { t } = useTranslation();
     const fileDetailRef = useRef<FileDetailInstance>(null);
 
@@ -39,6 +39,12 @@ const FileManager: NavigationFunctionComponent<FileManagerProps> = observer(
     useUpdateEffect(() => {
       refetch();
     }, [fileStore.orderBy]);
+
+    useUpdateEffect(() => {
+      if (global.maskVisible) {
+        FileViewer.dismiss(false);
+      }
+    }, [global.maskVisible]);
 
     const {
       data: fileResult,
@@ -85,6 +91,16 @@ const FileManager: NavigationFunctionComponent<FileManagerProps> = observer(
                 },
               });
             } else {
+              // Navigation.push(props.componentId, {
+              //   component: {
+              //     name: 'FileView',
+              //     passProps: {
+              //       url: `file://${item.uri}`,
+              //       // folderId: item.id,
+              //     },
+              //   },
+              // });
+              // return;
               FileViewer.open(item.uri, {
                 displayName: item.name,
               });

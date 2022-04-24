@@ -1,16 +1,193 @@
-diff --git a/node_modules/react-native-file-viewer/ios/RNFileViewerManager.m b/node_modules/react-native-file-viewer/ios/RNFileViewerManager.m
-index 8149cac..35eb1a8 100644
---- a/node_modules/react-native-file-viewer/ios/RNFileViewerManager.m
-+++ b/node_modules/react-native-file-viewer/ios/RNFileViewerManager.m
-@@ -102,6 +102,11 @@ - (void)previewControllerDidDismiss:(CustomQLViewController *)controller {
-     [self sendEventWithName:DISMISS_EVENT body: @{@"id": controller.invocation}];
+diff --git a/node_modules/react-native-file-viewer/index.d.ts b/node_modules/react-native-file-viewer/index.d.ts
+index 95653f6..8cba90d 100644
+--- a/node_modules/react-native-file-viewer/index.d.ts
++++ b/node_modules/react-native-file-viewer/index.d.ts
+@@ -3,6 +3,7 @@ interface RNFileViewerOptions {
+   showAppsSuggestions?: boolean;
+   showOpenWithDialog?: boolean;
+   onDismiss?(): any;
++  onContentUpdate?(): any;
  }
  
+ declare function open(
+@@ -10,8 +11,10 @@ declare function open(
+   options?: RNFileViewerOptions | string
+ ): Promise<void>;
+ 
++declare function dismiss(animated?:boolean): void;
++
+ declare namespace _default {
+-  export { open };
++  export { open, dismiss };
+ }
+ 
+ export default _default;
+diff --git a/node_modules/react-native-file-viewer/index.js b/node_modules/react-native-file-viewer/index.js
+index 3a6db71..7414e1f 100644
+--- a/node_modules/react-native-file-viewer/index.js
++++ b/node_modules/react-native-file-viewer/index.js
+@@ -8,7 +8,7 @@ let lastId = 0;
+ function open(path, options = {}) {
+   const _options =
+     typeof options === "string" ? { displayName: options } : options;
+-  const { onDismiss, ...nativeOptions } = _options;
++  const { onDismiss, onContentUpdate, ...nativeOptions } = _options;
+ 
+   if (!["android", "ios"].includes(Platform.OS)) {
+     return RNFileViewer.open(path, nativeOptions);
+@@ -35,11 +35,24 @@ function open(path, options = {}) {
+         }
+       }
+     );
++    const updateContentSubscription = eventEmitter.addListener(
++      "RNFileViewerDidUpdateContent",
++      ({ id }) => {
++        if (id === currentId) {
++          updateContentSubscription.remove();
++          onContentUpdate && onContentUpdate();
++        }
++      }
++    );
+ 
+     RNFileViewer.open(normalize(path), currentId, nativeOptions);
+   });
+ }
+ 
++function dismiss(animated) {
++ return RNFileViewer.dismiss(animated);
++}
++
+ function normalize(path) {
+   if (Platform.OS === "ios" || Platform.OS === "android") {
+     const filePrefix = "file://";
+@@ -53,5 +66,5 @@ function normalize(path) {
+   return path;
+ }
+ 
+-export default { open };
+-export { open };
++export default { open, dismiss };
++export { open, dismiss};
+diff --git a/node_modules/react-native-file-viewer/ios/RNFileViewerManager.h b/node_modules/react-native-file-viewer/ios/RNFileViewerManager.h
+index aaaa975..6fa95a1 100644
+--- a/node_modules/react-native-file-viewer/ios/RNFileViewerManager.h
++++ b/node_modules/react-native-file-viewer/ios/RNFileViewerManager.h
+@@ -6,7 +6,4 @@
+ 
+ @interface RNFileViewer : RCTEventEmitter <RCTBridgeModule>
+ 
+-+ (UIViewController*)topViewController;
+-+ (UIViewController*)topViewControllerWithRootViewController:(UIViewController*)viewController;
+-
+ @end
+diff --git a/node_modules/react-native-file-viewer/ios/RNFileViewerManager.m b/node_modules/react-native-file-viewer/ios/RNFileViewerManager.m
+index 8149cac..e386fd6 100644
+--- a/node_modules/react-native-file-viewer/ios/RNFileViewerManager.m
++++ b/node_modules/react-native-file-viewer/ios/RNFileViewerManager.m
+@@ -1,10 +1,11 @@
+-
+ #import "RNFileViewerManager.h"
+ #import <QuickLook/QuickLook.h>
+ #import <React/RCTConvert.h>
++#import <React/RCTUtils.h>
+ 
+ #define OPEN_EVENT @"RNFileViewerDidOpen"
+ #define DISMISS_EVENT @"RNFileViewerDidDismiss"
++#define UPDATE_CONTENT_EVENT @"RNFileViewerDidUpdateContent"
+ 
+ @interface File: NSObject<QLPreviewItem>
+ 
+@@ -16,6 +17,9 @@ - (id)initWithPath:(NSString *)file title:(NSString *)title;
+ @end
+ 
+ @interface RNFileViewer ()<QLPreviewControllerDelegate>
++
++@property(nonatomic, strong) QLPreviewController *controller;
++
+ @end
+ 
+ @implementation File
+@@ -62,6 +66,7 @@ - (NSInteger)numberOfPreviewItemsInPreviewController:(QLPreviewController *)cont
+ 
+ @end
+ 
++
+ @implementation RNFileViewer
+ 
+ - (dispatch_queue_t)methodQueue
+@@ -69,43 +74,25 @@ - (dispatch_queue_t)methodQueue
+     return dispatch_get_main_queue();
+ }
+ 
+-+ (UIViewController*)topViewController {
+-    UIViewController *presenterViewController = [self topViewControllerWithRootViewController:UIApplication.sharedApplication.keyWindow.rootViewController];
+-    return presenterViewController ? presenterViewController : UIApplication.sharedApplication.keyWindow.rootViewController;
++- (void)previewControllerDidDismiss:(CustomQLViewController *)controller {
++    [self sendEventWithName:DISMISS_EVENT body: @{@"id": controller.invocation}];
+ }
+ 
+-+ (UIViewController*)topViewControllerWithRootViewController:(UIViewController*)viewController {
+-    if ([viewController isKindOfClass:[UITabBarController class]]) {
+-        UITabBarController* tabBarController = (UITabBarController*)viewController;
+-        return [self topViewControllerWithRootViewController:tabBarController.selectedViewController];
+-    }
+-    if ([viewController isKindOfClass:[UINavigationController class]]) {
+-        UINavigationController* navContObj = (UINavigationController*)viewController;
+-        return [self topViewControllerWithRootViewController:navContObj.visibleViewController];
+-    }
+-    if (viewController.presentedViewController && !viewController.presentedViewController.isBeingDismissed) {
+-        UIViewController* presentedViewController = viewController.presentedViewController;
+-        return [self topViewControllerWithRootViewController:presentedViewController];
+-    }
+-    for (UIView *view in [viewController.view subviews]) {
+-        id subViewController = [view nextResponder];
+-        if ( subViewController && [subViewController isKindOfClass:[UIViewController class]]) {
+-            if ([(UIViewController *)subViewController presentedViewController]  && ![subViewController presentedViewController].isBeingDismissed) {
+-                return [self topViewControllerWithRootViewController:[(UIViewController *)subViewController presentedViewController]];
+-            }
+-        }
+-    }
+-    return viewController;
 +- (QLPreviewItemEditingMode)previewController:(QLPreviewController *)controller
 +                    editingModeForPreviewItem:(id<QLPreviewItem>)previewItem  API_AVAILABLE(ios(13.0)){
 +    return QLPreviewItemEditingModeUpdateContents;
-+}
-+
+ }
+ 
+-- (void)previewControllerDidDismiss:(CustomQLViewController *)controller {
+-    [self sendEventWithName:DISMISS_EVENT body: @{@"id": controller.invocation}];
++- (void)previewController:(CustomQLViewController *)controller
++didUpdateContentsOfPreviewItem:(id<QLPreviewItem>)previewItem {
++    [self sendEventWithName:UPDATE_CONTENT_EVENT body:@{@"id": controller.invocation,
++                                                     @"url": previewItem.previewItemURL.absoluteString}];
+ }
+ 
  RCT_EXPORT_MODULE()
  
  - (NSArray<NSString *> *)supportedEvents {
+-    return @[OPEN_EVENT, DISMISS_EVENT];
++    return @[OPEN_EVENT, DISMISS_EVENT, UPDATE_CONTENT_EVENT];
+ }
+ 
+ RCT_EXPORT_METHOD(open:(NSString *)path invocation:(nonnull NSNumber *)invocationId
+@@ -114,13 +101,18 @@ - (void)previewControllerDidDismiss:(CustomQLViewController *)controller {
+     NSString *displayName = [RCTConvert NSString:options[@"displayName"]];
+     File *file = [[File alloc] initWithPath:path title:displayName];
+ 
+-    QLPreviewController *controller = [[CustomQLViewController alloc] initWithFile:file identifier:invocationId];
+-    controller.delegate = self;
++    self.controller = [[CustomQLViewController alloc] initWithFile:file identifier:invocationId];
++    self.controller.delegate = self;
++    UIViewController *rootViewController = RCTPresentedViewController();
+ 
+     typeof(self) __weak weakSelf = self;
+-    [[RNFileViewer topViewController] presentViewController:controller animated:YES completion:^{
++    [rootViewController presentViewController:self.controller animated:YES completion:^{
+         [weakSelf sendEventWithName:OPEN_EVENT body: @{@"id": invocationId}];
+     }];
+ }
+ 
++RCT_EXPORT_METHOD(dismiss:(BOOL)animated) {
++    [self.controller dismissViewControllerAnimated:animated ?: YES completion:nil];
++}
++
+ @end

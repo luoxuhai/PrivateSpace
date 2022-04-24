@@ -291,7 +291,7 @@ export const SearchPanel = observer<SearchPanelProps, SearchPanelInstance>(
 
     return (
       <Animated.View style={[styles.container, containerStyle]}>
-        {visible && (
+        {visible && segmentedControlTop && (
           <AnimatedSegmentedControl
             style={[
               styles.segment,

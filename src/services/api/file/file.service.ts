@@ -19,6 +19,7 @@ import {
   getThumbnailPath,
   getSourcePath,
   getPosterPath,
+  filePathWithScheme,
 } from '@/utils';
 import { setPhotoSource } from '../common/utils';
 import { stores } from '@/store';
@@ -78,7 +79,8 @@ class FileService {
   }
 
   public async create(params: Types.CreatePhotoParams) {
-    const mime = params.mime || (await getMimeType(`file://${params.uri}`));
+    const mime =
+      params.mime || (await getMimeType(filePathWithScheme(params.uri)));
 
     if ([SourceType.Image, SourceType.Video].includes(getSourceByMime(mime))) {
       return await PhotoService.create({

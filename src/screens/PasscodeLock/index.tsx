@@ -6,6 +6,7 @@ import { observer } from 'mobx-react';
 import {
   NavigationComponentProps,
   NavigationFunctionComponent,
+  OptionsModalPresentationStyle,
 } from 'react-native-navigation';
 import {
   useNavigationButtonPress,
@@ -145,7 +146,7 @@ const PasscodeLockOverlay: PasscodeLockOverlayComponent<IPasscodeLockProps> = (
           pauseLocalAuth = true;
           handleLocalAuth();
         }
-      }, 250);
+      }, 150);
     } else if (appState === 'background') {
       pauseLocalAuth = false;
       global.appLaunchType = AppLaunchType.Unknown;
@@ -382,6 +383,7 @@ PasscodeLockOverlay.open = (
   },
 ) => {
   return services.nav.screens?.show('PasscodeLock', props, {
+    modalPresentationStyle: OptionsModalPresentationStyle.overFullScreen,
     animations: {
       showModal: {
         enter: {

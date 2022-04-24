@@ -128,6 +128,8 @@ export async function generateThumbnail(
   }
 }
 
+export async function generateFileThumbnail() {}
+
 export async function resizeImage({
   uri,
   width,
@@ -218,4 +220,13 @@ export async function getDefaultAlbum(
   });
 
   return result;
+}
+
+export function filePathWithScheme(path: string, isEncode = true) {
+  const newPath = path.startsWith('file://') ? path : `file://${path}`;
+  return isEncode ? encodeURI(newPath) : newPath;
+}
+
+export function filePathWithoutScheme(path: string) {
+  return path.startsWith('file://') ? path.replace('file://', '') : path;
 }

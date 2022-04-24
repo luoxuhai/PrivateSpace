@@ -15,6 +15,7 @@ import {
   useNavigationComponentDidDisappear,
 } from 'react-native-navigation-hooks';
 import { StyleSheet, View } from 'react-native';
+import { useDeviceOrientation } from '@react-native-community/hooks';
 import { observer } from 'mobx-react-lite';
 import { useQuery } from 'react-query';
 import { useTranslation, getI18n } from 'react-i18next';
@@ -80,6 +81,7 @@ const ImageList: NavigationFunctionComponent<IImageListProps> = props => {
   const { visible, forceRender } = useForceRender();
   const fileDetailRef = useRef(null);
   const imagesRef = useRef<API.PhotoWithSource[] | undefined>();
+  const { landscape } = useDeviceOrientation();
 
   const addButtonStyle = useAnimatedStyle(() => {
     return {
@@ -352,7 +354,7 @@ const ImageList: NavigationFunctionComponent<IImageListProps> = props => {
             <DataLoadStatus loading={isFetching} text={t('imageList:noData')} />
           )
         }
-        itemWidth={100}
+        itemWidth={landscape ? 120 : 110}
         gutter={2}
         externalGutter={false}
         gridEnabled={isGalleryView}

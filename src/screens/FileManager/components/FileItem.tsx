@@ -4,7 +4,7 @@ import { observer } from 'mobx-react-lite';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 
-import FileCover from '@/components/FileCover';
+import FileThumbnail from '@/components/FileThumbnail';
 import { useStore } from '@/store';
 import { FileType } from '@/services/database/entities/file.entity';
 import { formatFileSize } from '@/utils';
@@ -30,7 +30,13 @@ const FileItem = observer<FileItemProps>(props => {
       ]}
       activeOpacity={0.7}
       onPress={props.onPress}>
-      <FileCover item={props.item} />
+      <FileThumbnail
+        uri={props.item.uri!}
+        sourceId={props.item.extra?.source_id}
+        isFolder={props.item.type === FileType.Folder}
+        width="90%"
+        height={90}
+      />
       <Text
         style={[
           styles.name,
@@ -75,13 +81,12 @@ export const FileItemLine = observer<FileItemLineProps>(props => {
       ]}
       activeOpacity={0.7}
       onPress={props.onPress}>
-      <FileCover
-        item={props.item}
-        coverProps={{
-          width: 40,
-          height: 40,
-          style: lineStyles.cover,
-        }}
+      <FileThumbnail
+        uri={props.item.uri!}
+        sourceId={props.item.extra?.source_id}
+        width={40}
+        isFolder={props.item.type === FileType.Folder}
+        style={[lineStyles.cover]}
       />
       <View
         style={[
@@ -133,11 +138,12 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'column',
     alignItems: 'center',
-    height: 170,
+    height: 160,
     paddingHorizontal: 5,
+    paddingVertical: 5,
   },
   name: {
-    fontSize: 15,
+    fontSize: 14,
     marginVertical: 6,
     textAlign: 'center',
   },
@@ -174,8 +180,6 @@ const lineStyles = StyleSheet.create({
     marginLeft: 10,
   },
   cover: {
-    width: 40,
-    height: 40,
     borderRadius: 4,
   },
 });

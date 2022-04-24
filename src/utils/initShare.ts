@@ -4,7 +4,7 @@ import { getMimeType } from '@qeepsake/react-native-file-utils';
 import { transformResult } from '@/screens/PhotoList/AddButton';
 import { services } from '@/services';
 import { stores } from '@/store';
-import { getDefaultAlbum } from '@/utils';
+import { getDefaultAlbum, filePathWithScheme } from '@/utils';
 import config from '@/config';
 import { CustomSentry } from './customSentry';
 
@@ -15,6 +15,13 @@ export async function initShareData() {
 
   const sharedPath = await FS.pathForGroup(config.groupIdentifier);
   const sourcePath = `${sharedPath}/Library/data/source`;
+  if (!(await FS.exists(sourcePath))) {
+    await FS.mkdir(sourcePath, {
+      NSURLIsExcludedFromBackupKey: true,
+    });
+    return;
+  }
+
   const files = await FS.readDir(sourcePath);
 
   files.forEach(async file => {
@@ -24,7 +31,7 @@ export async function initShareData() {
           uri: file.path,
           name: file.name,
           size: file.size,
-          mime: await getMimeType(`file://${file.path}`),
+          mime: await getMimeType(filePathWithScheme(file.path)),
         },
         albumId,
       );
