@@ -80,6 +80,15 @@ function SettingsPage(props: NavigationComponentProps) {
               onPress: () => handleToPage('FakePasswordSetting'),
             }
           : undefined,
+        // user.current?.type === EUserType.ADMIN
+        //   ? {
+        //       title: t('fakePass:navigation.title'),
+        //       extra: global.settingInfo.fakePassword.enabled
+        //         ? t('common:enabled')
+        //         : null,
+        //       onPress: () => handleToPage('FakePasswordSetting'),
+        //     }
+        //   : undefined,
         {
           title: t('autoLock:navigation.title'),
           extra: getAutoLockOptions(t).find(

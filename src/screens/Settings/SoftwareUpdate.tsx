@@ -91,7 +91,7 @@ export const SoftwareUpdateCard = observer<SoftwareUpdateCardProps>(props => {
   ) : null;
 });
 
-const BADGE_SIZE = 16;
+const BADGE_SIZE = 14;
 
 const styles = StyleSheet.create({
   card: {
@@ -99,6 +99,7 @@ const styles = StyleSheet.create({
   },
   extra: {
     flexDirection: 'row',
+    alignItems: 'center',
   },
   badge: {
     width: BADGE_SIZE,

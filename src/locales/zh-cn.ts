@@ -205,9 +205,12 @@ export default {
     },
     mode: '外观模式',
     theme: '主题',
-    appIcon: '应用图标',
     light: '浅色模式',
     dark: '深色模式',
+    appIcon: {
+      title: '应用图标',
+      unsupported: '当前设备不支持更换应用图标',
+    },
   },
 
   langSetting: {
@@ -365,7 +368,7 @@ export default {
         title: 'WI-FI 无线传输',
       },
       search: {
-        title: '智能搜索',
+        title: 'AI 智能搜索',
       },
       trash: {
         title: '自定义回收站保留时长',
@@ -375,6 +378,9 @@ export default {
       },
       scan: {
         title: '扫描文档',
+      },
+      appIcon: {
+        title: '更换 App 图标',
       },
     },
     unpayTip: '购买后可使用',

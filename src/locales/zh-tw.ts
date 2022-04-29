@@ -205,9 +205,12 @@ export default {
     },
     mode: '外觀模式',
     theme: '主題',
-    appIcon: '應用圖標',
     light: '淺色模式',
     dark: '深色模式',
+    appIcon: {
+      title: '應用圖標',
+      unsupported: '當前設備不支持更換應用圖標',
+    },
   },
 
   langSetting: {
@@ -374,6 +377,9 @@ export default {
       },
       scan: {
         title: '掃描文檔',
+      },
+      appIcon: {
+        title: '更換 App 圖標',
       },
     },
     unpayTip: '購買後可使用',

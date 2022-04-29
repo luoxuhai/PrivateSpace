@@ -53,9 +53,13 @@ function UrgentSettingScreen(): JSX.Element {
     {
       title: t('urgent:tableViewHeader'),
       data: getUrgentOptions(t, ui),
-      defaultValue: global.settingInfo.urgentSwitchUrl,
+      value: global.settingInfo.urgentSwitchUrl,
       async onChange(value) {
-        if (value !== null) {
+        if (value === null) {
+          global.setSettingInfo({
+            urgentSwitchUrl: value as EAppOpenUrl,
+          });
+        } else {
           try {
             const res = await Linking.canOpenURL(value);
             if (!res) {

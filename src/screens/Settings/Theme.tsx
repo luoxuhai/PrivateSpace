@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   StyleSheet,
   View,
-  Image,
   ScrollView,
   TouchableOpacity,
   Text,
+  Alert,
 } from 'react-native';
 import { observer } from 'mobx-react-lite';
 import { useTranslation, getI18n } from 'react-i18next';
@@ -27,6 +27,10 @@ import {
   EThemeName,
   EAppIcon,
 } from '@/utils/designSystem';
+import { UserRole } from '@/store/user';
+import { services } from '@/services';
+import { getAppIcon } from '@/utils/designSystem';
+
 import IconCheckMark from '@/assets/icons/checkmark.svg';
 
 function ThemeSettingScreen(): JSX.Element {
@@ -60,14 +64,15 @@ function ThemeSettingScreen(): JSX.Element {
       <SimpleSelectionList listType="check" sections={appearanceSections} />
       <ListTitle title={t('appearance:theme')} />
       <ThemeColorList />
-      <ListTitle title={t('appearance:appIcon')} />
+      <ListTitle title={t('appearance:appIcon.title')} />
       <AppIconList />
     </SafeAreaScrollView>
   );
 }
 
 const AppIconList = observer(() => {
-  const { ui } = useStore();
+  const { ui, user } = useStore();
+  const { t } = useTranslation();
   const [curIconName, setCurIconName] = useState<EAppIcon>(EAppIcon.Default);
 
   useEffect(() => {
@@ -84,25 +89,53 @@ const AppIconList = observer(() => {
     {
       title: '默认',
       name: EAppIcon.Default,
-      icon: require('@/assets/icons/app-icon/privatespace.png'),
     },
     {
       title: '深色',
       name: EAppIcon.Dark,
-      icon: require('@/assets/icons/app-icon/privatespace.dark.png'),
     },
     {
-      title: '橙色',
-      name: EAppIcon.Orange,
-      icon: require('@/assets/icons/app-icon/privatespace.orange.png'),
+      title: '计算器',
+      name: EAppIcon.Calculator,
+      needsBuy: true,
+    },
+    {
+      title: '密码箱',
+      name: EAppIcon.PasswordBox,
+      needsBuy: true,
+    },
+    {
+      title: '时钟',
+      name: EAppIcon.Clock,
+      needsBuy: true,
+    },
+    {
+      title: '安全管家',
+      name: EAppIcon.Housekeeper,
+      needsBuy: true,
+    },
+    {
+      title: '待办',
+      name: EAppIcon.Todo,
+      needsBuy: true,
     },
   ];
 
+  const canOpen = useCallback(() => {
+    if (user.userRole === UserRole.VIP) {
+      return true;
+    } else {
+      services.nav.screens?.show('Purchase');
+      return false;
+    }
+  }, [user.userRole]);
+
   return (
     <ListContainer style={styles.listContainer}>
-      <ScrollView horizontal>
+      <View style={styles.iconContainer}>
         {appIcons.map(item => {
           const checked = curIconName === item.name;
+          const AppIcon = getAppIcon(item.name);
 
           return (
             <TouchableOpacity
@@ -114,32 +147,38 @@ const AppIconList = observer(() => {
                 const isSupported =
                   await AppIconManager.supportsDynamicAppIcon();
 
-                if (isSupported) {
+                if (!isSupported) {
+                  Alert.alert(t('appearance:appIcon.unsupported'));
+                  return;
+                }
+
+                if (!item.needsBuy || (item.needsBuy && canOpen())) {
                   AppIconManager.setAppIcon(
                     item.name === EAppIcon.Default ? null : item.name,
                   );
                   setCurIconName(item.name);
                 }
               }}>
-              <Image
+              <AppIcon
                 style={[
                   styles.iconItem,
                   {
                     borderColor: ui.colors.quaternaryLabel,
                   },
                   checked && {
-                    borderWidth: 2,
+                    ...styles.iconItemChecked,
                     borderColor: ui.themes.primary,
                   },
                 ]}
-                source={item.icon}
+                width={60}
+                height={60}
               />
               <Text
                 style={[
                   styles.iconTitle,
+                  checked && styles.iconTitleChecked,
                   {
                     color: checked ? ui.themes.primary : ui.colors.label,
-                    fontWeight: checked ? '500' : '400',
                   },
                 ]}>
                 {item.title}
@@ -147,7 +186,7 @@ const AppIconList = observer(() => {
             </TouchableOpacity>
           );
         })}
-      </ScrollView>
+      </View>
     </ListContainer>
   );
 });
@@ -318,7 +357,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  iconCheckMark: {},
+  iconContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
   colorName: {
     marginTop: 6,
     fontSize: 12,
@@ -329,12 +371,17 @@ const styles = StyleSheet.create({
   iconTitle: {
     fontSize: 12,
   },
+  iconTitleChecked: {
+    fontWeight: '500',
+  },
   iconItem: {
-    width: 60,
-    height: 60,
     marginHorizontal: 12,
     marginVertical: 8,
     borderRadius: 10,
     borderWidth: StyleSheet.hairlineWidth,
+    overflow: 'hidden',
+  },
+  iconItemChecked: {
+    borderWidth: 2,
   },
 });

@@ -202,6 +202,13 @@ const PurchaseScreen: NavigationFunctionComponent =
         )
       ) {
         user.setPurchaseResults(result?.results);
+        stores.global.setSettingInfo({
+          advanced: {
+            smartSearch: {
+              enabled: true,
+            },
+          },
+        });
         handleDismiss();
       } else {
         user.setPurchaseResults([]);
@@ -439,6 +446,18 @@ const Rights = ({ componentId }: { componentId: string }) => {
         image: IconWifi,
         title: t('purchase:rights.wifi.title'),
         screenId: 'Transfer',
+      },
+      {
+        title: t('purchase:rights.appIcon.title'),
+        screenId: 'ThemeSetting',
+        symbol: (
+          <SFSymbol
+            name="app.badge"
+            color={ICON_COLOR}
+            weight="medium"
+            size={25}
+          />
+        ),
       },
       {
         symbol: (

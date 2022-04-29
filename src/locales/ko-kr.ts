@@ -207,9 +207,12 @@ export default {
     },
     mode: '외모 모드',
     theme: '주제',
-    appIcon: '응용 프로그램 아이콘',
     light: '라이트 모드',
     dark: '다크 모드',
+    appIcon: {
+      title: '응용 프로그램 아이콘',
+      unsupported: '현재 기기는 앱 아이콘 변경을 지원하지 않습니다.',
+    },
   },
 
   langSetting: {
@@ -379,6 +382,9 @@ export default {
       },
       scan: {
         title: '스캔한 문서',
+      },
+      appIcon: {
+        title: '앱 아이콘 변경',
       },
     },
     unpayTip: '구매 후 사용 가능',

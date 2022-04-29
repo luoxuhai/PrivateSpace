@@ -24,18 +24,72 @@
 					<string>dark167x167</string>
 					<string>dark128x128</string>
 					<string>dark120x120</string>
+					<string>dark180x180</string>
 				</array>
 				<key>UIPrerenderedIcon</key>
 				<false/>
 			</dict>
-			<key>orange</key>
+			<key>calculator</key>
 			<dict>
 				<key>CFBundleIconFiles</key>
 				<array>
-					<string>orange152x152</string>
-					<string>orange167x167</string>
-					<string>orange128x128</string>
-					<string>orange120x120</string>
+					<string>calculator120x120</string>
+					<string>calculator167x167</string>
+					<string>calculator128x128</string>
+					<string>calculator152x152</string>
+					<string>calculator180x180</string>
+				</array>
+				<key>UIPrerenderedIcon</key>
+				<false/>
+			</dict>
+			<key>clock</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>clock152x152</string>
+					<string>clock167x167</string>
+					<string>clock128x128</string>
+					<string>clock120x120</string>
+					<string>clock180x180</string>
+				</array>
+				<key>UIPrerenderedIcon</key>
+				<false/>
+			</dict>
+			<key>housekeeper</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>housekeeper152x152</string>
+					<string>housekeeper167x167</string>
+					<string>housekeeper128x128</string>
+					<string>housekeeper120x120</string>
+					<string>housekeeper180x180</string>
+				</array>
+				<key>UIPrerenderedIcon</key>
+				<false/>
+			</dict>
+			<key>password_box</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>password_box152x152</string>
+					<string>password_box167x167</string>
+					<string>password_box128x128</string>
+					<string>password_box120x120</string>
+					<string>password_box180x180</string>
+				</array>
+				<key>UIPrerenderedIcon</key>
+				<false/>
+			</dict>
+			<key>todo</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>todo152x152</string>
+					<string>todo167x167</string>
+					<string>todo128x128</string>
+					<string>todo120x120</string>
+					<string>todo180x180</string>
 				</array>
 				<key>UIPrerenderedIcon</key>
 				<false/>

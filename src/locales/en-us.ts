@@ -209,9 +209,12 @@ export default {
     },
     mode: 'APPEARANCE MODE',
     theme: 'COLOR THEME',
-    appIcon: 'APP ICON',
     light: 'Light',
     dark: 'Dark',
+    appIcon: {
+      title: 'APP ICON',
+      unsupported: 'The current device does not support changing the app icon',
+    },
   },
 
   langSetting: {
@@ -386,6 +389,9 @@ export default {
       },
       scan: {
         title: 'Scan Documents',
+      },
+      appIcon: {
+        title: 'Change App Icons',
       },
     },
     unpayTip: 'Only available after purchase',

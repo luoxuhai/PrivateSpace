@@ -2,7 +2,11 @@ import chroma from 'chroma-js';
 
 import IconAppIcon from '@/assets/icons/app-icon/privatespace.svg';
 import IconAppIconDark from '@/assets/icons/app-icon/privatespace.dark.svg';
-import IconAppIconOrange from '@/assets/icons/app-icon/privatespace.orange.svg';
+import AppIconCalculator from '@/assets/icons/app-icon/calculator.svg';
+import AppIconHousekeeper from '@/assets/icons/app-icon/housekeeper.svg';
+import AppIconPasswordBox from '@/assets/icons/app-icon/password_box.svg';
+import AppIconTodo from '@/assets/icons/app-icon/todo.svg';
+import AppIconClock from '@/assets/icons/app-icon/clock.svg';
 
 export type AppearanceMode = 'dark' | 'light';
 export type UIAppearance = 'dark' | 'light' | 'system';
@@ -81,7 +85,11 @@ export enum EThemeName {
 export enum EAppIcon {
   Default = 'default',
   Dark = 'dark',
-  Orange = 'orange',
+  Calculator = 'calculator',
+  Clock = 'clock',
+  Todo = 'todo',
+  Housekeeper = 'housekeeper',
+  PasswordBox = 'password_box',
 }
 
 const BASE_COLORS: Pick<SystemColors, 'black' | 'white'> = {
@@ -238,7 +246,11 @@ export function getColors(appearance: AppearanceMode): SystemColors {
 const appIconSourceMap = {
   [EAppIcon.Default]: IconAppIcon,
   [EAppIcon.Dark]: IconAppIconDark,
-  [EAppIcon.Orange]: IconAppIconOrange,
+  [EAppIcon.Calculator]: AppIconCalculator,
+  [EAppIcon.Clock]: AppIconClock,
+  [EAppIcon.Housekeeper]: AppIconHousekeeper,
+  [EAppIcon.PasswordBox]: AppIconPasswordBox,
+  [EAppIcon.Todo]: AppIconTodo,
 };
 
 export function getAppIcon(name: EAppIcon): React.FC<SvgProps> {

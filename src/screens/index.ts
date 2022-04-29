@@ -34,6 +34,7 @@ import DescriptionFormScreen from './PhotoView/DescriptionForm';
 import FileManagerScreen from './FileManager';
 import FileDirPikerScreen from './FileDirPiker';
 import FileViewScreen from './FileView';
+import { UserRole } from '@/store/user';
 
 const t = getI18n().t;
 
@@ -86,15 +87,19 @@ export const getScreens = (): Screens<ScreenName> =>
                 text: t('album:add:title'),
               },
             ],
-            leftButtons: [
-              {
-                id: 'vip',
-                text: 'VIP',
-                component: {
-                  name: 'TopBarButtonVip',
-                },
-              },
-            ],
+            ...(stores.user.userRole !== UserRole.VIP
+              ? {
+                  leftButtons: [
+                    {
+                      id: 'vip',
+                      text: 'VIP',
+                      component: {
+                        name: 'TopBarButtonVip',
+                      },
+                    },
+                  ],
+                }
+              : null),
             searchBar: {
               visible: true,
               hideTopBarOnFocus: true,
