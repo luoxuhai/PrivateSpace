@@ -12,27 +12,20 @@ import {
 } from 'react-native-navigation-hooks';
 import { useQuery } from 'react-query';
 import FileViewer from 'react-native-file-viewer';
-import SegmentedControl from '@react-native-segmented-control/segmented-control';
 
 import { services } from '@/services';
 import { SelectedMask } from '@/screens/PhotoList';
 import { ImageItemBlock } from '@/screens/PhotoList/ImageItem';
 import { useStore } from '@/store';
 import { FileStatus } from '@/services/database/entities/file.entity';
-import { ToolbarContainer } from './ToolbarContainer';
+import { ToolbarContainer, SourceType } from './ToolbarContainer';
 import { useTranslation } from 'react-i18next';
 import { useUpdateEffect, useForceRender } from '@/hooks';
 import { ContextMenu } from './ContextMenu';
 import { DataLoadStatus } from '@/components/DataLoadStatus';
 import { clearRecycleBin } from './clearRecycleBin';
 import GridList from '@/components/GridList';
-import { HapticFeedback } from '@/utils';
 import FileList from '../FileManager/components/FileList';
-
-enum SourceType {
-  Album = 0,
-  File,
-}
 
 const RecycleBinScreen: NavigationFunctionComponent<
   NavigationComponentProps
@@ -226,7 +219,10 @@ const RecycleBinScreen: NavigationFunctionComponent<
   const renderItem = useCallback(
     ({ item, index }) => {
       return visible ? (
-        <ContextMenu item={item} disabled={isSelectMode}>
+        <ContextMenu
+          item={item}
+          disabled={isSelectMode}
+          sourceType={selectedIndex}>
           <ImageItemBlock
             index={index}
             data={item}
@@ -287,6 +283,7 @@ const RecycleBinScreen: NavigationFunctionComponent<
       <ToolbarContainer
         visible={isSelectMode}
         selectedIds={selectedIds}
+        sourceType={selectedIndex}
         onDone={() => {
           setIsSelectMode(false);
           refetchFileList();

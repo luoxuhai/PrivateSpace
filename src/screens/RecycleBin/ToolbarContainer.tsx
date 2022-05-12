@@ -10,9 +10,15 @@ import { useRestorePhoto, useDeleteFile } from '@/hooks';
 import { UIStore } from '@/store/ui';
 import { useStore } from '@/store';
 
+export enum SourceType {
+  Album = 0,
+  File,
+}
+
 interface IToolbarContainerProps {
   visible: boolean;
   selectedIds: string[];
+  sourceType: SourceType;
   onDone?: () => void;
 }
 
@@ -61,9 +67,12 @@ export const ToolbarContainer = observer<IToolbarContainerProps>(props => {
     [t, ui, props.selectedIds.length],
   );
 
-  const { data: fileResult } = useQuery('recycle.bin.photos', {
-    enabled: false,
-  });
+  const { data: fileResult } = useQuery(
+    ['recycle.bin.photos.', props.sourceType],
+    {
+      enabled: false,
+    },
+  );
   const { refetch: refetchAlbumList } = useQuery('albums', {
     enabled: false,
   });

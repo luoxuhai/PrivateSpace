@@ -7,17 +7,19 @@ import { ContextMenuView, MenuConfig } from 'react-native-ios-context-menu';
 import { showDeleteActionSheet } from '@/utils';
 import { services } from '@/services';
 import { useDeleteFile, useRestorePhoto } from '@/hooks';
+import { SourceType } from './ToolbarContainer';
 
 interface IContextMenuProps {
   item: API.PhotoWithSource;
   disabled?: boolean;
+  sourceType: SourceType;
   children?: React.ReactNode;
 }
 
 export const ContextMenu = observer<IContextMenuProps>(props => {
   const { t } = useTranslation();
 
-  const { refetch: refetchFileList } = useQuery('recycle.bin.photos', {
+  const { refetch: refetchFileList } = useQuery(['recycle.bin.photos'], {
     enabled: false,
   });
   const { refetch: refetchAlbumList } = useQuery('albums', {
