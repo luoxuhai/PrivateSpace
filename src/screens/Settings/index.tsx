@@ -43,7 +43,7 @@ function SettingsPage(props: NavigationComponentProps) {
     | undefined
     | null
   )[] = [
-    user.userRole === UserRole.VIP
+    user.userRole === UserRole.VIP && user.current?.type === EUserType.ADMIN
       ? {
           data: [
             {
