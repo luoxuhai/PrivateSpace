@@ -126,6 +126,12 @@ const PasscodeLockOverlay: PasscodeLockOverlayComponent<IPasscodeLockProps> = (
   );
 
   const appState = useAppState();
+  const extraButtonVisible =
+    inputType === EInputType.Verify &&
+    (globalStore.settingInfo.localAuth ?? true) &&
+    (userStore.current?.type === EUserType.GHOST
+      ? !globalStore.settingInfo.fakePassword?.hideLocalAuth
+      : true);
 
   useEffect(() => {
     if (appState === 'active' || isFirstOpen) {
@@ -235,11 +241,12 @@ const PasscodeLockOverlay: PasscodeLockOverlayComponent<IPasscodeLockProps> = (
 
     return (
       <TouchableOpacity
+        style={!extraButtonVisible && style}
         onPress={() => {
           handleLocalAuth();
           HapticFeedback.impactAsync.light();
         }}>
-        {authIcon}
+        {extraButtonVisible && authIcon}
       </TouchableOpacity>
     );
   }
@@ -334,13 +341,6 @@ const PasscodeLockOverlay: PasscodeLockOverlayComponent<IPasscodeLockProps> = (
     });
   }
 
-  const extraButtonEnabled =
-    inputType === EInputType.Verify &&
-    (globalStore.settingInfo.localAuth ?? true) &&
-    (userStore.current?.type === EUserType.GHOST
-      ? !globalStore.settingInfo.fakePassword?.hideLocalAuth
-      : true);
-
   return (
     <Animated.View style={[styles.container]} entering={FadeIn.duration(150)}>
       <PasscodeKeyboard
@@ -370,7 +370,7 @@ const PasscodeLockOverlay: PasscodeLockOverlayComponent<IPasscodeLockProps> = (
             )}
           </View>
         }
-        extraButton={extraButtonEnabled && <LocalAuthIconButton />}
+        extraButton={<LocalAuthIconButton />}
       />
     </Animated.View>
   );
