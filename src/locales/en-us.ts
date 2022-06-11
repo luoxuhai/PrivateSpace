@@ -303,6 +303,7 @@ export default {
     closed: 'Closed',
     opened: 'Opened',
     rename: 'Rename',
+    back: 'Back',
   },
 
   permission: {
@@ -476,5 +477,9 @@ export default {
       fail: 'Add failed! ',
     },
     tip: 'Add {{count}} images or videos to the default album',
+  },
+
+  player: {
+    airplayTip: 'airplaying',
   },
 };

@@ -294,6 +294,7 @@ export default {
     opened: '已打开',
     rename: '重命名',
     folder: '文件夹',
+    back: '返回',
   },
 
   permission: {
@@ -464,5 +465,9 @@ export default {
       fail: '添加失败！',
     },
     tip: '添加{{count}}个图片或视频到默认相册',
+  },
+
+  player: {
+    airplayTip: '正在隔空播放',
   },
 };

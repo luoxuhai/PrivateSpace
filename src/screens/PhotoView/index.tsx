@@ -189,7 +189,7 @@ const ImageView: NavigationFunctionComponent<IImageViewProps> = props => {
       },
       {
         layout: {
-          componentBackgroundColor: 'transparent',
+          componentBackgroundColor: '#000',
         },
         modalPresentationStyle: OptionsModalPresentationStyle.overFullScreen,
         modalTransitionStyle: OptionsModalTransitionStyle.crossDissolve,

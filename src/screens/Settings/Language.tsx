@@ -4,7 +4,7 @@ import { observer } from 'mobx-react-lite';
 import { useTranslation } from 'react-i18next';
 
 import { useStore } from '@/store';
-import { ELanguage, Language, Languages } from '@/locales';
+import { ELanguage, Language } from '@/locales';
 import CheckList from '@/components/CheckList';
 import { SafeAreaScrollView } from '@/components';
 
@@ -59,10 +59,10 @@ export const languageOptions = (
   //   title: '日本語',
   //   value: ELanguage.JA_JP,
   // },
-  {
-    title: '한국어',
-    value: ELanguage.KO_KR,
-  },
+  // {
+  //   title: '한국어',
+  //   value: ELanguage.KO_KR,
+  // },
   // {
   //   title: 'Русский',
   //   value: ELanguage.RU_RU,

@@ -5,7 +5,6 @@ import * as RNLocalize from 'react-native-localize';
 import enUS from './en-us';
 import zhCN from './zh-cn';
 import zhTW from './zh-tw';
-import koKR from './ko-kr';
 
 export type Language =
   | 'en-US'
@@ -34,15 +33,7 @@ export enum ELanguage {
   ES_ES = 'es-ES',
 }
 
-export const Languages = [
-  ELanguage.ZH_CN,
-  ELanguage.ZH_TW,
-  ELanguage.EN_US,
-  ELanguage.KO_KR,
-  // ELanguage.JA_JP,
-  // ELanguage.RU_RU,
-  // ELanguage.ES_ES,
-];
+export const Languages = [ELanguage.ZH_CN, ELanguage.ZH_TW, ELanguage.EN_US];
 
 const DEFAULT_LANGUAGE = ELanguage.ZH_CN;
 
@@ -56,7 +47,6 @@ i18next.use(initReactI18next).init({
     [ELanguage.EN_US]: enUS,
     [ELanguage.ZH_CN]: zhCN,
     [ELanguage.ZH_TW]: zhTW,
-    [ELanguage.KO_KR]: koKR,
   },
   lng: DEFAULT_LANGUAGE,
 });
