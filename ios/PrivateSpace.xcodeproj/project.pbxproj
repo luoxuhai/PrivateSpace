@@ -144,16 +144,10 @@
 		35AE5CDD273EC86D00892FA8 /* ShareExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ShareExtension.entitlements; sourceTree = "<group>"; };
 		35AE5CDF273F5A9B00892FA8 /* ReactShareViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ReactShareViewController.swift; path = "../../node_modules/react-native-share-menu/ios/ReactShareViewController.swift"; sourceTree = "<group>"; };
 		35AE5CE1273F5B8700892FA8 /* ShareViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ShareViewController.swift; path = "../../node_modules/react-native-share-menu/ios/ShareViewController.swift"; sourceTree = "<group>"; };
-		35C7E27027F8756900D4A694 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/MainInterface.strings; sourceTree = "<group>"; };
 		35C7E27527F8761400D4A694 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		35C7E27727F8761C00D4A694 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		35C7E27C27F8765A00D4A694 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		35C7E27E27F8765B00D4A694 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
-		35C7E28027F876BA00D4A694 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/MainInterface.strings; sourceTree = "<group>"; };
-		35C7E28127F876BA00D4A694 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/Localizable.strings; sourceTree = "<group>"; };
-		35C7E28227F876BA00D4A694 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		35C7E28327F876C400D4A694 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
-		35C7E28427F876C700D4A694 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		35C7E28527F877AB00D4A694 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/MainInterface.strings"; sourceTree = "<group>"; };
 		35C7E28627F877AB00D4A694 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		35C7E28727F877AB00D4A694 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
@@ -515,8 +509,6 @@
 				en,
 				Base,
 				"zh-Hans",
-				ja,
-				ko,
 				"zh-Hant",
 			);
 			mainGroup = 83CBB9F61A601CBA00E9B192;
@@ -861,8 +853,6 @@
 			children = (
 				35AE5CCF273EB14800892FA8 /* Base */,
 				3561269F274332BD0073C95E /* zh-Hans */,
-				35C7E27027F8756900D4A694 /* ja */,
-				35C7E28027F876BA00D4A694 /* ko */,
 				35C7E28527F877AB00D4A694 /* zh-Hant */,
 			);
 			name = MainInterface.storyboard;
@@ -873,8 +863,6 @@
 			children = (
 				35C7E27527F8761400D4A694 /* en */,
 				35C7E27727F8761C00D4A694 /* zh-Hans */,
-				35C7E28127F876BA00D4A694 /* ko */,
-				35C7E28327F876C400D4A694 /* ja */,
 				35C7E28627F877AB00D4A694 /* zh-Hant */,
 			);
 			name = Localizable.strings;
@@ -885,8 +873,6 @@
 			children = (
 				35C7E27C27F8765A00D4A694 /* en */,
 				35C7E27E27F8765B00D4A694 /* zh-Hans */,
-				35C7E28227F876BA00D4A694 /* ko */,
-				35C7E28427F876C700D4A694 /* ja */,
 				35C7E28727F877AB00D4A694 /* zh-Hant */,
 			);
 			name = InfoPlist.strings;
@@ -978,7 +964,7 @@
 				CODE_SIGN_ENTITLEMENTS = PrivateSpace/PrivateSpaceDebug.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = MH9G89WBAL;
 				ENABLE_BITCODE = NO;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
@@ -997,7 +983,7 @@
 					"$(PROJECT_DIR)",
 				);
 				MACH_O_TYPE = mh_execute;
-				MARKETING_VERSION = 1.10.0;
+				MARKETING_VERSION = 1.11.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1025,7 +1011,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODEPUSH_KEY = "LsOfPzALBphX8m4PTjB72z1nvBX7CURq-Pj6f";
 				CODE_SIGN_ENTITLEMENTS = PrivateSpace/PrivateSpace.entitlements;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = MH9G89WBAL;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
 				HEADER_SEARCH_PATHS = (
@@ -1043,7 +1029,7 @@
 					"$(PROJECT_DIR)",
 				);
 				MACH_O_TYPE = mh_execute;
-				MARKETING_VERSION = 1.10.0;
+				MARKETING_VERSION = 1.11.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",

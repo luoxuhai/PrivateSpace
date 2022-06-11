@@ -1,12 +1,4 @@
-/* 
-  InfoPlist.strings
-  PrivateSpace
-
-  Created by 罗绪海 on 2022/4/2.
-  
-*/
-
-CFBundleDisplayName = "隐私空间";
+CFBundleDisplayName = "我的空间";
 NSAppleMusicUsageDescription = "为了删除已导入的图片和视频";
 NSCameraUsageDescription = "App会在您使用从相机导入图片和视频功能时，访问您的相机权限，为了导入图片和视频";
 NSFaceIDUsageDescription = "App会在您使用面容解锁功能时，访问您的面容ID权限，为了快速解锁";

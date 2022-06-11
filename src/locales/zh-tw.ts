@@ -293,6 +293,7 @@ export default {
     closed: '已關閉',
     opened: '已打開',
     rename: '重命名',
+    back: '返回',
   },
 
   permission: {
@@ -463,5 +464,9 @@ export default {
       fail: '添加失敗！ ',
     },
     tip: '添加{{count}}個圖片或視頻到默認相冊',
+  },
+
+  player: {
+    airplayTip: '正在隔空播放',
   },
 };

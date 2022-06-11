@@ -1,11 +1,3 @@
-/* 
-  InfoPlist.strings
-  PrivateSpace
-
-  Created by 罗绪海 on 2022/4/2.
-  
-*/
-
 CFBundleDisplayName = "隱私空間";
 NSAppleMusicUsageDescription = "為了刪除已導入的圖片和視頻";
 NSCameraUsageDescription = "App會在您使用從相機導入圖片和視頻功能時，訪問您的相機權限，為了導入圖片和視頻";

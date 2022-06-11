@@ -16,19 +16,6 @@
 	<dict>
 		<key>CFBundleAlternateIcons</key>
 		<dict>
-			<key>dark</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>dark152x152</string>
-					<string>dark167x167</string>
-					<string>dark128x128</string>
-					<string>dark120x120</string>
-					<string>dark180x180</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
 			<key>calculator</key>
 			<dict>
 				<key>CFBundleIconFiles</key>
@@ -51,6 +38,19 @@
 					<string>clock128x128</string>
 					<string>clock120x120</string>
 					<string>clock180x180</string>
+				</array>
+				<key>UIPrerenderedIcon</key>
+				<false/>
+			</dict>
+			<key>dark</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>dark152x152</string>
+					<string>dark167x167</string>
+					<string>dark128x128</string>
+					<string>dark120x120</string>
+					<string>dark180x180</string>
 				</array>
 				<key>UIPrerenderedIcon</key>
 				<false/>

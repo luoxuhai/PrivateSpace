@@ -275,6 +275,8 @@ PODS:
     - React-RCTSettings (= 0.67.4)
     - React-RCTText (= 0.67.4)
     - React-RCTVibration (= 0.67.4)
+  - react-airplay (1.2.0):
+    - React-Core
   - React-callinvoker (0.67.4)
   - React-Core (0.67.4):
     - glog
@@ -485,6 +487,12 @@ PODS:
     - React-Core
   - react-native-pager-view (6.0.0-rc.0):
     - React-Core
+  - react-native-safe-area-context (4.3.1):
+    - RCT-Folly
+    - RCTRequired
+    - RCTTypeSafety
+    - React
+    - ReactCommon/turbomodule/core
   - react-native-segmented-control (2.4.0):
     - React-Core
   - react-native-sfsymbols (1.2.1):
@@ -758,6 +766,7 @@ DEPENDENCIES:
   - RCTRequired (from `../node_modules/react-native/Libraries/RCTRequired`)
   - RCTTypeSafety (from `../node_modules/react-native/Libraries/TypeSafety`)
   - React (from `../node_modules/react-native/`)
+  - react-airplay (from `../node_modules/react-airplay`)
   - React-callinvoker (from `../node_modules/react-native/ReactCommon/callinvoker`)
   - React-Core (from `../node_modules/react-native/`)
   - React-Core/DevSupport (from `../node_modules/react-native/`)
@@ -785,6 +794,7 @@ DEPENDENCIES:
   - react-native-orientation-locker (from `../node_modules/react-native-orientation-locker`)
   - react-native-override-color-scheme (from `../node_modules/react-native-override-color-scheme`)
   - react-native-pager-view (from `../node_modules/react-native-pager-view`)
+  - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - "react-native-segmented-control (from `../node_modules/@react-native-segmented-control/segmented-control`)"
   - react-native-sfsymbols (from `../node_modules/react-native-sfsymbols`)
   - react-native-sqlite-storage (from `../node_modules/react-native-sqlite-storage`)
@@ -952,6 +962,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/Libraries/TypeSafety"
   React:
     :path: "../node_modules/react-native/"
+  react-airplay:
+    :path: "../node_modules/react-airplay"
   React-callinvoker:
     :path: "../node_modules/react-native/ReactCommon/callinvoker"
   React-Core:
@@ -1002,6 +1014,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-override-color-scheme"
   react-native-pager-view:
     :path: "../node_modules/react-native-pager-view"
+  react-native-safe-area-context:
+    :path: "../node_modules/react-native-safe-area-context"
   react-native-segmented-control:
     :path: "../node_modules/@react-native-segmented-control/segmented-control"
   react-native-sfsymbols:
@@ -1168,6 +1182,7 @@ SPEC CHECKSUMS:
   RCTRequired: 0aa6c1c27e1d65920df35ceea5341a5fe76bdb79
   RCTTypeSafety: d76a59d00632891e11ed7522dba3fd1a995e573a
   React: ab8c09da2e7704f4b3ebad4baa6cfdfcc852dcb5
+  react-airplay: 8197767f12cae11a7623b1507d29a89482a720ad
   React-callinvoker: 216fb96b482da516b8aba4142b145938f6ea92f0
   React-Core: af99b93aff83599485e0e0879879aafa35ceae32
   React-CoreModules: 137a054ce8c547e81dc3502933b1bc0fd08df05d
@@ -1193,6 +1208,7 @@ SPEC CHECKSUMS:
   react-native-orientation-locker: 2da91e5391971dace445495821c899c111dcad7a
   react-native-override-color-scheme: 4d91bb8c8c10adbae1590bc161bd890126035229
   react-native-pager-view: a4834c4b7fe672ec53f38928f0ced5e32443c371
+  react-native-safe-area-context: 6c12e3859b6f27b25de4fee8201cfb858432d8de
   react-native-segmented-control: 06607462630512ff8eef652ec560e6235a30cc3e
   react-native-sfsymbols: bd3a0d3eab185e80b571bae60753dcf5a0d57967
   react-native-sqlite-storage: f6d515e1c446d1e6d026aa5352908a25d4de3261
