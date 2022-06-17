@@ -8,7 +8,7 @@ import { useNavigationButtonPress } from 'react-native-navigation-hooks';
 import { observer } from 'mobx-react-lite';
 import { stat } from 'react-native-fs';
 
-import { clearPersistedStores } from '@/store';
+import { clearPersistedStores, useStore } from '@/store';
 import { applicationInfo, systemInfo } from '@/utils/system';
 import { services } from '@/services';
 import { DynamicUpdate } from '@/utils/dynamicUpdate';
@@ -43,6 +43,7 @@ const DeveloperScreen: NavigationFunctionComponent<
 > = props => {
   const [data, setData] = useState<any>([]);
   const updateMetadata = useDynamicUpdateMetadata();
+  const { global } = useStore();
 
   useNavigationButtonPress(
     () => {
@@ -65,18 +66,22 @@ const DeveloperScreen: NavigationFunctionComponent<
 
   return (
     <ScrollView style={styles.container}>
-      <Button
-        title="清除数据库"
-        onPress={() => {
-          services.db.clear();
-        }}
-      />
-      <Button
-        title="清除 mobx persist"
-        onPress={() => {
-          clearPersistedStores();
-        }}
-      />
+      {global.debug && (
+        <>
+          <Button
+            title="清除数据库"
+            onPress={() => {
+              services.db.clear();
+            }}
+          />
+          <Button
+            title="清除 Storage"
+            onPress={() => {
+              clearPersistedStores();
+            }}
+          />
+        </>
+      )}
       <Button
         title="检测更新"
         onPress={() => {

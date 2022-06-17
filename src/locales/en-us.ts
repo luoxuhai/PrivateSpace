@@ -171,6 +171,16 @@ export default {
         title: 'Enable Smart Search',
         header: 'SMART SEARCH',
       },
+      exportData: {
+        title: 'EXPORT DATA',
+        album: 'Export all pictures and videos',
+        file: 'Export all files',
+        destination: {
+          title: 'Export pictures and videos to the following location',
+          album: 'Album',
+          file: 'File',
+        },
+      },
     },
   },
 

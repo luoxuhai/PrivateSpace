@@ -160,7 +160,12 @@ const IconCover = observer(() => {
                 : ui.colors.systemBackground,
           },
         ]}>
-        <AppIcon style={styles.logo} width="100%" height="100%" />
+        <Pressable
+          onLongPress={() => {
+            services.nav.screens?.show('Developer');
+          }}>
+          <AppIcon style={styles.logo} width="100%" height="100%" />
+        </Pressable>
       </View>
       <Text
         style={[

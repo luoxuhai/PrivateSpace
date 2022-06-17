@@ -169,6 +169,16 @@ export default {
         title: '开启智能搜索',
         header: '智能搜索',
       },
+      exportData: {
+        title: '导出数据',
+        album: '导出所有图片视频',
+        file: '导出所有文件',
+        destination: {
+          title: '导出图片视频到以下位置',
+          album: '相册',
+          file: '文件',
+        },
+      },
     },
   },
 
