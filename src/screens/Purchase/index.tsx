@@ -710,7 +710,10 @@ function setPurchaseListener() {
             try {
               await LoadingOverlay.hide();
               if (applicationInfo.env === 'AppStore') {
-                services.api.purchase.pay();
+                services.api.purchase.pay({
+                  app: '隐私空间',
+                  price: 25 * 0.85,
+                });
               }
             } catch {}
             handleDismiss();
